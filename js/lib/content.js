@@ -18,12 +18,14 @@ export const bureaus = [
 /** Sample wire lines typed into the preloader. Clearly sample text. */
 export const wireFeed = [
   { time: '14:32', bureau: 'CHENNAI', text: 'ELECTION COUNT BEGINS' },
-  { time: '14:33', bureau: 'KOCHI', text: 'MONSOON ALERT ISSUED' },
+  { time: '14:33', bureau: 'MUMBAI', text: 'MONSOON ALERT ISSUED' },
   { time: '14:33', bureau: 'DELHI', text: 'MARKETS OPEN HIGHER' },
   { time: '14:34', bureau: 'HYDERABAD', text: 'CIVIC POLL DATES ANNOUNCED' },
   { time: '14:35', bureau: 'GUWAHATI', text: 'RIVER LEVELS UNDER WATCH' },
   { time: '14:36', bureau: 'BHOPAL', text: 'BUDGET SESSION EXTENDED' },
-  { time: '14:36', bureau: 'KOZHIKODE', text: 'PORT TRAFFIC RESUMES' },
+  { time: '14:36', bureau: 'KOLKATA', text: 'PORT TRAFFIC RESUMES' },
+  { time: '14:37', bureau: 'BENGALURU', text: 'TECH HIRING NUMBERS FILED' },
+  { time: '14:38', bureau: 'JAIPUR', text: 'HEAT ADVISORY EXTENDED' },
 ]
 
 /**

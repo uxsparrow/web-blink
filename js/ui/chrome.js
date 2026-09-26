@@ -39,8 +39,12 @@ export function initHeader() {
   const ticker = document.querySelector('[data-header-ticker]')
   if (!header) return
 
+  // Present from the first frame and at the very top of the page, not revealed
+  // on scroll. It slides in behind the preloader, so it is already in place by
+  // the time the intro lifts.
+  header.classList.add('is-shown')
+
   let dark = null
-  let shown = null
 
   onScroll(() => {
     const nextDark = navThemeAt(34) === 'dark'
@@ -53,12 +57,6 @@ export function initHeader() {
       }
       // the breaking ticker rides along under the header on dark sections
       if (ticker) ticker.style.maxHeight = dark ? '34px' : '0px'
-    }
-
-    const nextShown = window.scrollY > window.innerHeight * 0.8
-    if (nextShown !== shown) {
-      shown = nextShown
-      header.classList.toggle('is-shown', shown)
     }
   })
 

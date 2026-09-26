@@ -192,9 +192,9 @@ function setupPins(scenes) {
           onUpdate: (self) => scenes.conveyor?.setProgress(self.progress),
         },
       })
-      // the giant word slides against the run of the belt
+      // the giant word slides against the run of the rail
       tl.fromTo(q('[data-platform-word]'), { xPercent: 12 }, { xPercent: -46, ease: 'none' }, 0)
-      // each front page unfolds off the belt in turn
+      // each platform card unfolds off the rail in turn
       qq('[data-platform-card]').forEach((card, i) => {
         tl.fromTo(
           card,

@@ -582,18 +582,23 @@
     <section id="hero" class="hero position-relative" data-nav="dark" data-label="FRONT PAGE">
       <div class="position-sticky top-0 h-svh overflow-hidden">
 
+        <!-- the wrap's opacity is the lazy reveal (CSS, .is-ready); the inner
+             layer is what the hero scroll dims, so the two never fight over
+             the same property -->
         <div class="hero-globe z-1" data-globe-wrap>
-          <canvas class="w-100 h-100" data-scene="globe"></canvas>
+          <div class="position-absolute inset-0" data-globe-dim>
+            <canvas class="w-100 h-100" data-scene="globe"></canvas>
 
-          <!-- city names for every ping without a headline tag; the globe
-               writes these in, since they only mean anything with it running -->
-          <div class="pe-none position-absolute inset-0" data-ping-labels aria-hidden="true"></div>
+            <!-- city names for every ping without a headline tag; the globe
+                 writes these in, since they only mean anything with it running -->
+            <div class="pe-none position-absolute inset-0" data-ping-labels aria-hidden="true"></div>
 
-          <div class="pe-none position-absolute inset-0">
-            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>LIVE CHENNAI</span>
-            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>BREAKING KOCHI</span>
-            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>UPDATE DELHI</span>
-            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>EXCLUSIVE GUWAHATI</span>
+            <div class="pe-none position-absolute inset-0">
+              <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>LIVE CHENNAI</span>
+              <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>BREAKING KOCHI</span>
+              <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>UPDATE DELHI</span>
+              <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>EXCLUSIVE GUWAHATI</span>
+            </div>
           </div>
         </div>
 

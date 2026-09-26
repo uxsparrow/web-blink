@@ -95,7 +95,17 @@ function setupHero() {
   // the violet sky rises from the bottom and takes the page to white
   tl.fromTo(q('[data-hero-sky]'), { yPercent: 104 }, { yPercent: 0, ease: 'none' }, 0)
   tl.to(q('[data-hero-copy]'), { yPercent: -18, opacity: 0, ease: 'none' }, 0.12)
-  tl.to(q('[data-globe-wrap]'), { yPercent: -10, scale: 0.94, opacity: 0.25, ease: 'none' }, 0.1)
+  /*
+   * The dim runs on the inner layer, never on `[data-globe-wrap]` itself. The
+   * wrap's opacity belongs to the lazy reveal: it is 0 until the Three.js
+   * import resolves and `is-ready` fades it in. GSAP records a target's
+   * starting value the first time a tween renders and restores it when the
+   * playhead rewinds past that tween — so tweening the wrap recorded the
+   * pre-reveal 0 and, on the way back up, wrote it back as an inline style,
+   * which beats `.is-ready`. The hero came back empty. The inner layer rests
+   * at opacity 1, so there is nothing to sample wrong.
+   */
+  tl.to(q('[data-globe-dim]'), { yPercent: -10, scale: 0.94, opacity: 0.25, ease: 'none' }, 0.1)
 }
 
 function setupLive() {

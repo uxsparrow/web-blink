@@ -64,7 +64,7 @@ sequences to produce or ship:
 | Dotted globe, pings, arcs | `js/scenes/globe.js` — Three.js points placed on **real land geometry**, red ping flares, bezier arcs back to Noida, headline tags projected to screen space |
 | Bureau map + wire feed | `js/scenes/preloader.js` — Natural Earth land rasterised to a dot grid, centred on India |
 | Typewriter → laptop → newspaper fold | `js/scenes/desk.js` — one canvas rig; the body silhouette lerps between machines, the page types letter by letter, then folds in two stages |
-| Press conveyor + front pages | `js/scenes/conveyor.js` |
+| Delivery rail + screens | `js/scenes/conveyor.js` — a phone, laptop, tablet and e-paper reader ride the rail, each waking with the same article the Desk wrote; the rail tilts top-down into the black strip that carries into LIVE |
 | Top-down printing press | `js/scenes/press.js` — paper web with smeared colour photos, violet-lit rollers |
 | Flying newspaper pages | same file — ~320 page particles burst out of the press and flutter away to white |
 | Paper plane | `js/scenes/paper-plane.js` — folded from a front page, print still on the wing, flown along a bezier |

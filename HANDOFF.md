@@ -195,9 +195,17 @@ shape and its job in the scroll story.
   full-bleed, and a contain-fit would letterbox the line's ends. Riders scale off
   the canvas width instead (`k`).
 - Composed at progress 0, same as the Desk and for the same reason.
-- `drawArticle`, `roundRect` and the wake-rim logic are now **duplicated** in
-  `desk.js` and `conveyor.js`. Worth extracting to `js/lib/`; deliberately not
-  done yet.
+- `drawArticle` is now shared: it lives in **`js/lib/article.js`** and both
+  scenes import it, so the claim that 03 and 04 show the same story is enforced
+  by the code rather than by two copies agreeing. Its copy — the headline lines
+  and the dateline — moved to `content.js`, where the project says runtime copy
+  belongs. The dateline is dropped below a 150px surface, where it used to
+  render at its 6px floor and run into the edge; that removed it from the Desk's
+  phone, which is the one intentional visual change from the extraction.
+- **Still duplicated:** `roundRect` and the wake-rim logic in `desk.js` and
+  `conveyor.js`. The contact shadows deliberately differ — the Desk casts a dark
+  shadow on a white desk, the rail pools light on ink — so those are not the
+  same function and should not be merged.
 
 ---
 

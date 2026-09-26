@@ -81,8 +81,8 @@ the top of `index.html`; elements reference them with `<use href="#px-mic">`.
 All copy is written directly into `index.html`, so the page reads correctly
 with JavaScript disabled and search engines see everything. The only copy in
 JavaScript is in `js/lib/content.js` — the bureau coordinates, the preloader's
-sample wire feed, the globe's ping tags and the live-blog timestamps, because
-the scenes need those as data.
+sample wire feed, the globe's ping tags, the live-blog timestamps and the
+headline the Desk types out, because the scenes need those as data.
 
 ## Rebuilding the CSS
 

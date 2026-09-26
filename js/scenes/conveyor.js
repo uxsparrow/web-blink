@@ -12,17 +12,14 @@
  */
 
 import { clamp, easeOut, seg } from '../lib/motion.js'
-import { displayFamily, monoFamily } from '../lib/fonts.js'
+import { monoFamily } from '../lib/fonts.js'
 import { mountScene } from '../lib/canvas-scene.js'
+import { drawArticle } from '../lib/article.js'
 
 const INK = '#111111'
 const VIOLET = '#6118EA'
-const RED = '#E10600'
 const SHELL = '#16121f'
 const SCREEN = '#0a0812'
-
-/** The Desk's headline — the same story, still running downstream. */
-const HEADLINE = ['EVERY STAGE', 'OF THE', 'STORY']
 
 /** The channels THE EDITION card names; these stand where the CMYK marks did. */
 const CHANNELS = ['WEB', 'AMP', 'PWA', 'APP']
@@ -69,43 +66,6 @@ function contact(ctx, cx, y, w, lit) {
   ctx.ellipse(cx, y + 3, w * 0.5, 5, 0, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
-}
-
-/**
- * The story itself, drawn at whatever size the surface needs — every screen on
- * the rail renders this, so it is literally the same article at every size.
- */
-function drawArticle(ctx, x, y, w, h) {
-  const pad = w * 0.08
-
-  // kicker
-  ctx.fillStyle = RED
-  ctx.fillRect(x + pad, y + pad, w * 0.2, Math.max(2, h * 0.016))
-
-  // dateline, only where there is room for it to read
-  if (w >= 150) {
-    ctx.fillStyle = 'rgba(255,255,255,.34)'
-    ctx.font = `400 ${Math.max(6, w * 0.032)}px ${monoFamily()}`
-    ctx.fillText('NOIDA — 14:32 IST', x + pad + w * 0.24, y + pad + Math.max(2, h * 0.016))
-  }
-
-  // headline
-  const fs = w * 0.105
-  ctx.font = `700 ${fs}px ${displayFamily()}`
-  ctx.fillStyle = '#ffffff'
-  for (let i = 0; i < HEADLINE.length; i++) {
-    ctx.fillText(HEADLINE[i], x + pad, y + pad + fs * 1.6 + i * fs * 1.04)
-  }
-
-  // body rules under the headline
-  ctx.fillStyle = 'rgba(255,255,255,.2)'
-  const bodyTop = y + pad + fs * 1.6 + HEADLINE.length * fs * 1.04 + h * 0.04
-  const rule = Math.max(1.5, h * 0.012)
-  for (let i = 0; i < 6; i++) {
-    const ry = bodyTop + i * rule * 2.6
-    if (ry > y + h - pad) break
-    ctx.fillRect(x + pad, ry, (w - pad * 2) * (i % 3 === 2 ? 0.58 : 0.92), rule)
-  }
 }
 
 /**

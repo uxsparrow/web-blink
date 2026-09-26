@@ -8,8 +8,9 @@
  */
 
 import { clamp, easeInOut, easeOut, lerp, seg } from '../lib/motion.js'
-import { displayFamily, monoFamily } from '../lib/fonts.js'
+import { displayFamily } from '../lib/fonts.js'
 import { mountScene } from '../lib/canvas-scene.js'
+import { TOTAL_CHARS, drawArticle } from '../lib/article.js'
 
 /*
  * Virtual stage, sized to the content band rather than to a screen, so the
@@ -46,9 +47,6 @@ const RED = '#E10600'
 const SHELL = '#16121f'
 const SCREEN = '#0a0812'
 
-const HEADLINE = ['EVERY STAGE', 'OF THE', 'STORY']
-const TOTAL_CHARS = HEADLINE.join('').length
-
 /* ── helpers ──────────────────────────────────────────────────── */
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -74,59 +72,6 @@ function shadow(ctx, cx, y, w) {
   ctx.ellipse(cx, y + 5, w * 0.5, 8, 0, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
-}
-
-/**
- * The story itself, drawn at whatever size the surface needs — the editor,
- * the second laptop, the tablet and the phone all render this.
- */
-function drawArticle(ctx, x, y, w, h, { chars = TOTAL_CHARS, caret = false }) {
-  const pad = w * 0.08
-  const dim = 'rgba(255,255,255,.34)'
-
-  // kicker
-  ctx.fillStyle = RED
-  ctx.fillRect(x + pad, y + pad, w * 0.2, Math.max(2, h * 0.016))
-
-  // dateline
-  ctx.fillStyle = dim
-  ctx.font = `400 ${Math.max(6, w * 0.035)}px ${monoFamily()}`
-  ctx.fillText('NOIDA — 14:32 IST', x + pad + w * 0.24, y + pad + Math.max(2, h * 0.016))
-
-  // headline, typed in
-  const fs = w * 0.105
-  ctx.font = `700 ${fs}px ${displayFamily()}`
-  ctx.fillStyle = '#ffffff'
-  let seen = 0
-  let caretX = x + pad
-  let caretY = y + pad + fs * 1.6
-  for (let i = 0; i < HEADLINE.length; i++) {
-    const line = HEADLINE[i]
-    const take = clamp(chars - seen, 0, line.length)
-    const shown = line.slice(0, Math.floor(take))
-    const ly = y + pad + fs * 1.6 + i * fs * 1.04
-    if (shown) ctx.fillText(shown, x + pad, ly)
-    if (take > 0) {
-      caretX = x + pad + ctx.measureText(shown).width
-      caretY = ly
-    }
-    seen += line.length
-  }
-
-  if (caret) {
-    ctx.fillStyle = RED
-    ctx.fillRect(caretX + fs * 0.06, caretY - fs * 0.76, Math.max(2, fs * 0.05), fs * 0.84)
-  }
-
-  // body rules under the headline
-  ctx.fillStyle = 'rgba(255,255,255,.2)'
-  const bodyTop = y + pad + fs * 1.6 + HEADLINE.length * fs * 1.04 + h * 0.04
-  const rule = Math.max(1.5, h * 0.012)
-  for (let i = 0; i < 6; i++) {
-    const ry = bodyTop + i * rule * 2.6
-    if (ry > y + h - pad) break
-    ctx.fillRect(x + pad, ry, (w - pad * 2) * (i % 3 === 2 ? 0.58 : 0.92), rule)
-  }
 }
 
 /** The screen waking up — a lilac rim while it comes on. */

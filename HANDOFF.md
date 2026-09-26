@@ -169,14 +169,24 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
 - Plain contain-fit against a `1600 × 640` stage — an earlier 1.16× zoom cropped
   the phone off the right edge. Don't reintroduce a zoom multiplier without
   re-checking the right-hand device.
-- **The wall map** fills what that stage leaves empty: a dotted world drifting
-  slowly behind the devices, from the same Natural Earth geometry and the same
-  `START_LON` as the preloader map and the globe, so the page keeps one world.
-  It is drawn in **canvas space, not on the fitted stage**, so it reaches the
-  section's full width, and it is handed the desk line's y so it can shrink to
-  nothing before it — the screens are never read against a busy background.
-  `reducedMotion()` freezes both the drift and the swell. ~5,000 dots batched
-  into one path and one `fill()`; a full repaint measured 0.39ms.
+- **The wall map** fills what that stage leaves empty: a dotted world behind the
+  devices, from the same Natural Earth geometry as the preloader map and the
+  globe, so the page keeps one world. It is drawn in **canvas space, not on the
+  fitted stage**, so it reaches the section's full width, and it is handed the
+  desk line's y so it can shrink to nothing before it — the screens are never
+  read against a busy background. `reducedMotion()` freezes all of its motion.
+  ~5,000 dots batched into one path and one `fill()`; a full repaint measured
+  0.39ms.
+- **It sways; it does not drift**, and that is the whole reason the right-hand
+  side stays occupied. A one-way drift walks the entire world past over about
+  three minutes, so any framing you choose comes apart — the Pacific arrives and
+  the section looks empty again. Measured over a full cycle every centring is
+  identical, because the centring only picks the phase you happen to arrive at.
+  Constraining the travel to ±90px is what makes the framing hold.
+- **It is framed on 30°W (`MAP_LON`), not on the globe's `START_LON`.** That
+  stands Europe, Africa and Siberia up the right-hand side: measured worst-case
+  land in the top-right corner goes from 495 dots to 1515. The globe's opening
+  angle is about where its camera starts — don't couple the two again.
 - The **`CREATE · THE HEADLINE IS WRITTEN`** label sits top-right, offset 76px
   rather than on the spacing scale: the header is fixed, 55px tall and
   `z-index: 900`, so anything above ~60px is painted over by it.

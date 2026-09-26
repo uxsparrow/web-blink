@@ -12,7 +12,6 @@ import { displayFamily } from '../lib/fonts.js'
 import { mountScene } from '../lib/canvas-scene.js'
 import { TOTAL_CHARS, drawArticle } from '../lib/article.js'
 import { landDots, loadWorld, rasterize } from '../lib/world.js'
-import { START_LON } from '../lib/content.js'
 
 /*
  * Virtual stage, sized to the content band rather than to a screen, so the
@@ -61,13 +60,28 @@ const SCREEN = '#0a0812'
  * against a busy background, and it is drawn in canvas space rather than on
  * the fitted stage so it fills the section's full width at any size.
  */
+/*
+ * Framed on 30°W rather than on the globe's `START_LON`: that puts the Atlantic
+ * mid-canvas and stands Europe, Africa and Siberia up the right-hand side,
+ * where the section is otherwise empty. The globe's opening angle is about
+ * where its camera starts and is not this scene's to borrow.
+ */
+const MAP_LON = -30
+
 let mapDots = null
 loadWorld().then((world) => {
-  mapDots = landDots(rasterize(world.land, 360, 180, START_LON), 2)
+  mapDots = landDots(rasterize(world.land, 360, 180, MAP_LON), 2)
 })
 
-/** Pixels per second the map creeps by — slow enough to read as a still. */
-const MAP_DRIFT = 7
+/*
+ * The map sways rather than cycling. A one-way drift is the obvious thing, but
+ * it walks the whole world past over a few minutes, so whatever you frame comes
+ * apart — the Pacific eventually fills the right-hand side and the section
+ * looks empty again. Swaying keeps the framing and still reads as alive; at
+ * these numbers the fastest the dots ever move is about 4.7px a second.
+ */
+const MAP_SWAY = 90
+const MAP_SWAY_RATE = 0.052
 
 function drawWallMap(ctx, w, h, time, deskLineY) {
   if (!mapDots) return
@@ -78,7 +92,7 @@ function drawWallMap(ctx, w, h, time, deskLineY) {
   const fadeEnd = deskLineY - 28
   const top = fadeEnd * 0.46 - mapH / 2
   const unit = Math.max(1, mapW / 900)
-  const shift = still ? 0 : (time * MAP_DRIFT) % mapW
+  const shift = still ? 0 : Math.sin(time * MAP_SWAY_RATE) * MAP_SWAY
 
   ctx.save()
   ctx.fillStyle = 'rgba(17,17,17,.28)'

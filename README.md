@@ -63,7 +63,7 @@ sequences to produce or ship:
 |---|---|
 | Dotted globe, pings, arcs | `js/scenes/globe.js` — Three.js points placed on **real land geometry**, red ping flares, bezier arcs back to Noida, headline tags projected to screen space |
 | Bureau map + wire feed | `js/scenes/preloader.js` — Natural Earth land rasterised to a dot grid, centred on India |
-| Typewriter → laptop → newspaper fold | `js/scenes/desk.js` — one canvas rig; the body silhouette lerps between machines, the page types letter by letter, then folds in two stages |
+| Laptop → tablet → phone | `js/scenes/desk.js` — the headline types into the Blink editor, the finished story lifts off the screen and flies across the desk, then lights up a tablet and a phone with the same article. One article renderer draws all four surfaces |
 | Press conveyor + front pages | `js/scenes/conveyor.js` |
 | Top-down printing press | `js/scenes/press.js` — paper web with smeared colour photos, violet-lit rollers |
 | Flying newspaper pages | same file — ~320 page particles burst out of the press and flutter away to white |

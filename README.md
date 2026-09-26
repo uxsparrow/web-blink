@@ -7,6 +7,9 @@ shipping container: **Monitor → Gather → Create → Publish → Monetize →
 **Plain HTML, CSS and JavaScript. No framework, no build step, no runtime
 dependencies.** Drop this folder on any static host and it works.
 
+> Picking this up fresh? Read [HANDOFF.md](HANDOFF.md) first — it covers the
+> decisions behind the setup, what is still open, and the tooling gotchas.
+
 ## Running it
 
 The page uses ES modules and `fetch`, so it needs to be *served* — opening

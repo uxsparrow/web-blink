@@ -1,0 +1,257 @@
+# Handoff — Blink CMS one-page site
+
+Written 26 Sep 2026. Read this plus `README.md` before changing anything.
+`README.md` is the permanent doc (stack, structure, how to run). This file is
+the session context: **what was decided and why**, what's unverified, and what
+is still open.
+
+---
+
+## 1 · What this is
+
+A single-page marketing site for Blink CMS, built to the structure and motion
+system of unitedcarriers.com but told through a news story rather than a
+shipping container: **Monitor → Gather → Create → Publish → Monetize → Analyze.**
+
+Thirteen sections, in page order:
+
+```
+00 preloader (overlay)   06 press          (#press)
+01 hero      (#hero)     07 letters        (#letters)
+02 front page(#front-page)08 masthead wall (#case-studies)
+03 desk      (#desk)     09 the wire       (#the-wire)
+04 platform  (#platform) 10 faq            (#faq)
+05 live      (#live)     11 on air         (#on-air)
+                         12 footer         (#contact)
+```
+
+~31,000px of scroll at 1440×900. Four pinned, scroll-scrubbed scenes: desk,
+platform, press, plus the hero's sky transition.
+
+---
+
+## 2 · Current state
+
+**Plain HTML, CSS and JavaScript. No framework, no build step, no runtime
+dependencies, no CDN.** 61 files. Drop the folder on any static host.
+
+It must be *served* (ES modules + `fetch` don't work from `file://`):
+
+```bash
+node server.js      # → http://localhost:8080
+```
+
+### Git
+
+Three commits on top of an initial commit. Working tree has **3 modified files**
+(`README.md`, `index.html`, `js/scenes/desk.js`) from the last round of desk
+changes — review and commit them.
+
+---
+
+## 3 · How it got here (don't undo these)
+
+The project was migrated twice at the user's request. Both migrations are
+complete; there are no leftovers from either.
+
+1. **Next.js 15 + React 19 + Tailwind v4** — original build.
+2. **Tailwind → Bootstrap 5.3 (SCSS)** — user asked for Bootstrap.
+3. **Next/React removed → plain static site** — user's client wants "normal
+   html css js".
+4. **Unused files/exports/fonts pruned.**
+
+### Decisions that will look odd without context
+
+- **`$spacers` is redefined to Tailwind's numeric scale** (`1 = .25rem` …
+  `12 = 3rem`), *not* Bootstrap's stock 1–5. This is what let the spacing
+  survive the Tailwind→Bootstrap migration unchanged. Don't "fix" it.
+- **Breakpoints are Tailwind's** (sm 640 / md 768 / lg 1024), not Bootstrap's.
+- **`$position-values` is extended with the spacing scale** so `bottom-7` works;
+  stock Bootstrap only ships `0/50/100`.
+- **The type scale is `.t-hero` … `.t-giant`**, deliberately *not* `.d-*`, which
+  would collide visually with Bootstrap's `d-*` display utilities.
+- **The utilities API is imported last** in `scss/main.scss`, so utilities
+  override component classes. New component CSS goes in the partials, never
+  below that import.
+- **No Bootstrap JS.** Accordion, tabs, menu and film modal are hand-written
+  event handlers in `js/ui/widgets.js` / `chrome.js`. Bootstrap's JS manipulates
+  the DOM and there is no React here to fight, but the hand-rolled versions are
+  smaller and already done.
+- **Fonts are self-hosted**, lifted out of the old `next/font` build into
+  `fonts/` + `css/fonts.css`. The page needs no network at runtime.
+- **Three.js is lazy-loaded** via dynamic `import()` kicked off at boot (not at
+  preloader release — that left the hero empty for ~8s). `modulepreload` hints
+  are in `<head>`.
+
+---
+
+## 4 · Bugs already found and fixed
+
+Listed so they don't get reintroduced.
+
+| Bug | Cause | Fix |
+|---|---|---|
+| Every Tailwind spacing utility dead | `* { padding: 0 }` sat outside Tailwind's layers and beat them | Reset moved into `@layer base` |
+| Custom cursor invisible | `svg { max-width: 100% }` resolved to 0 inside the cursor's zero-width anchor | `svg` dropped from that rule; cursor SVGs pinned with explicit px + `max-width: none` |
+| Page could stay scroll-locked | Preloader was entirely rAF-driven; rAF is suspended in background tabs | Countdown is timer-driven, plus a 7s failsafe in `main.js` |
+| No pointer at all on script failure | `cursor: none` was unconditional | Gated on `[data-custom-cursor]`, set by `Cursor` on mount |
+| Font classes merged into one | A bulk rewrite ate the spaces around `${}` in template-literal classNames | All nine repaired |
+| Press never dissolved | `globalAlpha` set negative — Canvas silently ignores invalid values | Clamped with `Math.max(0, …)` |
+| Globe opened on the Americas | Hand-tuned yaw that didn't match the bureaus | Derived: `yawFor(lon) = -(lon + 90)°`, `START_LON = 78` |
+| Front-page headline clipped | Text overflowed the column and `.line-mask { overflow: hidden }` cut it; past the 1560px shell cap the `5vw` padding kept growing while the column didn't | Four explicit lines, `.front-head` clamp tuned to the column, `front-main` padding capped |
+| Desk section looked like blank space | Scene faded in from zero, but the stage scrolls into view *before* the pin engages | Scene is fully composed at progress 0 |
+
+---
+
+## 5 · The scenes
+
+All drawn in code — no image sequences, no renders to commission.
+
+| Scene | File | Notes |
+|---|---|---|
+| Dotted globe | `js/scenes/globe.js` | Three.js points on **real Natural Earth land**; 23 pings arcing to Noida |
+| Preloader map | `js/scenes/preloader.js` | Same land data, equirectangular, centred on India |
+| Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
+| Conveyor | `js/scenes/conveyor.js` | **Still newspapers** — see §7 |
+| Press | `js/scenes/press.js` | **Still a printing press** — see §7 |
+| Paper plane | `js/scenes/paper-plane.js` | Still folded from a front page — see §7 |
+| Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
+| Back-page map | `js/scenes/back-page-map.js` | India picked out in violet |
+
+2D scenes share `js/lib/canvas-scene.js` (dpr sizing, rAF loop, `setProgress`,
+`setActive`). Loops pause when their section scrolls out of view.
+
+### Globe pings (`js/lib/content.js`)
+
+23 pings, two label tiers:
+
+- **4 red + black headline tag** — the cities the brief names (Chennai, Kochi,
+  Delhi, Guwahati). Tags are live HTML in `index.html`.
+- **3 red + plain city label** — the brief's remaining bureaus (Hyderabad,
+  Kozhikode, Bhopal).
+- **16 violet + plain city label** — wire traffic (Mumbai, Kolkata, Colombo,
+  Dhaka, Kathmandu, Dubai, Singapore, Tokyo, Sydney, Nairobi, Johannesburg,
+  Frankfurt, London, New York, Toronto, São Paulo).
+
+The colour split is deliberate and **honest**: red = a bureau the brief names,
+violet = a dateline on the wire, implying no office there. Keep that rule if you
+add cities.
+
+---
+
+## 6 · The Desk scene (most recently reworked)
+
+The user confirmed **Blink CMS is digital-only — no print media**. The desk was
+rebuilt around that: laptop writes, three screens publish. No paper, no
+typewriter, no newspaper bundles.
+
+```
+p 0.02–0.44  headline types into the Blink editor (BLINKCMS in the AI sidebar)
+p 0.48–0.80  a send dart (the messaging-UI paper-plane glyph) flies across
+p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
+```
+
+- The editor keeps its text for the whole scene — it does **not** fade out.
+- One `drawArticle()` renderer draws all four screens, so it's literally the
+  same story at every size.
+- Two layouts: `WIDE` (editor + laptop + tablet + phone) and `NARROW`
+  (editor + phone, devices scaled 1.35×) below 900px.
+- Plain contain-fit against a `1600 × 640` stage — an earlier 1.16× zoom cropped
+  the phone off the right edge. Don't reintroduce a zoom multiplier without
+  re-checking the right-hand device.
+
+---
+
+## 7 · Open items
+
+### Still print, by the user's explicit scoping
+
+The user scoped the print→digital change to **the Desk only**. These remain and
+are known:
+
+- **04 · Platform** — newspapers riding a conveyor belt.
+- **06 · Press** — a printing press with a paper web through rollers.
+- **07 · Letters** — a paper plane "folded from a front page", torn-edge
+  newsprint clippings.
+
+If asked to continue, 06 is the big one: its name, section label and whole
+full-bleed scene would need redesigning.
+
+**Editorial language stays** — the user confirmed masthead, dateline, byline,
+front page, halftone, newsprint all read as journalism rather than print
+production. Don't strip them.
+
+### Kerala city names
+
+The user asked to remove Kerala cities **from the preloader wire feed** — done
+(Kochi→Mumbai, Kozhikode→Kolkata, plus Bengaluru and Jaipur added). They still
+appear elsewhere, flagged to the user but not changed:
+
+- `● BREAKING KOCHI` — a hero globe headline tag, verbatim from the brief
+- `KOZHIKODE` — a red bureau label on the globe
+- `MALAYALAM` — in the preloader language column (a language, not a city)
+
+### Content gaps — all render in red mono as `[BRACKETS]`
+
+- **F.A.Q answers** — 7 of 8 missing. The brief supplied only the questions plus
+  one answer ("Do you charge more as traffic grows?" → "No. Billing is by features.")
+- **The Wire** — 4 headlines supplied, 2 slots empty, no article bodies
+- **Footer email and phone**
+
+### Asset slots
+
+Brand film (modal), newsroom footage (front page thumb), B&W newsroom photo
+(footer), publisher logos (masthead wall currently sets names as type),
+case-study photos (Letters).
+
+### User's own edit — leave alone
+
+The **breaking-ticker strip under the header is commented out** in `index.html`.
+That was the user's change, not ours. `initHeader()` already guards for it being
+absent. Don't restore it without asking.
+
+---
+
+## 8 · Verification status
+
+**Verified** at 1440×900 and 375×812, no console errors: preloader → globe
+hand-off, self-hosted fonts, all pinned canvases drawing, the Desk scene frame
+by frame at p = 0 / 0.46 / 0.62 / 0.99 (both layouts), masthead tabs, F.A.Q
+accordion, tickers, custom cursor, header at scroll 0, no horizontal overflow,
+headline fit from 1024px to 2560px.
+
+**Not exhaustively verified:** the end states of the conveyor (tilt to top-down)
+and press (burst into flying pages), and the paper plane's full flight path.
+Scroll those on a real screen.
+
+---
+
+## 9 · Environment gotchas
+
+These cost a lot of time; they are about the tooling, not the site.
+
+- **The preview pane does not composite canvas/WebGL into screenshots.** DOM
+  renders fine, canvases come out blank or black. To actually see a canvas
+  scene, temporarily add a POST endpoint to `server.js` that writes a PNG to
+  disk, capture frames into an offscreen grid canvas in the page, POST it, and
+  read the file. Remove the endpoint afterwards.
+- **`requestAnimationFrame` throttles when the pane isn't painting.** In-pane
+  the preloader falls through to its 7-second failsafe; on a real screen it
+  completes in ~4.5s. `getComputedStyle` readings can also go stale — if an
+  inline style you just set reads back as the old value, the readback is stale,
+  not the CSS.
+- **`window.scrollTo` does not stick — Lenis owns the scroll position.** Use
+  `window.__lenis.scrollTo(y, { immediate: true })`. `window.__ST` is
+  ScrollTrigger. Both are dev-only handles.
+- **Rebuilding CSS:** `npm run css` (needs `npm install` for sass + bootstrap,
+  dev-only). `css/styles.css` is committed and ready to serve.
+
+---
+
+## 10 · Content rules — hold these
+
+- **No invented testimonials, people or quotes.** Section 07 shows results only,
+  exactly as supplied, with a standing note that no quotes are attributed.
+- The preloader wire feed and the live-blog card are labelled sample text.
+- **Every headline is live HTML** — nothing baked into an image.
+- Only facts from the Blink CMS brief. Anything else is a marked placeholder.

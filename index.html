@@ -1,0 +1,1918 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blink CMS — Every stage of the story</title>
+  <meta name="description"
+    content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform. The extended tech team behind 150+ newsrooms.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blink CMS — Every stage of the story">
+  <meta property="og:description"
+    content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- the hero globe's WebGL, fetched while the intro plays -->
+  <link rel="modulepreload" href="vendor/three.module.min.js">
+  <link rel="modulepreload" href="vendor/three.core.min.js">
+  <link rel="preload" href="data/countries-110m.json" as="fetch" crossorigin>
+  <noscript>
+    <style>
+      /* Without scripts the intro can never lift itself, the accordion can never
+       open and the second tab panel can never be revealed — so hand the reader
+       the whole page instead. */
+      .preloader {
+        display: none;
+      }
+
+      .faq-panel {
+        grid-template-rows: 1fr;
+      }
+
+      [data-tab-panel] {
+        display: block !important;
+      }
+
+      .tab-btn {
+        display: none;
+      }
+
+      [data-globe-wrap] {
+        opacity: 1;
+      }
+    </style>
+  </noscript>
+</head>
+
+<body>
+
+  <svg class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="px-mic" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="6.25" cy="3.75" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="6.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="6.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="3.75" cy="11.25" r="0.90" />
+      <circle cx="16.25" cy="11.25" r="0.90" />
+      <circle cx="6.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="13.75" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-camera" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="1.25" cy="3.75" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="6.25" cy="3.75" r="0.90" />
+      <circle cx="8.75" cy="3.75" r="0.90" />
+      <circle cx="11.25" cy="3.75" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="18.75" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="18.75" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="6.25" cy="11.25" r="0.90" />
+      <circle cx="13.75" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="1.25" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="13.75" r="0.90" />
+      <circle cx="13.75" cy="13.75" r="0.90" />
+      <circle cx="18.75" cy="13.75" r="0.90" />
+      <circle cx="1.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="18.75" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+      <circle cx="18.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-pen" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="18.75" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="18.75" cy="3.75" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="16.25" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="3.75" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="1.25" cy="16.25" r="0.90" />
+      <circle cx="3.75" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-newspaper" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="3.75" cy="1.25" r="0.90" />
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="18.75" cy="1.25" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="18.75" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="3.75" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="6.25" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="18.75" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="13.75" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="1.25" cy="13.75" r="0.90" />
+      <circle cx="18.75" cy="13.75" r="0.90" />
+      <circle cx="1.25" cy="16.25" r="0.90" />
+      <circle cx="18.75" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+      <circle cx="18.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-phone" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="3.75" cy="1.25" r="0.90" />
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="3.75" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="6.25" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="16.25" cy="6.25" r="0.90" />
+      <circle cx="3.75" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="16.25" cy="8.75" r="0.90" />
+      <circle cx="3.75" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="16.25" cy="11.25" r="0.90" />
+      <circle cx="3.75" cy="13.75" r="0.90" />
+      <circle cx="16.25" cy="13.75" r="0.90" />
+      <circle cx="3.75" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="16.25" cy="16.25" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-chart" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="1.25" cy="1.25" r="0.90" />
+      <circle cx="1.25" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="16.25" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="16.25" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="13.75" cy="11.25" r="0.90" />
+      <circle cx="16.25" cy="11.25" r="0.90" />
+      <circle cx="1.25" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="13.75" cy="13.75" r="0.90" />
+      <circle cx="16.25" cy="13.75" r="0.90" />
+      <circle cx="1.25" cy="16.25" r="0.90" />
+      <circle cx="6.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="13.75" cy="16.25" r="0.90" />
+      <circle cx="16.25" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+      <circle cx="18.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-lock" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="3.75" cy="6.25" r="0.90" />
+      <circle cx="16.25" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="3.75" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="16.25" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="1.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="18.75" cy="13.75" r="0.90" />
+      <circle cx="1.25" cy="16.25" r="0.90" />
+      <circle cx="18.75" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+      <circle cx="18.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-globe" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="8.75" cy="3.75" r="0.90" />
+      <circle cx="11.25" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="6.25" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="18.75" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="3.75" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="16.25" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="1.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="18.75" cy="13.75" r="0.90" />
+      <circle cx="3.75" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="16.25" cy="16.25" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-bolt" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="3.75" r="0.90" />
+      <circle cx="11.25" cy="3.75" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="6.25" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="6.25" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="3.75" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="13.75" cy="8.75" r="0.90" />
+      <circle cx="16.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="13.75" cy="11.25" r="0.90" />
+      <circle cx="6.25" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="3.75" cy="16.25" r="0.90" />
+      <circle cx="6.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="1.25" cy="18.75" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-shield" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="1.25" cy="1.25" r="0.90" />
+      <circle cx="3.75" cy="1.25" r="0.90" />
+      <circle cx="6.25" cy="1.25" r="0.90" />
+      <circle cx="8.75" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="1.25" r="0.90" />
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="18.75" cy="1.25" r="0.90" />
+      <circle cx="1.25" cy="3.75" r="0.90" />
+      <circle cx="18.75" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="6.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="18.75" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="3.75" cy="13.75" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="16.25" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="13.75" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="px-ticker" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="1.25" cy="3.75" r="0.90" />
+      <circle cx="3.75" cy="3.75" r="0.90" />
+      <circle cx="6.25" cy="3.75" r="0.90" />
+      <circle cx="8.75" cy="3.75" r="0.90" />
+      <circle cx="11.25" cy="3.75" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="16.25" cy="3.75" r="0.90" />
+      <circle cx="18.75" cy="3.75" r="0.90" />
+      <circle cx="1.25" cy="6.25" r="0.90" />
+      <circle cx="6.25" cy="6.25" r="0.90" />
+      <circle cx="13.75" cy="6.25" r="0.90" />
+      <circle cx="18.75" cy="6.25" r="0.90" />
+      <circle cx="1.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="18.75" cy="8.75" r="0.90" />
+      <circle cx="1.25" cy="11.25" r="0.90" />
+      <circle cx="3.75" cy="11.25" r="0.90" />
+      <circle cx="6.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="13.75" cy="11.25" r="0.90" />
+      <circle cx="16.25" cy="11.25" r="0.90" />
+      <circle cx="18.75" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="11.25" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="13.75" cy="16.25" r="0.90" />
+    </symbol>
+    <symbol id="px-satellite" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="13.75" cy="1.25" r="0.90" />
+      <circle cx="16.25" cy="1.25" r="0.90" />
+      <circle cx="11.25" cy="3.75" r="0.90" />
+      <circle cx="13.75" cy="3.75" r="0.90" />
+      <circle cx="6.25" cy="6.25" r="0.90" />
+      <circle cx="8.75" cy="6.25" r="0.90" />
+      <circle cx="11.25" cy="6.25" r="0.90" />
+      <circle cx="3.75" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="8.75" r="0.90" />
+      <circle cx="8.75" cy="8.75" r="0.90" />
+      <circle cx="11.25" cy="8.75" r="0.90" />
+      <circle cx="6.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="11.25" r="0.90" />
+      <circle cx="11.25" cy="11.25" r="0.90" />
+      <circle cx="16.25" cy="11.25" r="0.90" />
+      <circle cx="8.75" cy="13.75" r="0.90" />
+      <circle cx="13.75" cy="13.75" r="0.90" />
+      <circle cx="6.25" cy="16.25" r="0.90" />
+      <circle cx="8.75" cy="16.25" r="0.90" />
+      <circle cx="11.25" cy="16.25" r="0.90" />
+      <circle cx="13.75" cy="16.25" r="0.90" />
+      <circle cx="16.25" cy="16.25" r="0.90" />
+      <circle cx="3.75" cy="18.75" r="0.90" />
+      <circle cx="6.25" cy="18.75" r="0.90" />
+      <circle cx="8.75" cy="18.75" r="0.90" />
+      <circle cx="11.25" cy="18.75" r="0.90" />
+      <circle cx="13.75" cy="18.75" r="0.90" />
+      <circle cx="16.25" cy="18.75" r="0.90" />
+      <circle cx="18.75" cy="18.75" r="0.90" />
+    </symbol>
+    <symbol id="reg-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="0.8">
+      <circle cx="8" cy="8" r="4.48" />
+      <line x1="8" y1="0" x2="8" y2="16" />
+      <line x1="0" y1="8" x2="16" y2="8" />
+    </symbol>
+    <symbol id="tear" viewBox="0 0 600 9">
+      <path
+        d="M0 0h600v3.2l-18 1.4-16-2.1-21 3-14-1.6-25 2.4-17-2.9-19 2-22-1.2-16 2.6-20-2.2-18 1.5-24-2.6-15 3.1-21-1.8-17 1.2-23-2.4-16 2.8-19-1.9-21 1.4-15-2.2-20 2.6-18-1.5-22 2.1-16-2.7-19 1.8-21-1.4-16 2.3-18-2.1-14 1.6-11-1.2z"
+        fill="#fff" />
+    </symbol>
+  </svg>
+
+  <!-- ═══ custom cursor ═══════════════════════════════════════════ -->
+  <div class="cursor-root pe-none position-fixed start-0 top-0 z-cursor" data-cursor-root aria-hidden="true" hidden>
+    <svg class="cursor-ring" width="46" height="46" viewBox="0 0 46 46">
+      <circle cx="23" cy="23" r="16" fill="none" stroke="currentColor" stroke-opacity=".28" stroke-width="1" />
+      <g class="cursor-arc">
+        <path d="M23 5.5 A17.5 17.5 0 0 1 40.5 23" fill="none" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round" />
+      </g>
+      <circle cx="23" cy="23" r="2.6" fill="currentColor" />
+    </svg>
+    <svg class="cursor-finder" width="76" height="62" viewBox="0 0 76 62">
+      <path d="M2 16 L2 2 L16 2" fill="none" stroke="#fff" stroke-width="1.6" />
+      <path d="M60 2 L74 2 L74 16" fill="none" stroke="#fff" stroke-width="1.6" />
+      <path d="M74 46 L74 60 L60 60" fill="none" stroke="#fff" stroke-width="1.6" />
+      <path d="M16 60 L2 60 L2 46" fill="none" stroke="#fff" stroke-width="1.6" />
+      <circle cx="38" cy="31" r="1.6" fill="#fff" />
+      <circle cx="15" cy="31" r="2.4" fill="#E10600">
+        <animate attributeName="opacity" values="1;0.15;1" dur="1.2s" repeatCount="indefinite" />
+      </circle>
+      <text x="23" y="34.5" fill="#fff" font-size="8" letter-spacing="1.2"
+        style="font-family:var(--font-spacemono),monospace">REC</text>
+    </svg>
+  </div>
+
+  <!-- ═══ 00 · PRELOADER ══════════════════════════════════════════ -->
+  <div class="preloader position-fixed inset-0 z-loader overflow-hidden" data-preloader data-nav="dark">
+    <canvas class="position-absolute inset-0 h-100 w-100" data-preloader-canvas></canvas>
+
+    <div class="loader-col loader-col--left">
+      <div class="display mb-5" style="font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff">BLINK<span
+          style="color:var(--blink-lift)">CMS</span></div>
+      <div class="mono-xs mb-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.34)">
+        <span style="width:12px;height:1px;background:currentColor"></span> WIRE · SAMPLE FEED
+      </div>
+      <ul class="d-flex flex-column gap-1" data-wire></ul>
+    </div>
+
+    <div class="loader-col loader-col--right d-none d-md-block">
+      <div class="mono-xs mb-2" style="color:rgba(255,255,255,.34)">LANGUAGES</div>
+      <div class="mono-xs loader-lang" data-lang>TAMIL</div>
+      <div class="mono-xs loader-lang" data-lang>TELUGU</div>
+      <div class="mono-xs loader-lang" data-lang>HINDI</div>
+      <div class="mono-xs loader-lang" data-lang>MALAYALAM</div>
+      <div class="mono-xs loader-lang" data-lang>ENGLISH</div>
+      <div class="mono-xs loader-lang" data-lang>ASSAMESE</div>
+    </div>
+
+    <div class="loader-clock">
+      <div class="mono-xs mb-1" style="color:rgba(255,255,255,.3)" data-state>STANDBY</div>
+      <div class="display d-flex align-items-baseline justify-content-end gap-2"
+        style="font-size:clamp(2.6rem,6vw,5rem);color:#fff;font-variant-numeric:tabular-nums">
+        <span class="live-dot" data-onair-dot style="margin-bottom:.9em" hidden></span>
+        <span data-count>000</span>
+      </div>
+      <div class="mono-xs" style="color:rgba(255,255,255,.3)" data-count-caption>LOADING BUREAUS</div>
+    </div>
+  </div>
+
+  <!-- ═══ header ══════════════════════════════════════════════════ -->
+  <header class="site-header position-fixed start-0 top-0 w-100 z-header" data-header>
+    <div class="site-header__bar">
+      <div class="shell header-bar d-flex align-items-center justify-content-between">
+        <a href="#top" class="d-flex align-items-baseline gap-1" aria-label="Blink CMS — home">
+          <span class="display" style="font-size:22px;letter-spacing:-.02em">B</span>
+          <span class="brand-dot"></span>
+        </a>
+
+        <button class="mono site-header__menu d-none d-md-flex align-items-center gap-2" data-menu-toggle
+          aria-expanded="false">
+          <span style="letter-spacing:.2em">•••</span><span data-menu-label>MENU</span>
+        </button>
+
+        <div class="d-flex align-items-center gap-4">
+          <span class="mono d-none d-sm-flex align-items-center gap-2"><span class="live-dot"></span>LIVE</span>
+          <a href="#on-air" class="pill pill-mono pill-ink" data-demo-pill>BOOK A DEMO</a>
+          <button class="mono d-md-none" data-menu-toggle aria-expanded="false"><span
+              data-menu-label>MENU</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="site-header__ticker" data-header-ticker>
+    <div class="ticker d-flex w-100 align-items-stretch overflow-hidden ticker--dark">
+      <div class="mono-xs ticker__tab d-flex flex-shrink-0 align-items-center gap-2 px-3 ticker-pad fw-bold">
+        <span class="live-dot" style="background:#fff"></span>BREAKING
+      </div>
+      <div class="marquee flex-grow-1" style="--marquee-dur:30s" data-marquee>
+        <div class="marquee-track align-items-center ticker-pad">
+          <span class="mono-xs d-flex align-items-center gap-4">150+ NEWSROOMS<span style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">43K CONCURRENT READERS<span style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">ZERO DOWNTIME<span style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">20+ FACT-CHECK SITES<span style="color:var(--breaking)">·</span></span>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  </header>
+
+  <!-- overlay menu -->
+  <div class="site-menu position-fixed inset-0 z-menu d-flex flex-column justify-content-center" data-menu
+    aria-hidden="true">
+    <nav class="shell">
+      <a href="#platform" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">01</span>PLATFORM</a>
+      <a href="#platform" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">02</span>MODULES</a>
+      <a href="#case-studies" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">03</span>CASE STUDIES</a>
+      <a href="#the-wire" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">04</span>THE WIRE</a>
+      <a href="#faq" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">05</span>FAQ</a>
+      <a href="#contact" class="display t-lg menu-link d-flex align-items-baseline gap-5"><span class="mono-xs"
+          style="color:var(--blink-lift)">06</span>CONTACT</a>
+    </nav>
+  </div>
+
+  <!-- section label -->
+  <div class="section-label pe-none position-fixed z-label d-none d-lg-flex align-items-center gap-2 is-dark"
+    data-section-label aria-hidden="true">
+    <span class="section-label__rule"></span>
+    <span class="mono-xs" data-section-label-text>FRONT PAGE</span>
+  </div>
+
+  <main id="top">
+
+    <!-- ═══ 01 · HERO ═══════════════════════════════════════════════ -->
+    <section id="hero" class="hero position-relative" data-nav="dark" data-label="FRONT PAGE">
+      <div class="position-sticky top-0 h-svh overflow-hidden">
+
+        <div class="hero-globe z-1" data-globe-wrap>
+          <canvas class="w-100 h-100" data-scene="globe"></canvas>
+
+          <!-- city names for every ping without a headline tag; the globe
+               writes these in, since they only mean anything with it running -->
+          <div class="pe-none position-absolute inset-0" data-ping-labels aria-hidden="true"></div>
+
+          <div class="pe-none position-absolute inset-0">
+            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>LIVE CHENNAI</span>
+            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>BREAKING KOCHI</span>
+            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>UPDATE DELHI</span>
+            <span class="mono-xs ping-tag" data-ping-tag><span class="live-dot"></span>EXCLUSIVE GUWAHATI</span>
+          </div>
+        </div>
+
+        <div class="shell position-relative z-3 d-flex h-100 flex-column justify-content-center" data-hero-copy>
+          <div class="hero-copy">
+            <div class="mb-5 d-flex align-items-center gap-4">
+              <span class="colour-bar" style="width:44px;height:4px"><i></i><i></i><i></i><i></i></span>
+              <span class="mono" style="color:rgba(255,255,255,.62)">ONE PLATFORM</span>
+            </div>
+
+            <h1 class="display t-hero head-lilac" data-reveal data-reveal-start="top 96%">
+              <span class="line-mask"><span class="line-inner">EVERY STAGE</span></span>
+              <span class="line-mask"><span class="line-inner">OF THE STORY</span></span>
+            </h1>
+
+            <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66)">
+              Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.
+            </p>
+
+            <div class="mt-9 d-flex flex-wrap align-items-center gap-3">
+              <a href="#on-air" class="pill pill-white">Book a demo</a>
+              <button class="pill pill-outline-inv" data-open-film><span class="play-tri"></span>Watch the film</button>
+            </div>
+
+            <div class="mono-xs mt-10" style="color:rgba(255,255,255,.3)">NOIDA, 26 SEP 2026 — 14:32 IST</div>
+          </div>
+        </div>
+
+        <div class="mono-xs scroll-cue position-absolute bottom-6 start-50 z-3 translate-middle-x text-center"
+          style="color:rgba(255,255,255,.35)">
+          <div class="scroll-cue__word">SCROLL</div>
+          <div class="scroll-cue__line"></div>
+        </div>
+
+        <div class="pe-none position-absolute inset-0 z-2 hero-sky" data-hero-sky></div>
+      </div>
+    </section>
+
+    <!-- ═══ 02 · FRONT PAGE ═════════════════════════════════════════ -->
+    <section id="front-page" class="tex-halftone position-relative" data-nav="light" data-label="FRONT PAGE"
+      style="background:#fff">
+      <div class="shell">
+        <div class="hair-b hair-t d-flex align-items-center justify-content-between gap-4 py-3">
+          <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
+          <span class="mono-xs text-center" style="color:rgba(17,17,17,.55)">THE BLINK TIMES · VOL. 150+ · NEWSROOM
+            EDITION</span>
+          <span class="mono-xs d-none d-sm-block" style="color:rgba(17,17,17,.38)">NOIDA, 26 SEP 2026 — 14:32 IST</span>
+        </div>
+      </div>
+
+      <div class="shell row gx-0 gy-14 pb-vh-7 pt-vh-7">
+        <div class="col-12 col-lg-7 front-main">
+          <div class="sticky-col sticky-col--high">
+            <figure class="halftone-media front-thumb position-relative mb-9" data-cursor="media">
+              <div
+                class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center gap-3 screen-bg">
+                <div class="screen-wall">
+                  <span style="background:var(--breaking);animation:flick 1.4s ease-in-out 0s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 1.8s ease-in-out .09s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 2.2s ease-in-out .18s infinite"></span>
+                  <span style="background:var(--blink);animation:flick 2.6s ease-in-out .27s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 3s ease-in-out .36s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out .45s infinite"></span>
+                  <span style="background:var(--blink);animation:flick 1.8s ease-in-out .54s infinite"></span>
+                  <span style="background:var(--breaking);animation:flick 2.2s ease-in-out .63s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 2.6s ease-in-out .72s infinite"></span>
+                  <span style="background:var(--blink);animation:flick 3s ease-in-out .81s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out .9s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 1.8s ease-in-out .99s infinite"></span>
+                  <span style="background:var(--blink);animation:flick 2.2s ease-in-out 1.08s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 2.6s ease-in-out 1.17s infinite"></span>
+                  <span style="background:var(--breaking);animation:flick 3s ease-in-out 1.26s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out 1.35s infinite"></span>
+                  <span style="background:var(--blink);animation:flick 1.8s ease-in-out 1.44s infinite"></span>
+                  <span style="background:rgba(255,255,255,.25);animation:flick 2.2s ease-in-out 1.53s infinite"></span>
+                </div>
+                <span class="mono-xs" style="color:rgba(255,255,255,.5)">[NEWSROOM FOOTAGE — NOT SUPPLIED]</span>
+              </div>
+              <figcaption class="mono-xs front-caption" style="color:rgba(17,17,17,.4)">FIG. 01 · THE DESK AT NIGHT
+              </figcaption>
+            </figure>
+
+            <h2 class="display t-xl mt-12" data-reveal>
+              <span class="line-mask"><span class="line-inner head-grey">WE BUILD NEWSROOMS.</span></span>
+              <span class="line-mask"><span class="line-inner head-ink">WE OWN THE UPTIME.</span></span>
+            </h2>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-5 hair-l front-aside">
+          <div class="mono-xs mb-5 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.4)">
+            <svg class="reg-mark" width="12" height="12" aria-hidden="true">
+              <use href="#reg-mark" />
+            </svg>
+            THE BRIEF
+          </div>
+          <p class="body-copy dropcap" style="max-width:38ch">
+            One platform, one accountable team. No plugin patchwork, no vendor ping-pong, just your extended tech team
+            from first draft to final click.
+          </p>
+          <a href="#platform" class="pill pill-outline pill-mono mt-8">ABOUT BLINK</a>
+        </div>
+      </div>
+
+      <div class="shell front-stats">
+        <div class="hair-t d-flex align-items-center gap-3 pt-5">
+          <span class="live-dot"></span>
+          <span class="mono-xs" style="color:rgba(17,17,17,.45)">FROM MILLIONS OF STORIES, CLARITY EMERGES</span>
+        </div>
+
+        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
+          <span class="display t-stat" data-count-to="150" data-suffix="+">0+</span>
+          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">newsrooms powered</span>
+        </div>
+        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
+          <span class="display t-stat" data-count-to="43" data-suffix="K">0K</span>
+          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">concurrent readers, zero
+            downtime</span>
+        </div>
+        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
+          <span class="display t-stat" data-count-to="20" data-suffix="+">0+</span>
+          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">fact-checking sites</span>
+        </div>
+        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
+          <span class="display t-stat" data-count-to="400" data-suffix="%">0%</span>
+          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">faster page loads</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 03 · THE DESK ═══════════════════════════════════════════ -->
+    <section id="desk" class="tex-halftone position-relative" data-nav="light" data-label="THE DESK"
+      style="background:#fff">
+      <div class="pin-stage">
+        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="desk"></canvas>
+        <div class="shell pe-none position-absolute inset-x-0 bottom-7 d-flex align-items-end justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
+            <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
+          </div>
+          <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
+            PRINT HERITAGE → DIGITAL
+            <svg class="reg-mark" width="13" height="13" aria-hidden="true">
+              <use href="#reg-mark" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 · OUR PLATFORM ═══════════════════════════════════════ -->
+    <section id="platform" class="position-relative" data-nav="light" data-label="THE DESK" style="background:#fff">
+      <div class="pin-stage">
+        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="conveyor"></canvas>
+
+        <div class="display t-giant platform-word pe-none" data-platform-word aria-hidden="true">OUR PLATFORM</div>
+
+        <div class="shell position-relative z-2 platform-head">
+          <div class="d-flex align-items-end justify-content-between gap-6">
+            <div class="d-flex align-items-center gap-3">
+              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
+              <span class="mono" style="color:rgba(17,17,17,.55)">OUR PLATFORM</span>
+            </div>
+            <p class="mono-xs mw-30ch text-end" style="color:rgba(17,17,17,.45)">Everything your newsroom needs. Under
+              one platform.</p>
+          </div>
+        </div>
+
+        <div class="shell platform-cards row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 z-2">
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#111111" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE REPORTER</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-mic" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Stringer app, assignments, offline
+                  filing, payments.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">01</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#6118EA" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE AI EDITOR</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-pen" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Auto-tagging, story suggestions, full
+                  AI drafts.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">02</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#E10600" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE EDITION</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-phone" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Web, AMP, PWA, Android &amp; iOS.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">03</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#111111" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE SUBSCRIBER</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-lock" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Time, dynamic &amp; hard paywalls,
+                  coupons, gift plans.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">04</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#6118EA" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE E-PAPER</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-newspaper" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Hosting, clip &amp; share, edition
+                  management.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">05</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="platform-card d-flex flex-column gap-2 p-4" data-platform-card>
+              <span class="platform-card__band" style="background:#E10600" aria-hidden="true"></span>
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <h3 class="display t-sm" style="color:var(--ink)">THE ANALYST</h3>
+                <svg class="px-icon" width="22" height="22" aria-hidden="true" style="color:rgba(17,17,17,.55)">
+                  <use href="#px-chart" />
+                </svg>
+              </div>
+              <div class="hair-t"></div>
+              <div class="d-flex align-items-baseline justify-content-between gap-3">
+                <p class="mono-xs" style="color:rgba(17,17,17,.62);max-width:30ch">Real-time analytics, GA4, H-SEO
+                  score.</p>
+                <span class="mono-xs" style="color:rgba(17,17,17,.3)">06</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="shell pe-none position-absolute inset-x-0 bottom-5 z-2 d-flex justify-content-between">
+          <span class="mono-xs" style="color:rgba(17,17,17,.4)">PRESS LINE · EDITION RUNNING</span>
+          <span class="mono-xs" style="color:rgba(17,17,17,.4)">CMYK · REG. OK</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 05 · LIVE ═══════════════════════════════════════════════ -->
+    <section id="live" class="tex-halftone position-relative" data-nav="light" data-label="LIVE"
+      style="background:#fff">
+      <div class="shell row gx-8 gy-12 sec-pad">
+        <div class="col-12 col-lg-4">
+          <div class="sticky-col">
+            <div class="mono-xs mb-5 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.45)">
+              <span class="live-dot"></span> THE DESK IS LIVE
+            </div>
+            <h2 class="display t-lg" data-reveal>
+              <span class="line-mask"><span class="line-inner head-grey">RELIABILITY</span></span>
+              <span class="line-mask"><span class="line-inner head-ink">ON EVERY DEADLINE</span></span>
+            </h2>
+            <p class="body-copy mt-8" style="color:rgba(17,17,17,.6)">Breaking news doesn't wait, and neither does your
+              platform.</p>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-3 position-relative" data-live-strip>
+          <div class="live-strip">
+            <div class="live-rail"></div>
+
+            <div class="live-tick" style="top:4%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">14:32</span></div>
+            <div class="live-tick" style="top:15.5%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">14:35</span></div>
+            <div class="live-tick" style="top:27%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">14:41</span></div>
+            <div class="live-tick" style="top:38.5%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">14:46</span></div>
+            <div class="live-tick" style="top:50%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">14:52</span></div>
+            <div class="live-tick" style="top:61.5%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">15:04</span></div>
+            <div class="live-tick" style="top:73%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">15:11</span></div>
+            <div class="live-tick" style="top:84.5%"><i></i><span class="mono-xs"
+                style="color:rgba(255,255,255,.45)">15:19</span></div>
+
+            <div class="live-card p-3" style="top:2%" data-live-card>
+              <div class="mb-2 d-flex align-items-center justify-content-between">
+                <span class="mono-xs d-flex align-items-center gap-2" style="color:var(--breaking)"><span
+                    class="live-dot"></span>LIVE</span>
+                <span class="mono-xs" style="color:rgba(17,17,17,.42)" data-live-stamp>14:32</span>
+              </div>
+              <p class="display" style="font-size:17px;line-height:1.04;color:var(--ink)">DESK HOLDS AT FULL LOAD</p>
+              <div class="hair-t mt-2 pt-2">
+                <span class="mono-xs" style="color:rgba(17,17,17,.38)">BY THE BLINK DESK · NOIDA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+          <div class="hair-t py-7">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+              <svg class="px-icon" width="24" height="24" aria-hidden="true" style="color:var(--ink)">
+                <use href="#px-bolt" />
+              </svg>
+              <span class="mono-xs" style="color:rgba(17,17,17,.3)">01 / 03</span>
+            </div>
+            <h3 class="display t-md mb-2">AUTO-SCALING CLOUD</h3>
+            <p class="body-copy" style="color:rgba(17,17,17,.58);max-width:40ch">Traffic spikes scale automatically on
+              AWS. Zero downtime at 43K concurrent readers.</p>
+          </div>
+          <div class="hair-t py-7">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+              <svg class="px-icon" width="24" height="24" aria-hidden="true" style="color:var(--ink)">
+                <use href="#px-ticker" />
+              </svg>
+              <span class="mono-xs" style="color:rgba(17,17,17,.3)">02 / 03</span>
+            </div>
+            <h3 class="display t-md mb-2">REAL-TIME DESK VISIBILITY</h3>
+            <p class="body-copy" style="color:rgba(17,17,17,.58);max-width:40ch">Dashboards, story checkpoints and TAT
+              tracking for every desk.</p>
+          </div>
+          <div class="hair-t py-7">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+              <svg class="px-icon" width="24" height="24" aria-hidden="true" style="color:var(--ink)">
+                <use href="#px-shield" />
+              </svg>
+              <span class="mono-xs" style="color:rgba(17,17,17,.3)">03 / 03</span>
+            </div>
+            <h3 class="display t-md mb-2">WEBMASTER SUPPORT</h3>
+            <p class="body-copy" style="color:rgba(17,17,17,.58);max-width:40ch">Monitoring, fixes and Google News
+              setup, handled for you.</p>
+          </div>
+          <div class="hair-t d-flex align-items-center gap-2 pt-5">
+            <svg class="reg-mark" width="13" height="13" aria-hidden="true" style="color:rgba(17,17,17,.3)">
+              <use href="#reg-mark" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(17,17,17,.34)">MONITORED ROUND THE CLOCK</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="live-feed">
+        <div class="live-feed__sheet"></div>
+        <div class="live-feed__fade"></div>
+        <span class="mono-xs position-absolute bottom-4 start-50 translate-middle-x"
+          style="color:rgba(255,255,255,.5)">FEEDING THE PRESS</span>
+      </div>
+    </section>
+
+    <!-- ═══ 06 · THE PRESS ══════════════════════════════════════════ -->
+    <section id="press" class="position-relative" data-nav="dark" data-label="THE PRESS" style="background:#0a0810">
+      <div class="pin-stage">
+        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="press"></canvas>
+
+        <div
+          class="pe-none position-absolute inset-0 z-2 d-flex flex-column align-items-center justify-content-center px-4 text-center"
+          data-press-head>
+          <h2 class="display t-xl" style="color:#fff;text-shadow:0 18px 60px rgba(0,0,0,.6)">
+            <span class="line-mask"><span class="line-inner">A NEWSROOM THAT</span></span>
+            <span class="line-mask"><span class="line-inner">WORKS AS HARD</span></span>
+            <span class="line-mask"><span class="line-inner">AS YOU DO</span></span>
+          </h2>
+        </div>
+
+        <div class="press-feature press-feature--l1 z-3 d-none d-md-block" data-press-feature>
+          <div class="mb-2 d-flex align-items-center gap-2">
+            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-globe" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(255,255,255,.4)">01</span>
+          </div>
+          <h3 class="display t-sm mb-1" style="color:#fff">ONE PLATFORM, NOT FIVE VENDORS</h3>
+          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">CMS, apps, paywall, ads and analytics
+            under one roof.</p>
+        </div>
+        <div class="press-feature press-feature--l2 z-3 d-none d-md-block" data-press-feature>
+          <div class="mb-2 d-flex align-items-center gap-2">
+            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-camera" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(255,255,255,.4)">02</span>
+          </div>
+          <h3 class="display t-sm mb-1" style="color:#fff">FULL NEWSROOM VISIBILITY</h3>
+          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Every story tracked from assignment to
+            publish.</p>
+        </div>
+        <div class="press-feature press-feature--r1 z-3 d-none d-md-block" data-press-feature>
+          <div class="mb-2 d-flex align-items-center gap-2">
+            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-satellite" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(255,255,255,.4)">03</span>
+          </div>
+          <h3 class="display t-sm mb-1" style="color:#fff">SEO YOU CAN TRUST</h3>
+          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">H-SEO score, schemas, AMP and Google
+            News built in.</p>
+        </div>
+        <div class="press-feature press-feature--r2 z-3 d-none d-md-block" data-press-feature>
+          <div class="mb-2 d-flex align-items-center gap-2">
+            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-chart" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(255,255,255,.4)">04</span>
+          </div>
+          <h3 class="display t-sm mb-1" style="color:#fff">PAY FOR FEATURES, NOT TRAFFIC</h3>
+          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Grow your audience without growing your
+            bill.</p>
+        </div>
+        <div class="press-feature press-feature--b z-3 d-none d-md-block" data-press-feature>
+          <div class="mb-2 d-flex align-items-center justify-content-center gap-2">
+            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-bolt" />
+            </svg>
+            <span class="mono-xs" style="color:rgba(255,255,255,.4)">05</span>
+          </div>
+          <h3 class="display t-sm mb-1" style="color:#fff">FASTER PAGES</h3>
+          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Daily Thanthi loads in 1.5s.</p>
+        </div>
+
+        <div class="press-stack z-3 d-md-none">
+          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
+              aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-globe" />
+            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">ONE PLATFORM, NOT FIVE VENDORS</span></div>
+          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
+              aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-camera" />
+            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">FULL NEWSROOM VISIBILITY</span></div>
+          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
+              aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-satellite" />
+            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">SEO YOU CAN TRUST</span></div>
+          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
+              aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-chart" />
+            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">PAY FOR FEATURES, NOT TRAFFIC</span></div>
+          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
+              aria-hidden="true" style="color:#B9A4FF">
+              <use href="#px-bolt" />
+            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">FASTER PAGES</span></div>
+        </div>
+
+        <div class="pe-none position-absolute inset-0 z-4 press-flash" data-press-flash></div>
+      </div>
+    </section>
+
+    <!-- ═══ 07 · LETTERS ════════════════════════════════════════════ -->
+    <section id="letters" class="tex-halftone position-relative overflow-hidden" data-nav="light" data-label="LETTERS"
+      style="background:#fff">
+      <div class="pe-none position-absolute inset-0 z-1">
+        <div class="position-sticky top-0 h-svh w-100">
+          <canvas class="pe-none position-absolute inset-0 h-100 w-100" data-scene="plane"></canvas>
+        </div>
+      </div>
+
+      <div class="shell position-relative z-2 sec-pad">
+        <div class="row g-8 align-items-end">
+          <div class="col-12 col-lg-7">
+            <div class="mb-6 d-flex align-items-center gap-3">
+              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
+              <span class="mono" style="color:rgba(17,17,17,.5)">BY THE BLINK DESK · NOIDA</span>
+            </div>
+            <h2 class="display t-xl" data-reveal>
+              <span class="line-mask"><span class="line-inner head-ink">TRUSTED</span></span>
+              <span class="line-mask"><span class="line-inner head-ink">BY NEWSROOMS</span></span>
+              <span class="line-mask"><span class="line-inner head-grey">ACROSS INDIA</span></span>
+            </h2>
+          </div>
+          <div class="col-12 col-lg-5 front-aside">
+            <p class="body-copy" style="color:rgba(17,17,17,.6)">From regional dailies to national networks, publishers
+              stay because we treat their newsroom like our own.</p>
+          </div>
+        </div>
+
+        <div class="mt-vh-7">
+          <article class="clipping row g-5 align-items-center mt-4 p-5">
+            <svg class="clipping__tear" viewBox="0 0 600 9" preserveAspectRatio="none" aria-hidden="true">
+              <use href="#tear" />
+            </svg>
+            <div class="col-12 col-sm-2">
+              <div class="halftone-media clipping__shot d-flex align-items-center justify-content-center"
+                data-cursor="media">
+                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#2b2438,#6118EA)"></div>
+                <span class="display position-relative" style="color:#fff;font-size:22px">DA</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <h3 class="display t-md">DAILY THANTHI</h3>
+              <span class="mono-xs" style="color:rgba(17,17,17,.45)">TAMIL DAILY · CASE STUDY 01</span>
+            </div>
+            <div
+              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">20×</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">growth</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">1.5s</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">load time</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">83%</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">search discovery</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="clipping row g-5 align-items-center mt-4 p-5">
+            <svg class="clipping__tear" viewBox="0 0 600 9" preserveAspectRatio="none" aria-hidden="true">
+              <use href="#tear" />
+            </svg>
+            <div class="col-12 col-sm-2">
+              <div class="halftone-media clipping__shot d-flex align-items-center justify-content-center"
+                data-cursor="media">
+                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#1d1d22,#E10600)"></div>
+                <span class="display position-relative" style="color:#fff;font-size:22px">HA</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <h3 class="display t-md">THE HANS INDIA</h3>
+              <span class="mono-xs" style="color:rgba(17,17,17,.45)">ENGLISH DAILY · CASE STUDY 02</span>
+            </div>
+            <div
+              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">2 MO</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">to record traffic</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">43K</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">concurrent users</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">ZERO</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">downtime</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="clipping row g-5 align-items-center mt-4 p-5">
+            <svg class="clipping__tear" viewBox="0 0 600 9" preserveAspectRatio="none" aria-hidden="true">
+              <use href="#tear" />
+            </svg>
+            <div class="col-12 col-sm-2">
+              <div class="halftone-media clipping__shot d-flex align-items-center justify-content-center"
+                data-cursor="media">
+                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#232a33,#00AEEF)"></div>
+                <span class="display position-relative" style="color:#fff;font-size:22px">LI</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <h3 class="display t-md">LIVELAW</h3>
+              <span class="mono-xs" style="color:rgba(17,17,17,.45)">LEGAL NEWS · CASE STUDY 03</span>
+            </div>
+            <div
+              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">−30%</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">bounce rate</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">10s</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">faster pages</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="clipping row g-5 align-items-center mt-4 p-5">
+            <svg class="clipping__tear" viewBox="0 0 600 9" preserveAspectRatio="none" aria-hidden="true">
+              <use href="#tear" />
+            </svg>
+            <div class="col-12 col-sm-2">
+              <div class="halftone-media clipping__shot d-flex align-items-center justify-content-center"
+                data-cursor="media">
+                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#2b2438,#6118EA)"></div>
+                <span class="display position-relative" style="color:#fff;font-size:22px">FE</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <h3 class="display t-md">THE FEDERAL</h3>
+              <span class="mono-xs" style="color:rgba(17,17,17,.45)">DIGITAL-FIRST · CASE STUDY 04</span>
+            </div>
+            <div
+              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">2×</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">traffic in 8 months</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">93ms</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">INP</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="clipping row g-5 align-items-center mt-4 p-5">
+            <svg class="clipping__tear" viewBox="0 0 600 9" preserveAspectRatio="none" aria-hidden="true">
+              <use href="#tear" />
+            </svg>
+            <div class="col-12 col-sm-2">
+              <div class="halftone-media clipping__shot d-flex align-items-center justify-content-center"
+                data-cursor="media">
+                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#1d1d22,#E10600)"></div>
+                <span class="display position-relative" style="color:#fff;font-size:22px">MA</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <h3 class="display t-md">MADHYAMAM</h3>
+              <span class="mono-xs" style="color:rgba(17,17,17,.45)">MALAYALAM DAILY · CASE STUDY 05</span>
+            </div>
+            <div
+              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">+50%</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">engagement</div>
+              </div>
+              <div class="text-start text-sm-end">
+                <div class="display clipping__metric">72%</div>
+                <div class="mono-xs" style="color:rgba(17,17,17,.45)">search discovery</div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <p class="mono-xs mt-6" style="color:rgba(17,17,17,.34)">RESULTS AS SUPPLIED BY BLINK CMS · NO QUOTES ATTRIBUTED
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ 08 · THE MASTHEAD WALL ══════════════════════════════════ -->
+    <section id="case-studies" class="position-relative" data-nav="light" data-label="LETTERS" style="background:#fff">
+      <div class="shell pb-vh-10">
+        <div class="hair-b d-flex flex-wrap align-items-end justify-content-between gap-4 pb-4">
+          <span class="mono" style="color:rgba(17,17,17,.5)">OUR PUBLISHERS</span>
+          <div class="d-flex align-items-center gap-1">
+            <button class="mono-xs tab-btn px-3 py-2" data-tab="PUBLISHERS" aria-pressed="true">PUBLISHERS</button>
+            <button class="mono-xs tab-btn px-3 py-2" data-tab="INTEGRATIONS" aria-pressed="false">INTEGRATIONS</button>
+          </div>
+        </div>
+
+        <div data-tab-panel="PUBLISHERS">
+          <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-0 masthead-grid">
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">TV5 TELUGU</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">DAILY THANTHI</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">TUPAKI</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">MAALAIMALAR</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">BHASKAR HINDI</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">MEDIAONE</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">LIVELAW</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">THE ASIAN AGE</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">THE BRIDGE</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">RANI</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">MADHYAMAM</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">MEDICAL DIALOGUES</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">DECCAN CHRONICLE</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">CORE</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">BOOM</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">THE FEDERAL</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">THE HANS INDIA</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">TELUGU GLOBE</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">THE ASSAM TRIBUNE</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">MILLENNIUM POST</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+          </div>
+          <div class="mono-xs mt-4 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)"><span
+              class="live-dot"></span>20 MASTHEADS SHOWN · 150+ NEWSROOMS POWERED</div>
+        </div>
+
+        <div data-tab-panel="INTEGRATIONS" hidden>
+          <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-0 masthead-grid">
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">GOOGLE NEWS</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">AMP</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">GA4</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">GOOGLE MCM / DFP</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">FACEBOOK PIXEL</span><svg
+                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">CHATGPT</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">AWS</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">YOUTUBE</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">FACEBOOK</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">LINKEDIN</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+            <div
+              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
+              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
+                class="display masthead-name position-relative z-2">X</span><svg class="reg-mark masthead-mark"
+                width="11" height="11" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg></div>
+          </div>
+          <div class="mono-xs mt-4 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)"><span
+              class="live-dot"></span>11 INTEGRATIONS · MORE ON REQUEST</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 09 · THE WIRE ═══════════════════════════════════════════ -->
+    <section id="the-wire" class="position-relative" data-nav="dark" data-label="THE WIRE" style="background:#111111">
+      <div class="wire-sky" aria-hidden="true"></div>
+
+      <div class="shell pb-vh-12">
+        <div class="mb-10 d-flex flex-wrap align-items-end justify-content-between gap-6">
+          <h2 class="display t-lg head-gradient" data-reveal>
+            <span class="line-mask"><span class="line-inner">WHAT'S MOVING</span></span>
+            <span class="line-mask"><span class="line-inner">IN NEWSROOM TECH</span></span>
+          </h2>
+          <a href="#the-wire" class="pill pill-outline-inv pill-mono">VIEW ALL</a>
+        </div>
+
+        <div data-wire-list>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="CASE STUDY"
+            data-tint="linear-gradient(135deg,#2A0B8F,#6118EA)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
+              style="color:rgba(255,255,255,.4)"><span class="live-dot"></span>26 SEP 2026</span>
+            <span class="col-12 col-sm-7 wire-title">How a Tamil daily grew 20× on Blink CMS</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:var(--breaking)">● NEW · GROWTH</span>
+          </a>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="PRODUCT"
+            data-tint="linear-gradient(135deg,#1d1d22,#E10600)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">19
+              SEP 2026</span>
+            <span class="col-12 col-sm-7 wire-title">AI story creation, now in the editor</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">PRODUCT</span>
+          </a>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="GUIDE"
+            data-tint="linear-gradient(135deg,#14212b,#00AEEF)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">11
+              SEP 2026</span>
+            <span class="col-12 col-sm-7 wire-title">Leaving WordPress without losing SEO</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">MIGRATION</span>
+          </a>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="ELECTIONS"
+            data-tint="linear-gradient(135deg,#2b2438,#B9A4FF)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">02
+              SEP 2026</span>
+            <span class="col-12 col-sm-7 wire-title">Running a live results desk at scale</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">LIVE DESK</span>
+          </a>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="SLOT"
+            data-tint="linear-gradient(135deg,#1a1a1f,#6118EA)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
+              style="color:rgba(255,255,255,.4)">—</span>
+            <span class="col-12 col-sm-7 wire-title">[ARTICLE SLOT 05]</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">TBD</span>
+          </a>
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="SLOT"
+            data-tint="linear-gradient(135deg,#1a1a1f,#EC008C)">
+            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
+              style="color:rgba(255,255,255,.4)">—</span>
+            <span class="col-12 col-sm-7 wire-title">[ARTICLE SLOT 06]</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">TBD</span>
+          </a>
+          <div class="wire-row"></div>
+        </div>
+
+        <p class="mono-xs mt-6" style="color:rgba(255,255,255,.3)">ARTICLE SLOTS — HEADLINES SUPPLIED, BODIES NOT YET
+          WRITTEN</p>
+      </div>
+
+      <div class="wire-thumb-wrap pe-none position-fixed start-0 top-0 z-thumb" data-wire-thumb aria-hidden="true">
+        <div class="halftone-media wire-thumb">
+          <div class="position-absolute inset-0" data-wire-thumb-tint></div>
+          <span class="mono-xs wire-thumb__kind" data-wire-thumb-kind></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 10 · F.A.Q ══════════════════════════════════════════════ -->
+    <section id="faq" class="tex-halftone position-relative" data-nav="light" data-label="CLASSIFIEDS"
+      style="background:#fff">
+      <div class="shell row gx-8 gy-10 sec-pad-lg">
+        <div class="col-12 col-lg-3">
+          <h2 class="display t-lg">F.A.Q</h2>
+          <p class="body-copy mt-5" style="color:rgba(17,17,17,.55)">Straight answers, so your newsroom can move
+            forward.</p>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="true">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">01</span>
+              <span class="flex-grow-1 faq-q">What does Blink CMS do?</span><span class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER — BRIEF SUPPLIES THE QUESTION ONLY]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">02</span>
+              <span class="flex-grow-1 faq-q">Which publishers do you work with?</span><span class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER — THE SUPPLIED PUBLISHER LIST IS ON THE MASTHEAD WALL
+                  ABOVE]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">03</span>
+              <span class="flex-grow-1 faq-q">Can we migrate from WordPress without losing SEO?</span><span
+                class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">04</span>
+              <span class="flex-grow-1 faq-q">Will the site survive a traffic spike?</span><span
+                class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">05</span>
+              <span class="flex-grow-1 faq-q">Do you charge more as traffic grows?</span><span class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer">No. Billing is by features.</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">06</span>
+              <span class="flex-grow-1 faq-q">Do you have a reporter / stringer app?</span><span
+                class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">07</span>
+              <span class="flex-grow-1 faq-q">Can you build custom modules (elections, cricket,
+                classifieds)?</span><span class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t" data-faq-item>
+            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
+              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">08</span>
+              <span class="flex-grow-1 faq-q">How do we get a demo?</span><span class="faq-plus">+</span>
+            </button>
+            <div class="faq-panel" data-faq-panel>
+              <div>
+                <p class="body-copy faq-answer is-slot">[ANSWER]</p>
+              </div>
+            </div>
+          </div>
+          <div class="hair-t"></div>
+        </div>
+
+        <div class="col-12 col-lg-3 front-aside">
+          <div class="sticky-col sticky-col--low">
+            <svg class="reg-mark" width="14" height="14" aria-hidden="true" style="color:rgba(17,17,17,.3)">
+              <use href="#reg-mark" />
+            </svg>
+            <h3 class="display t-sm mt-4">Still have questions?</h3>
+            <a href="#on-air" class="pill pill-outline pill-mono mt-5">EMAIL THE DESK</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 11 · ON AIR ═════════════════════════════════════════════ -->
+    <section id="on-air" class="position-relative overflow-hidden" data-nav="dark" data-label="CLASSIFIEDS"
+      style="background:#111111">
+      <div class="pe-none position-absolute inset-0 d-flex align-items-center justify-content-center"
+        aria-hidden="true">
+        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 0s infinite"></span>
+        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 1.08s infinite"></span>
+        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 2.16s infinite"></span>
+        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 3.24s infinite"></span>
+        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 4.32s infinite"></span>
+      </div>
+
+      <div class="shell position-relative z-2 d-flex flex-column align-items-center sec-pad-xl text-center">
+        <div class="mb-10 d-flex align-items-center gap-3">
+          <span class="on-air-lamp"></span>
+          <span class="mono" style="color:rgba(255,255,255,.6)">ON AIR</span>
+        </div>
+
+        <h2 class="display t-xl" data-reveal>
+          <span class="line-mask"><span class="line-inner text-white">READY TO</span></span>
+          <span class="line-mask"><span class="line-inner text-white">GO LIVE?</span></span>
+        </h2>
+
+        <p class="body-copy mt-8 mx-auto" style="color:rgba(255,255,255,.6);max-width:52ch">
+          The extended tech team behind 150+ newsrooms. No ticket queues. No runaround. Just people who know news.
+        </p>
+
+        <a href="#on-air" class="pill pill-white mt-10">BOOK A DEMO</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ 12 · THE BACK PAGE ══════════════════════════════════════ -->
+  <footer id="contact" class="tex-halftone position-relative" data-nav="light" data-label="BACK PAGE"
+    style="background:#fff">
+    <div class="shell">
+      <div class="hair-b d-flex flex-wrap align-items-center justify-content-between gap-4 py-5">
+        <div class="d-flex align-items-baseline gap-1">
+          <span class="display" style="font-size:30px;letter-spacing:-.02em">B</span>
+          <span class="brand-dot" style="width:8px;height:8px"></span>
+        </div>
+        <p class="masthead-serif" style="font-size:clamp(1.2rem,2.4vw,2.1rem)">Every stage of the story.</p>
+        <div class="d-flex align-items-center gap-2">
+          <a href="#contact"
+            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">X</a>
+          <a href="#contact"
+            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">IN</a>
+          <a href="#contact"
+            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">FB</a>
+          <a href="#contact"
+            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">YT</a>
+        </div>
+      </div>
+
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 gx-6 gy-9 py-10">
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">PLATFORM</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#platform" class="footer-link">Monitor</a></li>
+            <li><a href="#platform" class="footer-link">Gather</a></li>
+            <li><a href="#platform" class="footer-link">Create</a></li>
+            <li><a href="#platform" class="footer-link">Publish</a></li>
+            <li><a href="#platform" class="footer-link">Monetize</a></li>
+            <li><a href="#platform" class="footer-link">Analyze</a></li>
+          </ul>
+        </nav>
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">MODULES</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#platform" class="footer-link">The Reporter</a></li>
+            <li><a href="#platform" class="footer-link">The AI Editor</a></li>
+            <li><a href="#platform" class="footer-link">The Edition</a></li>
+            <li><a href="#platform" class="footer-link">The Subscriber</a></li>
+            <li><a href="#platform" class="footer-link">The E-Paper</a></li>
+            <li><a href="#platform" class="footer-link">The Analyst</a></li>
+          </ul>
+        </nav>
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">CASE STUDIES</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#letters" class="footer-link">Daily Thanthi</a></li>
+            <li><a href="#letters" class="footer-link">The Hans India</a></li>
+            <li><a href="#letters" class="footer-link">LiveLaw</a></li>
+            <li><a href="#letters" class="footer-link">The Federal</a></li>
+            <li><a href="#letters" class="footer-link">Madhyamam</a></li>
+          </ul>
+        </nav>
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">THE WIRE</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#the-wire" class="footer-link">Case Studies</a></li>
+            <li><a href="#the-wire" class="footer-link">Product</a></li>
+            <li><a href="#the-wire" class="footer-link">Guides</a></li>
+            <li><a href="#the-wire" class="footer-link">Elections</a></li>
+          </ul>
+        </nav>
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">CAREERS</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#contact" class="footer-link">Open roles</a></li>
+            <li><a href="#contact" class="footer-link">Engineering</a></li>
+            <li><a href="#contact" class="footer-link">Newsroom support</a></li>
+          </ul>
+        </nav>
+        <nav>
+          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">CONTACT</span></div>
+          <ul class="d-flex flex-column gap-2 list-unstyled">
+            <li><a href="#on-air" class="footer-link">Book a demo</a></li>
+            <li><a href="#contact" class="footer-link">Email the desk</a></li>
+            <li><a href="#contact" class="footer-link">Support</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="ticker d-flex w-100 align-items-stretch overflow-hidden ticker--dark">
+      <div class="mono-xs ticker__tab d-flex flex-shrink-0 align-items-center gap-2 px-3 ticker-pad fw-bold">
+        <span class="live-dot" style="background:#fff"></span>SEGMENTS | MODULES
+      </div>
+      <div class="marquee flex-grow-1" style="--marquee-dur:38s" data-marquee>
+        <div class="marquee-track align-items-center ticker-pad">
+          <span class="mono-xs d-flex align-items-center gap-4">NATIONAL DAILIES<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">REGIONAL &amp; LANGUAGE NEWS<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">DIGITAL-FIRST MEDIA<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">FACT-CHECKERS<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">LEGAL NEWS<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">HEALTH NEWS<span
+              style="color:var(--breaking)">·</span></span>
+          <span class="mono-xs d-flex align-items-center gap-4">SPORTS<span
+              style="color:var(--breaking)">·</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shell row g-6 py-10">
+      <div class="col-12 col-lg-4">
+        <div class="halftone-media footer-photo position-relative" data-cursor="media">
+          <div class="position-absolute inset-0" style="background:linear-gradient(140deg,#1b1b21,#3a3a44 55%,#101014)">
+          </div>
+          <span class="mono-xs footer-photo__note">[NEWSROOM PHOTO — B&amp;W — NOT SUPPLIED]</span>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4 hair-l ps-lg-6">
+        <div class="mono-xs mb-3 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.4)">
+          <svg class="reg-mark" width="12" height="12" aria-hidden="true">
+            <use href="#reg-mark" />
+          </svg>HEAD OFFICE
+        </div>
+        <p class="body-copy" style="max-width:34ch;color:rgba(17,17,17,.75)">
+          1st Floor, Rally Infra, H-157, near Noida Electronic City Metro, H Block, Sector 63, Noida, UP 201301
+        </p>
+        <div class="mt-5 d-flex flex-column gap-1">
+          <span class="mono-sm" style="color:var(--breaking)">[EMAIL]</span>
+          <span class="mono-sm" style="color:var(--breaking)">[PHONE]</span>
+        </div>
+        <span class="colour-bar mt-6" style="width:56px;height:5px"><i></i><i></i><i></i><i></i></span>
+      </div>
+
+      <div class="col-12 col-lg-4 hair-l ps-lg-6">
+        <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">BUREAUS</div>
+        <div class="footer-map"><canvas class="h-100 w-100" data-scene="map" role="img"
+            aria-label="Bureau map"></canvas></div>
+      </div>
+    </div>
+
+    <div class="shell">
+      <div class="hair-t d-flex flex-wrap align-items-center justify-content-between gap-3 py-4">
+        <span class="mono-xs" style="color:rgba(17,17,17,.45)">© 2026 Blink CMS · Printed digitally in Noida</span>
+        <div class="d-flex gap-5">
+          <a href="#contact" class="mono-xs" style="color:rgba(17,17,17,.45)">Privacy</a>
+          <a href="#contact" class="mono-xs" style="color:rgba(17,17,17,.45)">Terms</a>
+          <a href="#contact" class="mono-xs" style="color:rgba(17,17,17,.45)">Cookies</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-wordmark">
+      <div><canvas class="h-100 w-100" data-scene="wordmark" role="img" aria-label="BLINKCMS"></canvas></div>
+    </div>
+  </footer>
+
+  <!-- ═══ film modal ══════════════════════════════════════════════ -->
+  <div class="film-modal position-fixed inset-0 z-modal d-flex align-items-center justify-content-center"
+    data-film-modal aria-hidden="true">
+    <div class="film-frame position-relative">
+      <svg class="reg-mark film-corner film-corner--tl" width="14" height="14" aria-hidden="true">
+        <use href="#reg-mark" />
+      </svg>
+      <svg class="reg-mark film-corner film-corner--tr" width="14" height="14" aria-hidden="true">
+        <use href="#reg-mark" />
+      </svg>
+      <svg class="reg-mark film-corner film-corner--bl" width="14" height="14" aria-hidden="true">
+        <use href="#reg-mark" />
+      </svg>
+      <svg class="reg-mark film-corner film-corner--br" width="14" height="14" aria-hidden="true">
+        <use href="#reg-mark" />
+      </svg>
+
+      <div class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center gap-4">
+        <span class="mono-xs d-flex align-items-center gap-2" style="color:var(--breaking)"><span
+            class="live-dot"></span>FILM SLOT</span>
+        <p class="mono-sm text-center" style="color:rgba(255,255,255,.5);max-width:46ch">
+          [BRAND FILM — NOT SUPPLIED]<br>
+          <span class="mono-xs">Replace this frame with the cut · 16:9 · captions on by default</span>
+        </p>
+      </div>
+
+      <button class="mono-xs film-close d-flex align-items-center gap-2" data-close-film>CLOSE ✕</button>
+    </div>
+  </div>
+
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="vendor/lenis.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

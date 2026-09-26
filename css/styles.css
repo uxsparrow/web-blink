@@ -2968,7 +2968,7 @@ html.lenis body {
 .platform-word {
   position: absolute;
   left: 0;
-  top: 6%;
+  top: calc(5vh + 76px);
   white-space: nowrap;
   color: var(--newsprint);
   z-index: 0;
@@ -2982,7 +2982,7 @@ html.lenis body {
   position: absolute;
   left: 0;
   right: 0;
-  top: 17%;
+  top: calc(5vh + 162px);
   perspective: 1400px;
 }
 
@@ -2994,6 +2994,7 @@ html.lenis body {
   opacity: 0;
   height: 100%;
   overflow: hidden;
+  padding: 1rem;
   transition: border-color 0.3s, background 0.3s, box-shadow 0.35s;
 }
 .platform-card:hover {
@@ -3067,7 +3068,7 @@ html.lenis body {
 
 @media (max-width: 639.98px) {
   .platform-card {
-    padding: 0.875rem !important;
+    padding: 0.875rem;
   }
   .platform-card__plate {
     width: 26px;
@@ -3083,6 +3084,30 @@ html.lenis body {
     padding-top: 0.6rem;
     font-size: 0.72rem;
     line-height: 1.45;
+  }
+}
+@media (max-height: 760px) {
+  .platform-cards {
+    top: calc(5vh + 86px);
+    --bs-gutter-y: 0.5rem;
+  }
+  .platform-card {
+    padding: 0.7rem;
+  }
+  .platform-card__plate {
+    width: 22px;
+    height: 22px;
+  }
+  .platform-card__num {
+    line-height: 22px;
+  }
+  .platform-card__title {
+    margin-top: 0.45rem;
+  }
+  .platform-card__body {
+    padding-top: 0.45rem;
+    font-size: 0.68rem;
+    line-height: 1.4;
   }
 }
 .live-strip {

@@ -789,14 +789,15 @@
       style="background:#fff">
       <div class="pin-stage">
         <canvas class="position-absolute inset-0 h-100 w-100" data-scene="desk"></canvas>
-        <!-- clear of the 55px fixed header, which outranks this on z-index -->
-        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex justify-content-end" style="top:76px">
+        <!-- Both of the desk's labels sit together, top right and clear of the
+             55px fixed header, which outranks them on z-index. Keeping the
+             second one at the foot left it crowding the next section's head. -->
+        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex flex-column align-items-end gap-2"
+          style="top:76px">
           <div class="d-flex align-items-center gap-3">
             <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
             <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
           </div>
-        </div>
-        <div class="shell pe-none position-absolute inset-x-0 bottom-7 z-2 d-flex justify-content-end">
           <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
             ONE STORY · EVERY SCREEN
             <svg class="reg-mark" width="13" height="13" aria-hidden="true">
@@ -827,7 +828,7 @@
 
         <div class="shell platform-cards row row-cols-2 row-cols-lg-3 g-3 z-2">
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#111111">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#111111">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">
@@ -843,7 +844,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#6118EA">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#6118EA">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">
@@ -859,7 +860,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#E10600">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#E10600">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">
@@ -875,7 +876,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#111111">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#111111">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">
@@ -891,7 +892,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#6118EA">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#6118EA">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">
@@ -907,7 +908,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="platform-card d-flex flex-column p-4" data-platform-card style="--accent:#E10600">
+            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#E10600">
               <span class="platform-card__band" aria-hidden="true"></span>
               <span class="platform-card__sweep" aria-hidden="true"></span>
               <div class="d-flex align-items-start justify-content-between gap-3">

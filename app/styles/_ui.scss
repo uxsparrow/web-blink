@@ -1,0 +1,246 @@
+// ── hairline rules ──────────────────────────────────────────────
+
+.hair-t {
+  border-top: 1px solid var(--hairline);
+}
+.hair-b {
+  border-bottom: 1px solid var(--hairline);
+}
+.hair-l {
+  border-left: 1px solid var(--hairline);
+}
+.hair-r {
+  border-right: 1px solid var(--hairline);
+}
+
+// ── textures ────────────────────────────────────────────────────
+
+.tex-halftone {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background-image: radial-gradient(rgba(17, 17, 17, 0.9) 0.5px, transparent 0.6px);
+    background-size: 3px 3px;
+    opacity: 0.045;
+  }
+}
+
+// Halftone dots over media, lifting to the full photo on hover.
+.halftone-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--newsprint);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-image: radial-gradient(rgba(17, 17, 17, 0.85) 1.1px, transparent 1.3px);
+    background-size: 4px 4px;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  > * {
+    filter: grayscale(1) contrast(1.15);
+    transition: filter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover::after {
+    opacity: 0;
+  }
+  &:hover > * {
+    filter: none;
+  }
+}
+
+// ── pills ───────────────────────────────────────────────────────
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  border-radius: 999px;
+  padding: 0.82em 1.5em;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition:
+    background 0.35s,
+    color 0.35s,
+    border-color 0.35s,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.pill-ink {
+  background: var(--ink);
+  color: #fff;
+
+  &:hover {
+    background: var(--blink);
+    color: #fff;
+  }
+}
+
+.pill-white {
+  background: #fff;
+  color: var(--ink);
+
+  &:hover {
+    background: var(--blink);
+    color: #fff;
+  }
+}
+
+.pill-outline {
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+
+  &:hover {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: #fff;
+  }
+}
+
+.pill-outline-inv {
+  border: 1px solid var(--hairline-inv);
+  color: #fff;
+
+  &:hover {
+    background: #fff;
+    color: var(--ink);
+  }
+}
+
+.pill-mono {
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  padding: 0.95em 1.6em;
+}
+
+// ── live dot ────────────────────────────────────────────────────
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--breaking);
+  position: relative;
+  flex: none;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    border: 1px solid var(--breaking);
+    animation: pulse-ring 1.8s ease-out infinite;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+// ── ticker marquee ──────────────────────────────────────────────
+
+.marquee {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-track {
+  display: flex;
+  flex: none;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  animation: marquee var(--marquee-dur, 28s) linear infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+// ── masthead wall: the ink roll ─────────────────────────────────
+
+.masthead-cell {
+  min-height: 118px;
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+
+  &:hover .masthead-ink {
+    transform: scaleX(1);
+  }
+  &:hover .display {
+    color: #fff;
+  }
+}
+
+.masthead-ink {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.masthead-grid {
+  border-left: 1px solid var(--hairline);
+  border-top: 1px solid var(--hairline);
+}
+
+// ── misc ────────────────────────────────────────────────────────
+
+.footer-link {
+  font-size: 14px;
+  color: rgba(17, 17, 17, 0.7);
+  transition: color 0.25s;
+
+  &:hover {
+    color: var(--blink);
+  }
+}
+
+.social-dot {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hairline);
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+
+  &:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+}

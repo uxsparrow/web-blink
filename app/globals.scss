@@ -1,0 +1,176 @@
+// ─────────────────────────────────────────────────────────────────
+//  BLINK CMS — design system on Bootstrap 5
+//
+//  Import order follows Bootstrap's own guidance: configuration, then
+//  the framework, then our components, and the utilities API LAST so
+//  utility classes still win over component classes.
+// ─────────────────────────────────────────────────────────────────
+
+@import 'bootstrap/scss/functions';
+
+// ── configuration ───────────────────────────────────────────────
+
+// Lenis owns the scroll; Bootstrap's smooth-scroll would fight it.
+$enable-smooth-scroll: false;
+$enable-dark-mode: false;
+$enable-shadows: false;
+
+// Tailwind's breakpoints, kept so every sm:/md:/lg: decision in the
+// layout survives the move unchanged.
+$grid-breakpoints: (
+  xs: 0,
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+  xxl: 1536px,
+);
+
+$container-max-widths: (
+  sm: 600px,
+  md: 728px,
+  lg: 984px,
+  xl: 1240px,
+  xxl: 1496px,
+);
+
+// Tailwind's numeric spacing scale, so gap-2 / mb-5 / py-10 keep their
+// exact values through the swap.
+$spacers: (
+  0: 0,
+  1: 0.25rem,
+  2: 0.5rem,
+  3: 0.75rem,
+  4: 1rem,
+  5: 1.25rem,
+  6: 1.5rem,
+  7: 1.75rem,
+  8: 2rem,
+  9: 2.25rem,
+  10: 2.5rem,
+  11: 2.75rem,
+  12: 3rem,
+  14: 3.5rem,
+  16: 4rem,
+);
+
+$grid-gutter-width: 1.5rem;
+
+// Bootstrap ships only 0/50/100 for top/bottom/start/end; the layout needs
+// the spacing scale there too (bottom-4, bottom-7, …).
+$position-values: map-merge(
+  (0: 0, 50: 50%, 100: 100%),
+  $spacers
+);
+
+// Semantic stacking order, used as z-* utilities.
+$zindex-levels: (
+  n1: -1,
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  thumb: 860,
+  label: 880,
+  menu: 890,
+  header: 900,
+  modal: 950,
+  loader: 1000,
+  cursor: 9999,
+);
+
+// brand
+$blink: #6118ea;
+$blink-lift: #b9a4ff;
+$breaking: #e10600;
+$ink: #111111;
+$newsprint: #f3f0e8;
+$paper-grey: #f4f4f4;
+$grey-head: #9a9a9a;
+
+$body-bg: #ffffff;
+$body-color: $ink;
+$font-family-base: var(--font-grotesk), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-family-monospace: var(--font-spacemono), ui-monospace, monospace;
+$font-size-base: 1.0625rem; // 17px
+$line-height-base: 1.45;
+
+$theme-colors: (
+  'primary': $blink,
+  'ink': $ink,
+  'breaking': $breaking,
+  'newsprint': $newsprint,
+);
+
+// ── framework ───────────────────────────────────────────────────
+
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+
+// The utilities API emits every group at every breakpoint, and the spacing
+// scale above is wide. Drop the groups this site never uses — colour, borders,
+// type and effects are all handled by the design system, not by utilities.
+$utilities: map-remove(
+  $utilities,
+  'float',
+  'object-fit',
+  'opacity',
+  'shadow',
+  'border',
+  'border-top',
+  'border-end',
+  'border-bottom',
+  'border-start',
+  'border-width',
+  'border-opacity',
+  'border-color',
+  'rounded-top',
+  'rounded-end',
+  'rounded-bottom',
+  'rounded-start',
+  'font-family',
+  'font-size',
+  'font-style',
+  'line-height',
+  'text-decoration',
+  'text-transform',
+  'word-wrap',
+  'vertical-align',
+  'background-color',
+  'bg-opacity',
+  'gradient',
+  'text-opacity',
+  'link-opacity',
+  'link-offset',
+  'link-underline',
+  'link-underline-opacity',
+  'user-select',
+  'align',
+  'max-width',
+  'max-height',
+  'viewport-height',
+  'viewport-width',
+  'min-viewport-height',
+  'min-viewport-width',
+  'focus-ring'
+);
+
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/helpers';
+
+// ── our layer ───────────────────────────────────────────────────
+
+@import 'styles/tokens';
+@import 'styles/base';
+@import 'styles/type';
+@import 'styles/ui';
+@import 'styles/layout';
+
+// ── utilities last, so they override the component classes above ─
+
+@import 'bootstrap/scss/utilities/api';

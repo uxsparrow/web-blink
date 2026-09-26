@@ -238,6 +238,8 @@
   top: 17%;
   perspective: 1400px;
 }
+// Each card carries its own accent as --accent, set inline in index.html, so
+// the band, the index number and the icon plate all read from one value.
 .platform-card {
   position: relative;
   background: var(--newsprint);
@@ -245,13 +247,116 @@
   transform-origin: bottom center;
   opacity: 0;
   height: 100%;
+  overflow: hidden;
+  transition:
+    border-color 0.3s,
+    background 0.3s,
+    box-shadow 0.35s;
+
+  // GSAP owns this element's transform for the flip-in, so hover states here
+  // must never animate transform — it would be overwritten inline. Everything
+  // below moves colour, or moves a child.
+  &:hover {
+    background: #fff;
+    border-color: rgba(17, 17, 17, 0.34);
+    box-shadow: 0 16px 38px -22px rgba(17, 17, 17, 0.5);
+  }
 }
+
 .platform-card__band {
   position: absolute;
   left: 0;
   top: 0;
   height: 4px;
   width: 100%;
+  background: var(--accent);
+}
+
+// the ink sweep the masthead wall uses, run along the foot of the card
+.platform-card__sweep {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+
+  .platform-card:hover & {
+    transform: scaleX(1);
+  }
+}
+
+.platform-card__num {
+  color: rgba(17, 17, 17, 0.42);
+  line-height: 34px; // centred against the icon plate opposite it
+  transition: color 0.3s;
+
+  .platform-card:hover & {
+    color: var(--accent);
+  }
+}
+
+// a stamped plate, sized like the footer's social dots
+.platform-card__plate {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  color: rgba(17, 17, 17, 0.62);
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+
+  .platform-card:hover & {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+}
+
+.platform-card__title {
+  margin-top: 1.25rem;
+  color: var(--ink);
+}
+
+// pinned to the foot so six cards of unequal copy still line up
+.platform-card__body {
+  margin-top: auto;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(17, 17, 17, 0.66);
+}
+
+// The grid is two-up rather than stacked on phones, and the card tightens to
+// match. Six stacked cards do not fit the pinned stage, and the stage clips —
+// the last two simply vanished. Keep the six rows inside 100svh.
+@include media-breakpoint-down(sm) {
+  .platform-card {
+    padding: 0.875rem !important;
+  }
+  .platform-card__plate {
+    width: 26px;
+    height: 26px;
+  }
+  .platform-card__num {
+    line-height: 26px;
+  }
+  .platform-card__title {
+    margin-top: 0.7rem;
+  }
+  .platform-card__body {
+    padding-top: 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
 }
 
 // ── 05 live ─────────────────────────────────────────────────────

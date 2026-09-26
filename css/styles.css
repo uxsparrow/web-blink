@@ -2993,6 +2993,13 @@ html.lenis body {
   transform-origin: bottom center;
   opacity: 0;
   height: 100%;
+  overflow: hidden;
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.35s;
+}
+.platform-card:hover {
+  background: #fff;
+  border-color: rgba(17, 17, 17, 0.34);
+  box-shadow: 0 16px 38px -22px rgba(17, 17, 17, 0.5);
 }
 
 .platform-card__band {
@@ -3001,8 +3008,83 @@ html.lenis body {
   top: 0;
   height: 4px;
   width: 100%;
+  background: var(--accent);
 }
 
+.platform-card__sweep {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.platform-card:hover .platform-card__sweep {
+  transform: scaleX(1);
+}
+
+.platform-card__num {
+  color: rgba(17, 17, 17, 0.42);
+  line-height: 34px;
+  transition: color 0.3s;
+}
+.platform-card:hover .platform-card__num {
+  color: var(--accent);
+}
+
+.platform-card__plate {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  color: rgba(17, 17, 17, 0.62);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.platform-card:hover .platform-card__plate {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.platform-card__title {
+  margin-top: 1.25rem;
+  color: var(--ink);
+}
+
+.platform-card__body {
+  margin-top: auto;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(17, 17, 17, 0.66);
+}
+
+@media (max-width: 639.98px) {
+  .platform-card {
+    padding: 0.875rem !important;
+  }
+  .platform-card__plate {
+    width: 26px;
+    height: 26px;
+  }
+  .platform-card__num {
+    line-height: 26px;
+  }
+  .platform-card__title {
+    margin-top: 0.7rem;
+  }
+  .platform-card__body {
+    padding-top: 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+}
 .live-strip {
   position: relative;
   margin-inline: auto;

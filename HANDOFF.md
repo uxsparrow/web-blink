@@ -107,6 +107,7 @@ Listed so they don't get reintroduced.
 | Front-page headline clipped | Text overflowed the column and `.line-mask { overflow: hidden }` cut it; past the 1560px shell cap the `5vw` padding kept growing while the column didn't | Four explicit lines, `.front-head` clamp tuned to the column, `front-main` padding capped |
 | Desk section looked like blank space | Scene faded in from zero, but the stage scrolls into view *before* the pin engages | Scene is fully composed at progress 0 |
 | Hero globe gone on the way back up | The hero scrub tweened `[data-globe-wrap]`'s opacity, but that element is the *lazy reveal* — CSS holds it at 0 until the Three.js import resolves and `is-ready` fades it in. GSAP records a target's start value on the tween's first render and restores it when the playhead rewinds past the tween, so it recorded the pre-reveal 0 and wrote it back **inline** at the top, beating `.is-ready` | The dim moved to an inner `[data-globe-dim]` layer that always rests at opacity 1. Never animate the wrap's opacity — that property belongs to the reveal |
+| Platform cards 05 and 06 invisible on a phone | Six cards stacked one-up came to ~880px inside a `100svh` pin-stage that clips, so the last two were simply cut off. Predates the card redesign, which made it worse before it was found | The grid is `row-cols-2` on phones with a compact card below 640px: 549px for all six at 390×820, with room to spare |
 | Screens overlapped on the conveyor | The rider wrap period wasn't a whole number of slots, so one coming back round the left landed between slots | Period is `slots × spacing`, with slots rounded up to a whole number of rider cycles |
 
 ---
@@ -216,6 +217,15 @@ shape and its job in the scroll story.
   full-bleed, and a contain-fit would letterbox the line's ends. Riders scale off
   the canvas width instead (`k`).
 - Composed at progress 0, same as the Desk and for the same reason.
+- **The six cards** carry their accent as `--accent`, set inline per card, and
+  the band, the index number, the icon plate and the foot sweep all read from
+  that one value. The body copy is deliberately *not* `.mono-xs`: at 9.5px
+  uppercase it read as a label rather than as a sentence. `margin-top: auto` on
+  the body pins it to the foot so six cards of unequal copy still line up.
+- **A card's hover state must never animate `transform`.** GSAP owns that
+  property for the flip-in and writes it inline, so a CSS hover transform is
+  overwritten — the same trap as the hero globe in §4. Hover moves colour, and
+  moves children (the foot sweep is its own element).
 - `drawArticle` is now shared: it lives in **`js/lib/article.js`** and both
   scenes import it, so the claim that 03 and 04 show the same story is enforced
   by the code rather than by two copies agreeing. Its copy — the headline lines
@@ -336,6 +346,13 @@ These cost a lot of time; they are about the tooling, not the site.
   ScrollTrigger. Both are dev-only handles.
 - **Rebuilding CSS:** `npm run css` (needs `npm install` for sass + bootstrap,
   dev-only). `css/styles.css` is committed and ready to serve.
+  - A worktree has no `node_modules` of its own. Rather than installing a second
+    copy, compile with the main checkout's:
+    `node ../../../node_modules/sass/sass.js scss/main.scss css/styles.css --load-path=../../../node_modules --no-source-map`.
+    Bootstrap's own partials emit a wall of deprecation warnings; they are not
+    yours. Check `git diff --stat css/styles.css` afterwards — if the diff is
+    anything other than purely additive for what you changed, your sass version
+    disagrees with whatever built the committed file.
 
 ---
 

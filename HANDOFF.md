@@ -1,6 +1,7 @@
 # Handoff — Blink CMS one-page site
 
-Written 26 Sep 2026. Read this plus `README.md` before changing anything.
+Written 26 Sep 2026, updated the same day after section 04 went digital.
+Read this plus `README.md` before changing anything.
 `README.md` is the permanent doc (stack, structure, how to run). This file is
 the session context: **what was decided and why**, what's unverified, and what
 is still open.
@@ -43,9 +44,14 @@ node server.js      # → http://localhost:8080
 
 ### Git
 
-Three commits on top of an initial commit. Working tree has **3 modified files**
-(`README.md`, `index.html`, `js/scenes/desk.js`) from the last round of desk
-changes — review and commit them.
+All committed on `master`, working tree clean. The digital Desk, the header
+logo and this file landed as three commits; section 04's rail was built on
+`claude/section-04-conveyor-digital-291321` and merged in. Nothing is pushed —
+there is no remote configured.
+
+The only merge conflict was in `README.md`, where both sides had edited
+neighbouring rows of the scenes table. If you branch again, expect that table
+and `index.html`'s section blocks to be the contended spots.
 
 ---
 
@@ -100,6 +106,8 @@ Listed so they don't get reintroduced.
 | Globe opened on the Americas | Hand-tuned yaw that didn't match the bureaus | Derived: `yawFor(lon) = -(lon + 90)°`, `START_LON = 78` |
 | Front-page headline clipped | Text overflowed the column and `.line-mask { overflow: hidden }` cut it; past the 1560px shell cap the `5vw` padding kept growing while the column didn't | Four explicit lines, `.front-head` clamp tuned to the column, `front-main` padding capped |
 | Desk section looked like blank space | Scene faded in from zero, but the stage scrolls into view *before* the pin engages | Scene is fully composed at progress 0 |
+| Hero globe gone on the way back up | The hero scrub tweened `[data-globe-wrap]`'s opacity, but that element is the *lazy reveal* — CSS holds it at 0 until the Three.js import resolves and `is-ready` fades it in. GSAP records a target's start value on the tween's first render and restores it when the playhead rewinds past the tween, so it recorded the pre-reveal 0 and wrote it back **inline** at the top, beating `.is-ready` | The dim moved to an inner `[data-globe-dim]` layer that always rests at opacity 1. Never animate the wrap's opacity — that property belongs to the reveal |
+| Screens overlapped on the conveyor | The rider wrap period wasn't a whole number of slots, so one coming back round the left landed between slots | Period is `slots × spacing`, with slots rounded up to a whole number of rider cycles |
 
 ---
 
@@ -112,7 +120,7 @@ All drawn in code — no image sequences, no renders to commission.
 | Dotted globe | `js/scenes/globe.js` | Three.js points on **real Natural Earth land**; 23 pings arcing to Noida |
 | Preloader map | `js/scenes/preloader.js` | Same land data, equirectangular, centred on India |
 | Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
-| Conveyor | `js/scenes/conveyor.js` | **Still newspapers** — see §7 |
+| Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — screens ride the rail, see §6 |
 | Press | `js/scenes/press.js` | **Still a printing press** — see §7 |
 | Paper plane | `js/scenes/paper-plane.js` | Still folded from a front page — see §7 |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
@@ -139,7 +147,9 @@ add cities.
 
 ---
 
-## 6 · The Desk scene (most recently reworked)
+## 6 · The digital scenes (03 and 04)
+
+### The Desk (03)
 
 The user confirmed **Blink CMS is digital-only — no print media**. The desk was
 rebuilt around that: laptop writes, three screens publish. No paper, no
@@ -160,22 +170,51 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
   the phone off the right edge. Don't reintroduce a zoom multiplier without
   re-checking the right-hand device.
 
+### The Platform rail (04)
+
+Same call, carried downstream: the conveyor now runs screens, not newspapers.
+Every print element was *replaced* rather than dropped, so the scene keeps its
+shape and its job in the scroll story.
+
+| was | is |
+|---|---|
+| folded newspapers on the belt | a phone, laptop, tablet and e-paper reader, each waking with the article the Desk wrote |
+| rollers with turning spokes | delivery nodes that pulse as a screen passes over, with a feed line up to the rail |
+| CMYK registration marks | `WEB · AMP · PWA · APP` chips — the channels THE EDITION card already names |
+| ink mist under the rollers | violet signal bloom |
+| — | the Desk's dashed violet publish route, running behind the screens |
+
+- **The structure is unchanged on purpose.** Travel still runs left → right with
+  scroll, and the tilt at `p 0.82–1` still widens the rail into the ink strip
+  that hands off to 05 · LIVE's vertical `.live-rail`. Don't break that handoff.
+- One `drawArticle()` renders every screen, as on the Desk.
+- Riders stay inside the **168px** band the folded papers occupied, so the
+  platform cards above keep the clearance they were laid out with. If you make a
+  rider taller, re-check the cards.
+- The scene draws in **canvas space, not a fitted virtual stage** — it is
+  full-bleed, and a contain-fit would letterbox the line's ends. Riders scale off
+  the canvas width instead (`k`).
+- Composed at progress 0, same as the Desk and for the same reason.
+- `drawArticle`, `roundRect` and the wake-rim logic are now **duplicated** in
+  `desk.js` and `conveyor.js`. Worth extracting to `js/lib/`; deliberately not
+  done yet.
+
 ---
 
 ## 7 · Open items
 
-### Still print, by the user's explicit scoping
+### Still print
 
-The user scoped the print→digital change to **the Desk only**. These remain and
-are known:
+03 and 04 are done (see §6). These remain and are known:
 
-- **04 · Platform** — newspapers riding a conveyor belt.
 - **06 · Press** — a printing press with a paper web through rollers.
 - **07 · Letters** — a paper plane "folded from a front page", torn-edge
   newsprint clippings.
 
-If asked to continue, 06 is the big one: its name, section label and whole
-full-bleed scene would need redesigning.
+06 is the big one: its name, section label and whole full-bleed scene would need
+redesigning. 04 is the worked example of how to do one of these — replace each
+print element with its digital counterpart and keep the scene's structure and
+its handoff to the next section, rather than deleting and starting over.
 
 **Editorial language stays** — the user confirmed masthead, dateline, byline,
 front page, halftone, newsprint all read as journalism rather than print
@@ -220,9 +259,14 @@ by frame at p = 0 / 0.46 / 0.62 / 0.99 (both layouts), masthead tabs, F.A.Q
 accordion, tickers, custom cursor, header at scroll 0, no horizontal overflow,
 headline fit from 1024px to 2560px.
 
-**Not exhaustively verified:** the end states of the conveyor (tilt to top-down)
-and press (burst into flying pages), and the paper plane's full flight path.
-Scroll those on a real screen.
+**Also verified** (section 04, via the frame-capture method in §9): the rail at
+1440×900 and 375×812 across p = 0 / 0.15 / 0.3 / 0.45 / 0.55 / 0.6 / 0.82 / 0.9 /
+0.96 / 1, including the tilt to top-down and the channel chips, no console
+errors. And the hero globe's return trip — the wrap keeps its CSS opacity while
+`[data-globe-dim]` goes 1 → 0.25 → 1 across repeated round trips.
+
+**Not exhaustively verified:** the press (burst into flying pages) and the paper
+plane's full flight path. Scroll those on a real screen.
 
 ---
 
@@ -240,6 +284,19 @@ These cost a lot of time; they are about the tooling, not the site.
   completes in ~4.5s. `getComputedStyle` readings can also go stale — if an
   inline style you just set reads back as the old value, the readback is stale,
   not the CSS.
+  - Useful consequence: `mountScene`'s `setProgress` **paints synchronously**
+    while the loop is paused, so a capture harness needs no rAF at all. Awaiting
+    one will just hang.
+  - CSS **transitions are frozen** too, so a lazily-revealed element can read as
+    `opacity: 0` long after its class landed. That is the pane, not a bug — but
+    it is also what makes the §4 globe bug reproducible on demand.
+- **A hidden pane reports a 0×0 viewport**, so `100svh` resolves to 0, the
+  pin-stages measure zero and ScrollTrigger pins them at that size — DOM
+  geometry readings become meaningless. Call `resize_window` to set an explicit
+  viewport before measuring anything, or work off the canvas captures instead.
+- **Scrub timelines don't settle without rAF.** To test a scroll-driven
+  timeline in-pane, drive it directly — `st.animation.progress(x)` — rather than
+  moving the scroll position and hoping the scrub catches up.
 - **`window.scrollTo` does not stick — Lenis owns the scroll position.** Use
   `window.__lenis.scrollTo(y, { immediate: true })`. `window.__ST` is
   ScrollTrigger. Both are dev-only handles.

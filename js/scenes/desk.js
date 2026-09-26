@@ -7,10 +7,12 @@
  * desk carries screens.
  */
 
-import { clamp, easeInOut, easeOut, lerp, seg } from '../lib/motion.js'
+import { clamp, easeInOut, easeOut, lerp, reducedMotion, seg } from '../lib/motion.js'
 import { displayFamily } from '../lib/fonts.js'
 import { mountScene } from '../lib/canvas-scene.js'
 import { TOTAL_CHARS, drawArticle } from '../lib/article.js'
+import { landDots, loadWorld, rasterize } from '../lib/world.js'
+import { START_LON } from '../lib/content.js'
 
 /*
  * Virtual stage, sized to the content band rather than to a screen, so the
@@ -46,6 +48,63 @@ const LILAC = '#b9a4ff'
 const RED = '#E10600'
 const SHELL = '#16121f'
 const SCREEN = '#0a0812'
+
+/* ── the newsroom wall map ────────────────────────────────────── */
+
+/*
+ * The stage is a band of devices across the middle, which left the top of the
+ * section empty. A dotted world drifts behind it — real Natural Earth land,
+ * the same geometry the preloader map and the hero globe use, centred on the
+ * same longitude, so the page keeps one world rather than a decorative shape.
+ *
+ * It shrinks to nothing before the desk line, so the screens are never read
+ * against a busy background, and it is drawn in canvas space rather than on
+ * the fitted stage so it fills the section's full width at any size.
+ */
+let mapDots = null
+loadWorld().then((world) => {
+  mapDots = landDots(rasterize(world.land, 360, 180, START_LON), 2)
+})
+
+/** Pixels per second the map creeps by — slow enough to read as a still. */
+const MAP_DRIFT = 7
+
+function drawWallMap(ctx, w, h, time, deskLineY) {
+  if (!mapDots) return
+
+  const still = reducedMotion()
+  const mapW = Math.max(w * 1.05, 900)
+  const mapH = mapW / 2
+  const fadeEnd = deskLineY - 28
+  const top = fadeEnd * 0.46 - mapH / 2
+  const unit = Math.max(1, mapW / 900)
+  const shift = still ? 0 : (time * MAP_DRIFT) % mapW
+
+  ctx.save()
+  ctx.fillStyle = 'rgba(17,17,17,.28)'
+  ctx.beginPath()
+  for (let i = 0; i < mapDots.length; i++) {
+    const d = mapDots[i]
+    const y = top + d.y * mapH
+    if (y < 0 || y > fadeEnd) continue
+
+    // in from the top edge, out well before the desk line
+    const fade = Math.min(1, y / (h * 0.08)) * Math.min(1, (fadeEnd - y) / (h * 0.16))
+    if (fade <= 0.02) continue
+
+    // a swell travelling through the field, so the map reads as alive
+    const swell = still ? 1 : 1 + 0.38 * Math.sin(d.x * 9 - time * 1.1 + d.y * 4)
+    const s = unit * fade * swell
+    if (s < 0.25) continue
+
+    // the map wraps, so the copy behind the seam keeps the drift continuous
+    const x = d.x * mapW + shift
+    if (x - mapW > -s) ctx.rect(x - mapW, y, s, s)
+    if (x < w + s) ctx.rect(x, y, s, s)
+  }
+  ctx.fill()
+  ctx.restore()
+}
 
 /* ── helpers ──────────────────────────────────────────────────── */
 
@@ -317,8 +376,13 @@ export function drawDesk(ctx, w, h, p, time, mobile) {
   // plain contain-fit: nothing is cropped at the edges, and the stage is only
   // as tall as the scene, so there is no dead band above it
   const scale = Math.min(w / L.sw, h / SH)
+  const stageTop = (h - SH * scale) / 2
+
+  // behind everything, and told where the desk line lands so it can clear it
+  drawWallMap(ctx, w, h, time, stageTop + DESK_Y * scale)
+
   ctx.save()
-  ctx.translate((w - L.sw * scale) / 2, (h - SH * scale) / 2)
+  ctx.translate((w - L.sw * scale) / 2, stageTop)
   ctx.scale(scale, scale)
 
   // The scene is fully composed at p = 0: this stage scrolls into view before

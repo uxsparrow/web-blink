@@ -169,6 +169,17 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
 - Plain contain-fit against a `1600 × 640` stage — an earlier 1.16× zoom cropped
   the phone off the right edge. Don't reintroduce a zoom multiplier without
   re-checking the right-hand device.
+- **The wall map** fills what that stage leaves empty: a dotted world drifting
+  slowly behind the devices, from the same Natural Earth geometry and the same
+  `START_LON` as the preloader map and the globe, so the page keeps one world.
+  It is drawn in **canvas space, not on the fitted stage**, so it reaches the
+  section's full width, and it is handed the desk line's y so it can shrink to
+  nothing before it — the screens are never read against a busy background.
+  `reducedMotion()` freezes both the drift and the swell. ~5,000 dots batched
+  into one path and one `fill()`; a full repaint measured 0.39ms.
+- The **`CREATE · THE HEADLINE IS WRITTEN`** label sits top-right, offset 76px
+  rather than on the spacing scale: the header is fixed, 55px tall and
+  `z-index: 900`, so anything above ~60px is painted over by it.
 
 ### The Platform rail (04)
 
@@ -298,6 +309,11 @@ These cost a lot of time; they are about the tooling, not the site.
   - CSS **transitions are frozen** too, so a lazily-revealed element can read as
     `opacity: 0` long after its class landed. That is the pane, not a bug — but
     it is also what makes the §4 globe bug reproducible on demand.
+- **An offscreen capture canvas gets clamped.** The reset gives `canvas` a
+  `max-width: 100%`, so a capture canvas styled `width: 1440px` silently comes
+  back at the pane's width — the frames look right but every proportion in them
+  is wrong. Set `max-width: none` on it and assert the measured box before
+  trusting a capture.
 - **A hidden pane reports a 0×0 viewport**, so `100svh` resolves to 0, the
   pin-stages measure zero and ScrollTrigger pins them at that size — DOM
   geometry readings become meaningless. Call `resize_window` to set an explicit

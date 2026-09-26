@@ -789,11 +789,14 @@
       style="background:#fff">
       <div class="pin-stage">
         <canvas class="position-absolute inset-0 h-100 w-100" data-scene="desk"></canvas>
-        <div class="shell pe-none position-absolute inset-x-0 bottom-7 d-flex align-items-end justify-content-between">
+        <!-- clear of the 55px fixed header, which outranks this on z-index -->
+        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex justify-content-end" style="top:76px">
           <div class="d-flex align-items-center gap-3">
             <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
             <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
           </div>
+        </div>
+        <div class="shell pe-none position-absolute inset-x-0 bottom-7 z-2 d-flex justify-content-end">
           <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
             ONE STORY · EVERY SCREEN
             <svg class="reg-mark" width="13" height="13" aria-hidden="true">

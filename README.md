@@ -70,7 +70,7 @@ sequences to produce or ship:
 | Delivery line + channel taps | `js/scenes/conveyor.js` — stories of uneven size ride one line; at a junction four taps branch off to the channels the section names; the line tilts top-down into the black strip that carries into LIVE |
 | The edition going out | `js/scenes/press.js` — the published feed races up a dark bus, hopping through violet-lit relays, then fans out to endpoint screens |
 | The story on every screen | same file — ~320 reader screens burst outward and clear to white |
-| Paper plane | `js/scenes/paper-plane.js` — folded from a front page, print still on the wing, flown along a bezier |
+| Reader signal | `js/scenes/reader-signal.js` — a return trace that rises as the section scrolls, response marks lighting as it passes them; no axis, scale or number |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` — the type is rendered offscreen, sampled, and redrawn as dots sized by ink coverage |
 
 The 12 pixel-dot icons and the registration marks are an inline SVG sprite at
@@ -157,5 +157,5 @@ cursor, self-hosted fonts and the full scroll length.
 
 **Not exhaustively verified:** the very end of each pinned scene (the newspaper
 landing on the bundles, the conveyor's tilt to top-down, the press burst into
-flying pages) and the paper plane's full flight path. Scroll through those on a
+flying pages) and the reader signal's full rise. Scroll through those on a
 real screen — they are the first things to look at.

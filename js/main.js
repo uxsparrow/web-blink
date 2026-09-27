@@ -19,7 +19,7 @@ import { mountPreloader } from './scenes/preloader.js'
 import { mountDesk } from './scenes/desk.js'
 import { mountConveyor } from './scenes/conveyor.js'
 import { mountPress } from './scenes/press.js'
-import { mountPaperPlane } from './scenes/paper-plane.js'
+import { mountReaderSignal } from './scenes/reader-signal.js'
 import { mountHalftoneWordmark } from './scenes/halftone-wordmark.js'
 import { mountBackPageMap } from './scenes/back-page-map.js'
 
@@ -49,8 +49,8 @@ function mountScenes() {
   const press = q('[data-scene="press"]')
   if (press) scenes.press = gate(mountPress(press, { mobile }), press)
 
-  const plane = q('[data-scene="plane"]')
-  if (plane) scenes.plane = gate(mountPaperPlane(plane), plane, '10%')
+  const signal = q('[data-scene="signal"]')
+  if (signal) scenes.signal = gate(mountReaderSignal(signal), signal, '10%')
 
   const wordmark = q('[data-scene="wordmark"]')
   if (wordmark) mountHalftoneWordmark(wordmark, 'BLINKCMS')
@@ -136,10 +136,10 @@ function setupLive() {
 
 function setupLetters(scenes) {
   const section = q('#letters')
-  if (!section || !scenes.plane) return
+  if (!section || !scenes.signal) return
 
   if (reducedMotion()) {
-    scenes.plane.setProgress(0.42)
+    scenes.signal.setProgress(0.42)
     return
   }
   ScrollTrigger.create({
@@ -147,7 +147,7 @@ function setupLetters(scenes) {
     start: 'top bottom',
     end: 'bottom top',
     scrub: true,
-    onUpdate: (self) => scenes.plane.setProgress(self.progress),
+    onUpdate: (self) => scenes.signal.setProgress(self.progress),
   })
 }
 

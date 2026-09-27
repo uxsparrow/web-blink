@@ -3282,21 +3282,27 @@ html.lenis body {
   font-size: clamp(2.4rem, 7vw, 7rem);
 }
 
-.clipping {
+.result {
   position: relative;
-  background: var(--newsprint);
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  transition: border-color 0.3s, box-shadow 0.35s;
 }
-
-.clipping__tear {
+.result::before {
+  content: "";
   position: absolute;
   left: 0;
-  right: 0;
-  top: -1px;
-  height: 9px;
-  width: 100%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--blink);
+}
+.result:hover {
+  border-color: rgba(17, 17, 17, 0.3);
+  box-shadow: 0 16px 38px -22px rgba(17, 17, 17, 0.45);
 }
 
-.clipping__shot {
+.result__shot {
   position: relative;
   aspect-ratio: 1/1;
   max-width: 108px;
@@ -3802,7 +3808,7 @@ html.lenis body {
   background: linear-gradient(115deg, #1a1a22 0%, #2b2438 42%, #120f1c 100%);
 }
 
-.clipping__metric {
+.result__metric {
   font-size: clamp(1.7rem, 3vw, 2.9rem);
   line-height: 0.9;
 }

@@ -614,19 +614,36 @@
   font-size: clamp(2.4rem, 7vw, 7rem);
 }
 
-.clipping {
+// These were clippings: newsprint, with a torn top edge cut from the `#tear`
+// sprite, as though snipped out of a paper and pinned up. What they actually
+// carry is measured results — traffic, load time, search discovery — so they
+// are readouts now. The accent rail replaces the tear as the thing that marks
+// the top of the card.
+.result {
   position: relative;
-  background: var(--newsprint);
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.35s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--blink);
+  }
+
+  &:hover {
+    border-color: rgba(17, 17, 17, 0.3);
+    box-shadow: 0 16px 38px -22px rgba(17, 17, 17, 0.45);
+  }
 }
-.clipping__tear {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -1px;
-  height: 9px;
-  width: 100%;
-}
-.clipping__shot {
+
+.result__shot {
   position: relative;
   aspect-ratio: 1 / 1;
   max-width: 108px;

@@ -128,7 +128,7 @@ All drawn in code — no image sequences, no renders to commission.
 | Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
 | Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — one delivery line, four channel taps, see §6 |
 | Press | `js/scenes/press.js` | **Rebuilt digital** — the edition going out, see §6 |
-| Paper plane | `js/scenes/paper-plane.js` | Still folded from a front page — see §7 |
+| Reader signal | `js/scenes/reader-signal.js` | **Rebuilt digital** — the return trace, see §6 |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
 | Back-page map | `js/scenes/back-page-map.js` | India picked out in violet |
 
@@ -268,6 +268,30 @@ at all.
 
 ---
 
+### Letters (07)
+
+Two print things lived here: a giant paper plane folded from a front page, and
+the results set as clippings — newsprint, with a torn top edge cut from a
+`#tear` sprite, as though snipped out and pinned up.
+
+| was | is |
+|---|---|
+| the plane, flown along a bezier | `reader-signal.js` — a return trace that rises as the section scrolls |
+| print still showing on its wing | response marks that light as the trace passes them |
+| newsprint clippings with torn edges | `.result` readouts: white, hairline, an accent rail where the tear was |
+
+- **The trace carries no axis, scale or number, and must not gain any.** The
+  numbers in this section are the supplied case-study results in the DOM; the
+  canvas is texture behind them. A background that looks like a chart of its
+  own would be inventing data, which §10 forbids.
+- The scene is renamed, unlike 06's: `THE PRESS` means the news media, so the
+  word survived the machine, but `paper-plane.js` describing a rising signal
+  would just be a lie. `data-scene="signal"`, `mountReaderSignal`.
+- The `#tear` symbol is gone from the sprite — nothing referenced it once the
+  clippings became readouts.
+- All the copy is untouched, including the standing note that the results are
+  as supplied and no quotes are attributed.
+
 ### The Press (06)
 
 The machine is gone; the section is not. Each print element was replaced, so
@@ -316,12 +340,10 @@ Rebuilt around the rail as a spine rather than three loose columns.
 
 ### Still print
 
-03, 04 and 06 are done (see §6). One scene remains:
+**Nothing.** 03, 04, 06 and 07 are all done — see §6. The site draws no paper,
+no press and no newsprint surface anywhere.
 
-- **07 · Letters** — a paper plane "folded from a front page", flown along a
-  bezier, and torn-edge newsprint clippings.
-
-Three worked examples now. The method that holds: replace each print element
+Four worked examples now. The method that holds: replace each print element
 with its digital counterpart and keep the scene's structure and its hand-off to
 the next section, rather than deleting and starting over. The scroll timeline in
 `main.js` expects the phases it already has, so keeping them is what lets the

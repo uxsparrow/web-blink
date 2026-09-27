@@ -127,7 +127,7 @@ All drawn in code — no image sequences, no renders to commission.
 | Preloader map | `js/scenes/preloader.js` | Same land data, equirectangular, centred on India |
 | Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
 | Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — screens ride the rail, see §6 |
-| Press | `js/scenes/press.js` | **Still a printing press** — see §7 |
+| Press | `js/scenes/press.js` | **Rebuilt digital** — the edition going out, see §6 |
 | Paper plane | `js/scenes/paper-plane.js` | Still folded from a front page — see §7 |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
 | Back-page map | `js/scenes/back-page-map.js` | India picked out in violet |
@@ -251,6 +251,29 @@ shape and its job in the scroll story.
 
 ---
 
+### The Press (06)
+
+The machine is gone; the section is not. Each print element was replaced, so
+the scene still has the shape `main.js` scrubs it through:
+
+| was | is |
+|---|---|
+| paper web racing up | the published feed, one story card after another |
+| rollers across the bed | relays the feed hops through, with a node at each end |
+| ink-lit machine bed | the same violet light, now the network's |
+| burst of ~320 flying pages | the story landing on ~320 readers' screens |
+| — | a fan-out from the centre to endpoint screens, as the camera pulls back |
+
+- **Keep the phases.** `p 0–0.5` the feed runs under the centred headline,
+  `0.5–0.84` the camera pulls back while the five features come in around the
+  edges, `0.82–1` it bursts and clears so the white flash at `0.93` lands on an
+  empty frame. The timeline in `main.js` is written against those numbers.
+- **The centre got darker on purpose.** The headline over this canvas is white,
+  and the old paper web put a sheet of newsprint behind it — measured at 154
+  mean luma with 60% of pixels above 150. The dark bus reads 39 and 4%.
+- The burst particles are screens now, not sheets, so they tumble far less —
+  paper flutters, a phone does not.
+
 ### 05 · LIVE
 
 Rebuilt around the rail as a spine rather than three loose columns.
@@ -276,16 +299,21 @@ Rebuilt around the rail as a spine rather than three loose columns.
 
 ### Still print
 
-03 and 04 are done (see §6). These remain and are known:
+03, 04 and 06 are done (see §6). One scene remains:
 
-- **06 · Press** — a printing press with a paper web through rollers.
-- **07 · Letters** — a paper plane "folded from a front page", torn-edge
-  newsprint clippings.
+- **07 · Letters** — a paper plane "folded from a front page", flown along a
+  bezier, and torn-edge newsprint clippings.
 
-06 is the big one: its name, section label and whole full-bleed scene would need
-redesigning. 04 is the worked example of how to do one of these — replace each
-print element with its digital counterpart and keep the scene's structure and
-its handoff to the next section, rather than deleting and starting over.
+Three worked examples now. The method that holds: replace each print element
+with its digital counterpart and keep the scene's structure and its hand-off to
+the next section, rather than deleting and starting over. The scroll timeline in
+`main.js` expects the phases it already has, so keeping them is what lets the
+scene change without the section's choreography changing.
+
+**Editorial language is not print language.** `THE PRESS` stayed as 06's label:
+the labels are newspaper sections (`FRONT PAGE`, `LIVE`, `CLASSIFIEDS`,
+`BACK PAGE`), and the press means the news media. What changed there was the
+machine, not the word. Same reasoning as masthead and front page below.
 
 **Editorial language stays** — the user confirmed masthead, dateline, byline,
 front page, halftone, newsprint all read as journalism rather than print

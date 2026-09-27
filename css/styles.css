@@ -3110,6 +3110,13 @@ html.lenis body {
     line-height: 1.4;
   }
 }
+.live-head {
+  font-size: clamp(2rem, 3.95vw, 4.05rem);
+}
+.live-head .line-inner {
+  white-space: nowrap;
+}
+
 .live-strip {
   position: relative;
   margin-inline: auto;
@@ -3220,6 +3227,10 @@ html.lenis body {
   right: 0;
   bottom: 6%;
   padding-inline: 1.25rem;
+}
+
+.letters-head {
+  font-size: clamp(2.4rem, 7vw, 7rem);
 }
 
 .clipping {

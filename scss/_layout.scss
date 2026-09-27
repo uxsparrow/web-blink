@@ -405,6 +405,23 @@
 
 // ── 05 live ─────────────────────────────────────────────────────
 
+// Same trap as `.front-head`: this headline sits in a third-width sticky
+// column, but `.t-lg` sized it against the viewport, so past about 1024px the
+// type outgrew the column. `RELIABILITY` and `DEADLINE` are single words and
+// cannot wrap, so they ran over the edge and `.line-mask { overflow: hidden }`
+// sliced their tails off — the section read as RELIABIL / ON EVERY / DEADLIN.
+//
+// Sized to the column instead, with the break after ON EVERY authored rather
+// than left to chance. At the cap, the longest word is about 6.7x the font
+// size and the column stops growing with the shell at 1560px.
+.live-head {
+  font-size: clamp(2rem, 3.95vw, 4.05rem);
+
+  .line-inner {
+    white-space: nowrap;
+  }
+}
+
 .live-strip {
   position: relative;
   margin-inline: auto;
@@ -513,6 +530,19 @@
 }
 
 // ── 07 letters ──────────────────────────────────────────────────
+
+// `.t-xl` kept scaling with the viewport, but this headline's 7-column well
+// stops growing once the shell hits its 1560px cap, so above about 1615px the
+// word `NEWSROOMS` ran past the column edge and the mask clipped its tail —
+// 104px of it gone at 1920. Capped to what the well actually holds.
+//
+// No `nowrap` here, unlike `.live-head`. These lines are several words and can
+// break; only a single word that outgrows the column can be clipped, so the
+// cap only has to clear the longest word. Pinning the lines would have cost
+// another 23% of the type size for nothing.
+.letters-head {
+  font-size: clamp(2.4rem, 7vw, 7rem);
+}
 
 .clipping {
   position: relative;

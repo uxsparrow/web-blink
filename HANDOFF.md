@@ -107,6 +107,7 @@ Listed so they don't get reintroduced.
 | Front-page headline clipped | Text overflowed the column and `.line-mask { overflow: hidden }` cut it; past the 1560px shell cap the `5vw` padding kept growing while the column didn't | Four explicit lines, `.front-head` clamp tuned to the column, `front-main` padding capped |
 | Desk section looked like blank space | Scene faded in from zero, but the stage scrolls into view *before* the pin engages | Scene is fully composed at progress 0 |
 | Hero globe gone on the way back up | The hero scrub tweened `[data-globe-wrap]`'s opacity, but that element is the *lazy reveal* — CSS holds it at 0 until the Three.js import resolves and `is-ready` fades it in. GSAP records a target's start value on the tween's first render and restores it when the playhead rewinds past the tween, so it recorded the pre-reveal 0 and wrote it back **inline** at the top, beating `.is-ready` | The dim moved to an inner `[data-globe-dim]` layer that always rests at opacity 1. Never animate the wrap's opacity — that property belongs to the reveal |
+| 05 and 07's headlines had their tails sliced off | Same trap as the front page, twice more. A `.t-*` size scales with the **viewport** while the column it sits in does not — past the 1560px shell cap the column stops growing entirely. A word wider than its column overflows, and `.line-mask { overflow: hidden }` cuts it: 05 read `RELIABIL / ON EVERY / DEADLIN`, and 07 lost 104px of `NEWSROOMS` at 1920 | `.live-head` and `.letters-head`, each capped to what its column actually holds. **Any headline in a `col-*` narrower than the shell needs its own size, not a `.t-*`** — see the sweep below for how to check |
 | Section 04's head sat on the ghost word | `.platform-word` was at `top: 6%` and the head starts at 0, so the giant letterforms ran straight through the section label and the standfirst | The word and the cards are anchored to the head — `calc(5vh + 76px)` and `calc(5vh + 162px)` — not to a percentage of the stage. A percentage tracks the stage, not the thing it has to clear, so it crept back into the head on short viewports |
 | The cards' responsive tightening did nothing | The card carried the `p-4` utility. The utilities API is imported last and ships `!important`, so `p-4` beat every `padding` this file set — including the `!important` ones, on a later-wins tie | Padding is owned by `.platform-card` and the `p-4` class is gone. **If a component rule on these cards seems to be ignored, check for a utility class doing it first** |
 | Platform cards 05 and 06 invisible on a phone | Six cards stacked one-up came to ~880px inside a `100svh` pin-stage that clips, so the last two were simply cut off. Predates the card redesign, which made it worse before it was found | The grid is `row-cols-2` on phones with a compact card below 640px: 549px for all six at 390×820, with room to spare |
@@ -349,6 +350,21 @@ These cost a lot of time; they are about the tooling, not the site.
 - **Scrub timelines don't settle without rAF.** To test a scroll-driven
   timeline in-pane, drive it directly — `st.animation.progress(x)` — rather than
   moving the scroll position and hoping the scrub catches up.
+- **Sweeping for clipped headlines.** Three of these have now been found by
+  eye, one at a time. Paste this at a few widths (1024, 1440, 1920, 2560) and it
+  finds them all at once:
+
+  ```js
+  [...document.querySelectorAll('.line-inner')]
+    .filter((i) => i.scrollWidth > i.clientWidth)
+    .map((i) => [i.closest('section,footer')?.id, i.textContent.trim(), i.scrollWidth - i.clientWidth])
+  ```
+
+  Use `scrollWidth` vs `clientWidth`, not a `Range` measurement: a range over a
+  line that has wrapped returns the *wrapped* width, which equals the column and
+  looks like a perfect fit. That misreading cost a wrong fix on 07 first time.
+  Only a single unbreakable word can be clipped, so a multi-word line that wraps
+  is fine — pin lines with `nowrap` only where the break is authored, as in 05.
 - **`window.scrollTo` does not stick — Lenis owns the scroll position.** Use
   `window.__lenis.scrollTo(y, { immediate: true })`. `window.__ST` is
   ScrollTrigger. Both are dev-only handles.

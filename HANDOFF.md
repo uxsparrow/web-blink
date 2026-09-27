@@ -107,6 +107,8 @@ Listed so they don't get reintroduced.
 | Front-page headline clipped | Text overflowed the column and `.line-mask { overflow: hidden }` cut it; past the 1560px shell cap the `5vw` padding kept growing while the column didn't | Four explicit lines, `.front-head` clamp tuned to the column, `front-main` padding capped |
 | Desk section looked like blank space | Scene faded in from zero, but the stage scrolls into view *before* the pin engages | Scene is fully composed at progress 0 |
 | Hero globe gone on the way back up | The hero scrub tweened `[data-globe-wrap]`'s opacity, but that element is the *lazy reveal* — CSS holds it at 0 until the Three.js import resolves and `is-ready` fades it in. GSAP records a target's start value on the tween's first render and restores it when the playhead rewinds past the tween, so it recorded the pre-reveal 0 and wrote it back **inline** at the top, beating `.is-ready` | The dim moved to an inner `[data-globe-dim]` layer that always rests at opacity 1. Never animate the wrap's opacity — that property belongs to the reveal |
+| 05 was mostly empty white | `.live-strip` was pinned to `min-height: 130vh` — 1170px at 1440×900 — while the column of entries beside it held ~800px. The rail ran 370px past the content, and the sticky left column is only ~280px tall, so two thirds of the section was blank | The rail stretches to the row instead, so it ends where the entries end |
+| 05's rail never met the sheet it feeds | Two separate misses, both there from the start: the row's own `sec-pad` left 90px of white between the rail's foot and `.live-feed`, and the sheet's apex is cut at `50%` of the section while the rail sat in an off-centre column — 56px apart at 1440 | The row is 4/4/4, which puts the rail on the page's centre line, and the rail takes an extra `10vh` to cross the row's padding. Measured: 0px gap, 0px offset, and the 92px rail meets the 92px apex |
 | 05 and 07's headlines had their tails sliced off | Same trap as the front page, twice more. A `.t-*` size scales with the **viewport** while the column it sits in does not — past the 1560px shell cap the column stops growing entirely. A word wider than its column overflows, and `.line-mask { overflow: hidden }` cuts it: 05 read `RELIABIL / ON EVERY / DEADLIN`, and 07 lost 104px of `NEWSROOMS` at 1920 | `.live-head` and `.letters-head`, each capped to what its column actually holds. **Any headline in a `col-*` narrower than the shell needs its own size, not a `.t-*`** — see the sweep below for how to check |
 | Section 04's head sat on the ghost word | `.platform-word` was at `top: 6%` and the head starts at 0, so the giant letterforms ran straight through the section label and the standfirst | The word and the cards are anchored to the head — `calc(5vh + 76px)` and `calc(5vh + 162px)` — not to a percentage of the stage. A percentage tracks the stage, not the thing it has to clear, so it crept back into the head on short viewports |
 | The cards' responsive tightening did nothing | The card carried the `p-4` utility. The utilities API is imported last and ships `!important`, so `p-4` beat every `padding` this file set — including the `!important` ones, on a later-wins tie | Padding is owned by `.platform-card` and the `p-4` class is gone. **If a component rule on these cards seems to be ignored, check for a utility class doing it first** |
@@ -246,6 +248,27 @@ shape and its job in the scroll story.
   `conveyor.js`. The contact shadows deliberately differ — the Desk casts a dark
   shadow on a white desk, the rail pools light on ink — so those are not the
   same function and should not be merged.
+
+---
+
+### 05 · LIVE
+
+Rebuilt around the rail as a spine rather than three loose columns.
+
+- **The row is 4/4/4 and that is load-bearing**, not a style choice: it is what
+  puts the ink rail on the page's centre line, where `.live-feed__sheet`'s apex
+  is cut. Change the split and the hand-off to 06 stops lining up.
+- **The rail's height comes from the row**, plus `10vh` to cross the row's
+  bottom padding. Nothing about it is a viewport height any more — see §4 for
+  what the old `130vh` did.
+- The three entries hang off a spine with a tick each, and reuse the platform
+  cards' stamped plate so 04 and 05 read as one system. Their titles are
+  deliberately sized *below* the section headline; at `.t-md` they ran to 49px
+  against the headline's 57px and read as three competing headlines.
+- The `MONITORED ROUND THE CLOCK` note moved to the left column, which had
+  nothing under its standfirst.
+- **No copy was invented.** Everything here is the copy that was already in the
+  section, rearranged — the live card is still the labelled sample text.
 
 ---
 

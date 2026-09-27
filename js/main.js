@@ -190,6 +190,36 @@ function setupSteps() {
   })
 }
 
+/**
+ * 11 · THE RATE CARD — the four plans rise in turn.
+ *
+ * The slices overlap, unlike 03's, so the four read as a stagger rather than
+ * as a queue waiting its turn. The figures themselves are counted up by the
+ * existing `[data-count-to]` plumbing — the same device the front page's stats
+ * use, which is the whole reason this section needs nothing else.
+ */
+function setupRates() {
+  const grid = q('[data-rates]')
+  const cards = qq('[data-rate]')
+  if (!grid || !cards.length) return
+
+  const draw = (p) =>
+    cards.forEach((c, i) => c.style.setProperty('--rise', easeOut(seg(p, i * 0.14, i * 0.14 + 0.58))))
+
+  if (reducedMotion()) {
+    draw(1)
+    return
+  }
+
+  const state = { p: 0 }
+  gsap.to(state, {
+    p: 1,
+    ease: 'none',
+    onUpdate: () => draw(state.p),
+    scrollTrigger: { trigger: grid, start: 'top 88%', end: 'bottom 80%', scrub: 0.5 },
+  })
+}
+
 function setupLive() {
   const strip = q('[data-live-strip]')
   const card = q('[data-live-card]')
@@ -339,7 +369,7 @@ function setupPins(scenes) {
 }
 
 /**
- * 13 · ON AIR — the background film.
+ * 14 · ON AIR — the background film.
  *
  * It is 4.4MB, so it carries no `src` until the section is close: the page's
  * whole point is that nothing heavy blocks first paint. It also never loads
@@ -389,6 +419,7 @@ function boot() {
   setupPins(scenes)
   setupLeaves()
   setupSteps()
+  setupRates()
   setupLive()
   setupLetters(scenes)
 

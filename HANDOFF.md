@@ -14,20 +14,20 @@ A single-page marketing site for Blink CMS, built to the structure and motion
 system of unitedcarriers.com but told through a news story rather than a
 shipping container: **Monitor → Gather → Create → Publish → Monetize → Analyze.**
 
-Fifteen sections, in page order:
+Sixteen sections, in page order:
 
 ```
 00 preloader    (overlay)       08 press        (#press)
 01 hero         (#hero)         09 letters      (#letters)
 02 front page   (#front-page)   10 masthead wall(#case-studies)
-03 why they go  (#why-leave)    11 the wire     (#the-wire)
-04 desk         (#desk)         12 faq          (#faq)
-05 platform     (#platform)     13 on air       (#on-air)
-06 how it works (#how-it-works) 14 footer       (#contact)
-07 live         (#live)
+03 why they go  (#why-leave)    11 rate card    (#pricing)
+04 desk         (#desk)         12 the wire     (#the-wire)
+05 platform     (#platform)     13 faq          (#faq)
+06 how it works (#how-it-works) 14 on air       (#on-air)
+07 live         (#live)         15 footer       (#contact)
 ```
 
-~31,000px of scroll at 1440×900. Four pinned, scroll-scrubbed scenes: desk,
+~33,000px of scroll at 1440×900. Four pinned, scroll-scrubbed scenes: desk,
 platform, press, plus the hero's sky transition.
 
 ---
@@ -360,6 +360,54 @@ p 1.00          the line has run the full width
 ---
 
 
+### The rate card (11) — new section
+
+The last of the three the audit found missing, and the only one whose facts had
+to come from outside this repo. **No canvas.**
+
+**Source: <https://www.blinkcms.ai/pricing-page>, read on 27 Sep 2026.** Every
+figure here — the four plans, their prices, their storage/bandwidth/user
+limits, the add-on names and all of the small print — is from that page. **If
+the live rate card changes, this section is stale and nothing in the build will
+tell you.** That is the one hard difference between this section and the other
+fifteen, which are all sourced from the brief and can be checked against it.
+
+- **It is an overview, by instruction.** The user asked for the block without
+  detailed pricing, so the feature matrices and the add-on rate tables stay on
+  `/pricing/` and this carries four plans, one line of scale each, and the
+  small print. `SEE THE FULL RATE CARD` in the aside is the way through.
+- **Two plans are flagged `POPULAR` because the source page flags two.** That
+  is almost certainly a slip on their side — flagging half the range says
+  nothing — but it is their data, so it is carried faithfully and raised with
+  the user rather than silently corrected to one.
+- **Demo and Custom Suite lead with "Talk to us", not with a number.** The
+  source page headlines both that way; `>$2000 per month` appears there only in
+  Custom Suite's detail, so it sits in this card's `rate__per` line, under the
+  words, exactly as the source has it.
+- **Every card carries a `rate__per` line, even the two without a price.** That
+  is not decoration — it is what makes the four price blocks the same shape, so
+  `margin-top: auto` lands all four figures on one line. Removing it from the
+  quoted plans breaks the alignment by a whole line.
+- **`--figure` exists for the same reason.** `.rate__figure--word` takes
+  `line-height: calc(0.9 * var(--figure))` — a length, not a ratio — so a word
+  occupies exactly the line box a figure would. Without it the two quoted
+  plans sat 18px high of the two priced ones. Measured after: all four within
+  2px, at 1440.
+- **The prices count up on the existing `[data-count-to]` plumbing**, the
+  device the front page's stats use and nothing had used since. `initCounters`
+  formats with `toLocaleString('en-IN')`, which is why 1500 reads `1,500`.
+- **The stagger overlaps**, unlike 03's: `seg(p, i * 0.14, i * 0.14 + 0.58)`,
+  so the four read as a stagger rather than as a queue. Measured at p = 0.3 the
+  rises are 0.89 / 0.62 / 0.10 / 0.
+- **A CSS hover on transform would be safe here and is still not used.** GSAP
+  writes `--rise` and never `transform`, so this card is *not* the trap section
+  05's cards are — but the hover moves colour only anyway, so the two behave
+  alike and nobody has to remember which is which.
+- `data-label` is `RATE CARD`: a newspaper publishes its rates under that name,
+  and `CLASSIFIEDS` was already taken twice.
+
+---
+
 ### Letters (09)
 
 Two print things lived here: a giant paper plane folded from a front page, and
@@ -469,7 +517,7 @@ reached from their listings, and 14 · the 404 page is reached by failing.
 
 ---
 
-### 13 · ON AIR — the background film
+### 14 · ON AIR — the background film
 
 `assets/videos/video_bg.mp4`, 960×540, 20s, **4.4MB** — by a distance the
 heaviest thing in the repo.
@@ -500,31 +548,36 @@ heaviest thing in the repo.
 
 ## 7 · Open items
 
-### The 12-essentials audit — one section still missing
+### The 12-essentials audit — all three sections landed
 
 The user checked the page against a 12-section home-page checklist. Seven were
-already there, two were partial, three were missing. Two of the three have
-landed; **only Pricing is left**, and it is blocked on facts the brief does not
-contain.
+already there, two were partial, three were missing. **All three are now in.**
 
 | # | section | state |
 |---|---|---|
 | 5 | How It Works | **done** — 06, see §6 |
 | 6 | Comparison vs WordPress | **done** — 03, see §6, but *as a problem statement, not a comparison*. The user chose the "why newsrooms leave" framing over a head-to-head table, so the page makes no claim about anyone else's software. It also covers job 3 |
-| 8 | Pricing | **missing.** Needs real tier names and what is in each. The only pricing fact on the page is the supplied F.A.Q answer, "No. Billing is by features." |
+| 8 | Pricing | **done** — 11, see §6. **The only section on this page sourced from outside the brief** — blinkcms.ai/pricing-page. It goes stale silently if the live rate card moves |
 
-Also found by that audit, not yet acted on:
+Still open from that audit, and worth raising before anything else is built:
 
 - **No `<form>` or `<input>` anywhere on the page.** Every CTA is an anchor, and
-  the footer has no newsletter signup. There is no lead capture at all.
+  the footer has no newsletter signup. There is no lead capture at all. This is
+  now the largest single gap on the page.
 - **The final CTA has one button, not two**, and it points at `#on-air` — its
   own section, so it does nothing. Same open question as `BOOK A DEMO` in §6b.
+  With 11 in place, a second button pointing at `#pricing` is the obvious fill.
+- **The overlay menu's `PRICING` goes to `/pricing/`, which 404s**, while the
+  page now has a real `#pricing` section. Every nav link has that problem per
+  §6b, but this is the first one with an on-page answer sitting right there.
 - **Use cases by segment is still partial**: the seven segments exist only as
   the footer marquee, never as a section. The problem-statement job that used
   to sit alongside it is covered by 03.
-- **The front page's `IN THIS EDITION` index still lists six sections** and has
-  not been touched. It is the page's own table of contents, so decide once,
-  after the last new section lands, whether it should carry ten.
+- **The front page's `IN THIS EDITION` index still lists six sections** and
+  still says `06 SECTIONS`. It is the page's own table of contents and it now
+  omits three, including the rate card. Left alone deliberately — it is the
+  user's front page and a nine-row index changes that column's height — but it
+  should not stay this way.
 
 ### Still print
 

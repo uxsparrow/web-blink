@@ -952,7 +952,145 @@
     color 0.3s;
 }
 
-// ── 11 the wire ─────────────────────────────────────────────────
+// ── 11 the rate card ────────────────────────────────────────────
+
+// Sized to its column, not with a `.t-*` — `NOT TRAFFIC` cannot wrap. Same
+// trap as `.front-head` and `.live-head`, see §4 of the handoff.
+.rate-head {
+  font-size: clamp(2rem, 5.2vw, 5.4rem);
+
+  .line-inner {
+    white-space: nowrap;
+  }
+}
+
+// `--rise` is this card's slice of the section's scroll, written by
+// setupRates() in main.js. GSAP writes the custom property and never the
+// transform, so computing a transform from it here is safe — unlike the
+// platform cards in 05, where GSAP owns transform outright and a CSS hover
+// on it is silently overwritten. Hover on these moves colour only.
+.rate {
+  --rise: 0;
+  // one figure size for the whole card, so the plans that are quoted rather
+  // than priced can borrow it for their line box and keep all four prices on
+  // the same line — see `.rate__figure--word`
+  --figure: clamp(2rem, 3.2vw, 3rem);
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  padding: 1.25rem;
+  overflow: hidden;
+  opacity: calc(0.18 + 0.82 * var(--rise));
+  transform: translateY(calc(26px * (1 - var(--rise))));
+  transition:
+    border-color 0.3s,
+    box-shadow 0.35s;
+
+  &:hover {
+    border-color: rgba(17, 17, 17, 0.34);
+    box-shadow: 0 16px 38px -22px rgba(17, 17, 17, 0.5);
+  }
+}
+
+// the two plans the source rate card flags sit forward of the other two
+.rate--flag {
+  border-color: rgba(17, 17, 17, 0.32);
+}
+
+.rate__band {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 4px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(var(--rise));
+  transform-origin: left center;
+}
+
+.rate__num {
+  color: rgba(17, 17, 17, 0.42);
+  line-height: 20px;
+}
+
+.rate__flag {
+  color: #fff;
+  background: var(--accent);
+  padding: 4px 7px;
+}
+
+.rate__name {
+  margin-top: 1.25rem;
+  color: var(--ink);
+}
+
+.rate__for {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(17, 17, 17, 0.6);
+}
+
+// `margin-top: auto` pins the price, the scale and the CTA to the foot, so
+// four plans with copy of unequal length still line their figures up — the
+// same trick `.platform-card__body` uses one section earlier.
+.rate__price {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.rate__unit {
+  font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.rate__figure {
+  font-size: var(--figure);
+  line-height: 0.9;
+  color: var(--ink);
+}
+
+// the plans quoted rather than priced: a word, not a figure, so it cannot
+// carry the figure's size without running out of a quarter-width card
+.rate__figure--word {
+  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+  // a length, not a ratio: it makes the word occupy exactly the line box a
+  // figure would, which is what lines the four prices up across the row
+  line-height: calc(0.9 * var(--figure));
+}
+
+.rate__per {
+  width: 100%;
+  margin-top: 0.35rem;
+  color: rgba(17, 17, 17, 0.38);
+}
+
+.rate__scale {
+  display: block;
+  color: rgba(17, 17, 17, 0.5);
+}
+
+.rate__cta {
+  margin-top: 1.25rem;
+  align-self: flex-start;
+}
+
+// the small print under the rates, set as prose rather than as labels
+.rate-note {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(17, 17, 17, 0.55);
+}
+
+// ── 12 the wire ─────────────────────────────────────────────────
 
 .wire-sky {
   height: 34vh;
@@ -984,7 +1122,7 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-// ── 12 faq ──────────────────────────────────────────────────────
+// ── 13 faq ──────────────────────────────────────────────────────
 
 .faq-q {
   font-size: clamp(1rem, 1.5vw, 1.35rem);
@@ -1020,7 +1158,7 @@
   max-width: 52ch;
 }
 
-// ── 13 on air ───────────────────────────────────────────────────
+// ── 14 on air ───────────────────────────────────────────────────
 
 // The background film, and the scrim that keeps white type readable over it.
 // The section's own #111 stays underneath, so if the film never loads — no
@@ -1101,7 +1239,7 @@
   }
 }
 
-// ── 14 footer ───────────────────────────────────────────────────
+// ── 15 footer ───────────────────────────────────────────────────
 
 .footer-photo {
   aspect-ratio: 4 / 3;

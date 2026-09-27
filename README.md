@@ -26,7 +26,7 @@ nginx, Apache, cPanel, S3, Netlify, GitHub Pages all serve it as-is.
 ## What's in the folder
 
 ```
-index.html            the whole page — all 15 sections as static markup
+index.html            the whole page — all 16 sections as static markup
 css/
   styles.css          compiled from scss/ — edit directly if you prefer
   fonts.css           @font-face rules for the self-hosted fonts
@@ -136,10 +136,18 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
   are attributed.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - Every headline is live HTML — nothing is baked into an image.
+- **The rate card is the one section sourced from outside the brief.** Its four
+  plans, prices, limits and small print come from
+  <https://www.blinkcms.ai/pricing-page>, read 27 Sep 2026. Nothing in the
+  build checks that against the live page, so if the rates move this section
+  goes stale silently — re-read it before a release.
+- `WHY NEWSROOMS LEAVE` makes no claim about any other product. Its left column
+  is a question a publisher asks; its right column is Blink's own supplied
+  answer. Keep that shape if you add rows.
 
 ## Behaviour notes
 
-- Total scroll is roughly **32k px** at 1440×900. Pins shorten by about half
+- Total scroll is roughly **33k px** at 1440×900. Pins shorten by about half
   below 900px, via `gsap.matchMedia()` in `js/main.js`.
 - `prefers-reduced-motion` collapses every pinned scene to a single key frame
   and disables smooth scroll.

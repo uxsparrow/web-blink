@@ -26,7 +26,7 @@ nginx, Apache, cPanel, S3, Netlify, GitHub Pages all serve it as-is.
 ## What's in the folder
 
 ```
-index.html            the whole page — all 13 sections as static markup
+index.html            the whole page — all 14 sections as static markup
 css/
   styles.css          compiled from scss/ — edit directly if you prefer
   fonts.css           @font-face rules for the self-hosted fonts

@@ -14,16 +14,16 @@ A single-page marketing site for Blink CMS, built to the structure and motion
 system of unitedcarriers.com but told through a news story rather than a
 shipping container: **Monitor → Gather → Create → Publish → Monetize → Analyze.**
 
-Thirteen sections, in page order:
+Fourteen sections, in page order:
 
 ```
-00 preloader (overlay)   06 press          (#press)
-01 hero      (#hero)     07 letters        (#letters)
-02 front page(#front-page)08 masthead wall (#case-studies)
-03 desk      (#desk)     09 the wire       (#the-wire)
-04 platform  (#platform) 10 faq            (#faq)
-05 live      (#live)     11 on air         (#on-air)
-                         12 footer         (#contact)
+00 preloader    (overlay)       07 press        (#press)
+01 hero         (#hero)         08 letters      (#letters)
+02 front page   (#front-page)   09 masthead wall(#case-studies)
+03 desk         (#desk)         10 the wire     (#the-wire)
+04 platform     (#platform)     11 faq          (#faq)
+05 how it works (#how-it-works) 12 on air       (#on-air)
+06 live         (#live)         13 footer       (#contact)
 ```
 
 ~31,000px of scroll at 1440×900. Four pinned, scroll-scrubbed scenes: desk,
@@ -220,7 +220,8 @@ at all.
 
 - **The structure that does hold, and must be kept:** travel runs left → right
   with scroll, and the tilt at `p 0.82–1` widens the line into the ink strip
-  that hands off to 05 · LIVE. That hand-off is why the tilt exists.
+  that hands off to the ink line 05 · HOW IT WORKS opens on, and through it to
+  06 · LIVE's rail. That hand-off is why the tilt exists.
 - The line keeps moving on `time` as well as `p`, or a still section reads as a
   diagram rather than something live.
 - The payloads are **deliberately uneven** in width, height and gap. The
@@ -267,8 +268,57 @@ at all.
   same function and should not be merged.
 
 ---
+### How it works (05) — new section
 
-### Letters (07)
+The first of the three sections the 12-essentials audit found missing. **No
+canvas.** The whole scene is DOM plus one scrubbed number, which is why it costs
+nothing and needs no `mountScene`.
+
+```
+--draw  0 → 1   scrubbed across the section by setupSteps() in main.js
+p 0.00          the line starts at node 01, nothing lit
+p 0.33 / 0.67   the head reaches node 02 / node 03, that step lights
+p 1.00          the line has run the full width
+```
+
+- **Every fact in it is already elsewhere on the page.** The three steps are
+  cards 01, 02 and 03 of section 04 — The Reporter, The AI Editor, The Edition
+  — and each step carries **that card's `--accent`**, so 04 and 05 name the same
+  three things in the same colour. §10 forbids inventing, and nothing here is
+  invented; the only new sentences are connective.
+- **`--draw` is the single source of truth.** JS writes one custom property and
+  toggles `is-on`; CSS decides what the number *means*. That is why the line can
+  run left-to-right on a desktop and top-to-bottom on a phone with no
+  `matchMedia` in the JS — the same 0→1 drives `width` on one axis and `height`
+  on the other.
+- **The scrub is on a tween of a plain object, not on the element.** A bare
+  `ScrollTrigger.create` accepts `scrub` but has no animation to scrub, so its
+  `onUpdate` runs at raw scroll position and the line tracks the wheel 1:1 —
+  the one thing no other section here does. Tweening a proxy gives the same
+  eased catch-up as the pinned scenes. Writing the custom property by hand also
+  keeps this off CSSPlugin's custom-property support.
+- **A step lights at `i / steps.length`, not at a hand-tuned number.** The nodes
+  are evenly spaced by the grid, so that expression *is* the node's position.
+  Measured at 1440: nodes at x = 0 / 447 / 895, and each step lights within 4px
+  of its own node. An earlier `+ 0.04` lead applied to every step and left the
+  head 54px past node 03 before it lit.
+- **`.step__body` may use a CSS transition on `transform`** — unlike the
+  platform cards in 04, GSAP never touches this element. It writes `--draw` on
+  the parent and nothing else. See §4 for what happens when the two do collide.
+- The track is `.step::before`, one segment per step, so the same rule becomes
+  the vertical spine when the steps stack — no second element to keep in sync.
+- `.steps-head` is sized to its column, not with a `.t-*`. Same trap as
+  `.front-head` and `.live-head`; swept clean at 1024, 1440, 1920 and 2560.
+- **It sits between 04 and 06 and that weakens one hand-off.** 04's tilt widens
+  the delivery line into an ink strip aimed at 06 · LIVE's ink rail. This
+  section now takes delivery of it instead — which is why its own line is ink
+  on the same axis. The chain still reads strip → line → rail, but if you move
+  or remove this section, check that seam.
+
+---
+
+
+### Letters (08)
 
 Two print things lived here: a giant paper plane folded from a front page, and
 the results set as clippings — newsprint, with a torn top edge cut from a
@@ -292,7 +342,7 @@ the results set as clippings — newsprint, with a torn top edge cut from a
 - All the copy is untouched, including the standing note that the results are
   as supplied and no quotes are attributed.
 
-### The Press (06)
+### The Press (07)
 
 The machine is gone; the section is not. Each print element was replaced, so
 the scene still has the shape `main.js` scrubs it through:
@@ -315,7 +365,7 @@ the scene still has the shape `main.js` scrubs it through:
 - The burst particles are screens now, not sheets, so they tumble far less —
   paper flutters, a phone does not.
 
-### 05 · LIVE
+### 06 · LIVE
 
 Rebuilt around the rail as a spine rather than three loose columns.
 
@@ -377,7 +427,7 @@ reached from their listings, and 14 · the 404 page is reached by failing.
 
 ---
 
-### 11 · ON AIR — the background film
+### 12 · ON AIR — the background film
 
 `assets/videos/video_bg.mp4`, 960×540, 20s, **4.4MB** — by a distance the
 heaviest thing in the repo.
@@ -408,9 +458,34 @@ heaviest thing in the repo.
 
 ## 7 · Open items
 
+### The 12-essentials audit — two sections still missing
+
+The user checked the page against a 12-section home-page checklist. Seven were
+already there, two were partial, three were missing. **How it works landed as
+05** (see §6). Still to build, both blocked on facts the brief does not contain:
+
+| # | section | state |
+|---|---|---|
+| 5 | How It Works | **done** — 05, see §6 |
+| 6 | Comparison vs WordPress | **missing.** Needs claims the user will stand behind publicly; only an F.A.Q question and a Wire headline mention WordPress today |
+| 8 | Pricing | **missing.** Needs real tier names and what is in each. The only pricing fact on the page is the supplied F.A.Q answer, "No. Billing is by features." |
+
+Also found by that audit, not yet acted on:
+
+- **No `<form>` or `<input>` anywhere on the page.** Every CTA is an anchor, and
+  the footer has no newsletter signup. There is no lead capture at all.
+- **The final CTA has one button, not two**, and it points at `#on-air` — its
+  own section, so it does nothing. Same open question as `BOOK A DEMO` in §6b.
+- **Problem statement and use-cases-by-segment are partial**: the segments exist
+  only as the footer ticker, and the newsroom pain is one sentence in the front
+  page aside. A comparison section would carry most of the second job.
+- **The front page's `IN THIS EDITION` index still lists six sections** and has
+  not been touched. It is the page's own table of contents, so decide once,
+  after the last new section lands, whether it should carry nine.
+
 ### Still print
 
-**Nothing.** 03, 04, 06 and 07 are all done — see §6. The site draws no paper,
+**Nothing.** 03, 04, 07 and 08 are all done — see §6. The site draws no paper,
 no press and no newsprint surface anywhere.
 
 Four worked examples now. The method that holds: replace each print element
@@ -419,7 +494,7 @@ the next section, rather than deleting and starting over. The scroll timeline in
 `main.js` expects the phases it already has, so keeping them is what lets the
 scene change without the section's choreography changing.
 
-**Editorial language is not print language.** `THE PRESS` stayed as 06's label:
+**Editorial language is not print language.** `THE PRESS` stayed as 07's label:
 the labels are newspaper sections (`FRONT PAGE`, `LIVE`, `CLASSIFIEDS`,
 `BACK PAGE`), and the press means the news media. What changed there was the
 machine, not the word. Same reasoning as masthead and front page below.

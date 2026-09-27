@@ -108,6 +108,55 @@ function setupHero() {
   tl.to(q('[data-globe-dim]'), { yPercent: -10, scale: 0.94, opacity: 0.25, ease: 'none' }, 0.1)
 }
 
+/**
+ * 05 · HOW IT WORKS — the delivery line draws itself.
+ *
+ * One scrubbed value does all of it: `--draw` goes 0 → 1 across the section
+ * and CSS decides what that means, so the line runs left-to-right on a desktop
+ * and top-to-bottom on a phone without this function knowing which. A step
+ * lights when the line reaches its node — the nodes are evenly spaced, so
+ * that is simply `i / steps.length`.
+ */
+function setupSteps() {
+  const track = q('[data-steps]')
+  const steps = qq('[data-step]')
+  if (!track || !steps.length) return
+
+  const draw = (p) => {
+    track.style.setProperty('--draw', p)
+    // The nodes are evenly spaced, so the head reaches node i at i/length and
+    // the step lights exactly there. The p > 0.02 is only to keep the first
+    // one — whose node is the line's own origin — dark until the line moves.
+    steps.forEach((s, i) => s.classList.toggle('is-on', p > 0.02 && p >= i / steps.length))
+  }
+
+  if (reducedMotion()) {
+    draw(1)
+    return
+  }
+
+  /*
+   * The scrub is on a tween of a plain object, not on the element. A bare
+   * ScrollTrigger.create takes `scrub` but has no animation to scrub, so its
+   * onUpdate would run at raw scroll position and the line would track the
+   * wheel 1:1 — the one thing the rest of this page never does. Tweening a
+   * proxy gives the same eased catch-up as the pinned scenes, and writing the
+   * custom property by hand keeps it off CSSPlugin's custom-property support.
+   */
+  const state = { p: 0 }
+  gsap.to(state, {
+    p: 1,
+    ease: 'none',
+    onUpdate: () => draw(state.p),
+    scrollTrigger: {
+      trigger: track,
+      start: 'top 78%',
+      end: 'bottom 76%',
+      scrub: 0.5,
+    },
+  })
+}
+
 function setupLive() {
   const strip = q('[data-live-strip]')
   const card = q('[data-live-card]')
@@ -305,6 +354,7 @@ function boot() {
   const scenes = mountScenes()
   setupHero()
   setupPins(scenes)
+  setupSteps()
   setupLive()
   setupLetters(scenes)
 

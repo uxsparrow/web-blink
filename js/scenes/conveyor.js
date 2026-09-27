@@ -16,7 +16,8 @@ import { mountScene } from '../lib/canvas-scene.js'
  * platform, and the row of pulsing dots under it answered to nothing at all.
  *
  * At the end the line tilts to top-down and widens into the ink strip that
- * carries into 05 · LIVE — that hand-off is why the tilt exists, so keep it.
+ * carries into 05 · HOW IT WORKS and on to 06 · LIVE — that hand-off is why the
+ * tilt exists, so keep it.
  */
 
 const INK = '#111111'

@@ -2756,6 +2756,8 @@ html.lenis body {
   width: 34px;
   height: 34px;
   border: 1px solid var(--hairline);
+  color: var(--ink);
+  text-decoration: none;
   transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 .social-dot:hover {

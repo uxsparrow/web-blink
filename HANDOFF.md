@@ -613,14 +613,37 @@ appear elsewhere, flagged to the user but not changed:
 
 - **F.A.Q answers** — 7 of 8 missing. The brief supplied only the questions plus
   one answer ("Do you charge more as traffic grows?" → "No. Billing is by features.")
-- **The Wire** — 4 headlines supplied, 2 slots empty, no article bodies
-- **Footer email and phone**
+- **The Wire** — 4 headlines supplied, no article bodies
 
 ### Asset slots
 
-Brand film (modal), newsroom footage (front page thumb), B&W newsroom photo
-(footer), publisher logos (masthead wall currently sets names as type),
-case-study photos (Letters).
+Brand film (modal), publisher logos (masthead wall currently sets names as
+type), case-study photos (Letters). The front page thumb and the footer photo
+are both supplied now.
+
+### Master's own commits — the wire thumbnail is now dead code
+
+Six commits landed on `master` while the three new sections were being built,
+and they merged cleanly. One of them has a consequence worth knowing:
+
+`chore: remove unused wire list slots` took `data-wire-row` and `data-tint` off
+every row in 12 · THE WIRE. **`initWireThumb()` in `js/ui/widgets.js` binds to
+`[data-wire-row]`, so it now binds to nothing** — the hover thumbnail that
+followed the cursor over the wire list no longer appears. It fails silently:
+`[data-wire-list]` and `[data-wire-thumb]` both still exist, so the early
+return never fires and only the per-row loop comes up empty.
+
+Still in the tree and doing nothing: `.wire-thumb-wrap` in `index.html`, the
+`.wire-thumb*` rules in `scss/_layout.scss`, `initWireThumb` and its call in
+`main.js`. **Left alone deliberately** — the attributes came off in the user's
+own commit, so whether the feature goes or comes back is theirs to say. Either
+restore the two attributes on the four rows, or delete the handler, the markup
+and the CSS together.
+
+The same commit also removed the two `[ARTICLE SLOT]` rows and the standing
+note under them, and `chore: remove careers link` unlinked `/careers/` from
+both the menu and the footer — page 8 of the §6b map is now unreferenced,
+correctly, since there is nothing to link to yet.
 
 ### User's own edit — leave alone
 

@@ -4,12 +4,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blink CMS — Every stage of the story</title>
+  <title>Blink CMS — The engine behind modern newsrooms.</title>
   <meta name="description"
     content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform. The extended tech team behind 150+ newsrooms.">
   <meta name="theme-color" content="#000000">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Blink CMS — Every stage of the story">
+  <meta property="og:title" content="Blink CMS — The engine behind modern newsrooms.">
   <meta property="og:description"
     content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.">
   <link rel="stylesheet" href="css/fonts.css">
@@ -510,7 +510,8 @@
       <div class="shell header-bar d-flex align-items-center justify-content-between">
         <a href="#top" class="d-flex align-items-baseline gap-1" aria-label="Blink CMS — home">
           <span class="display" style="font-size:22px;letter-spacing:-.02em">
-            <img src="./assets/images/blinkcms-logo-transparent.png" alt="Logo" style="height: 36px;">
+            <img src="./assets/images/blinkcms-logo-transparent.png" alt="blinkcms-logo" style="height: 36px;"
+              data-header-logo>
           </span>
         </a>
 
@@ -587,7 +588,6 @@
             style="color:var(--blink-lift)">06</span>COMPANY</a>
         <ul class="menu-sub list-unstyled">
           <li><a href="/about/" class="mono-xs">About Us</a></li>
-          <li><a href="/careers/" class="mono-xs">Careers</a></li>
           <li><a href="/contact/" class="mono-xs">Contact / Book a Demo</a></li>
         </ul>
       </div>
@@ -635,8 +635,8 @@
             </div>
 
             <h1 class="display t-hero head-lilac" data-reveal data-reveal-start="top 96%">
-              <span class="line-mask"><span class="line-inner">EVERY STAGE</span></span>
-              <span class="line-mask"><span class="line-inner">OF THE STORY</span></span>
+              <span class="line-mask"><span class="line-inner">THE ENGINE BEHIND</span></span>
+              <span class="line-mask"><span class="line-inner">MODERN NEWSROOMS</span></span>
             </h1>
 
             <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66)">
@@ -700,7 +700,9 @@
                   <span style="background:var(--blink);animation:flick 1.8s ease-in-out 1.44s infinite"></span>
                   <span style="background:rgba(255,255,255,.25);animation:flick 2.2s ease-in-out 1.53s infinite"></span>
                 </div>
-                <span class="mono-xs" style="color:rgba(255,255,255,.5)">[NEWSROOM FOOTAGE — NOT SUPPLIED]</span>
+                <span class="mono-xs" style="color:rgba(255,255,255,.5)">
+                  <img src="./assets/images/news.jpg" alt="news" width="100%" />
+                </span>
               </div>
               <figcaption class="mono-xs front-caption" style="color:rgba(17,17,17,.4)">FIG. 01 · THE DESK AT NIGHT
               </figcaption>
@@ -925,17 +927,18 @@
         <!-- Both of the desk's labels sit together, top right and clear of the
              55px fixed header, which outranks them on z-index. Keeping the
              second one at the foot left it crowding the next section's head. -->
-        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex flex-column align-items-end gap-2"
-          style="top:76px">
-          <div class="d-flex align-items-center gap-3">
-            <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-            <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
-          </div>
-          <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
-            ONE STORY · EVERY SCREEN
-            <svg class="reg-mark" width="13" height="13" aria-hidden="true">
-              <use href="#reg-mark" />
-            </svg>
+        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex flex-column gap-2" style="top:76px">
+          <div class="d-flex align-items-end justify-content-between gap-6">
+            <div class="d-flex align-items-center gap-3">
+              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
+              <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
+            </div>
+            <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
+              ONE STORY · EVERY SCREEN
+              <svg class="reg-mark" width="13" height="13" aria-hidden="true">
+                <use href="#reg-mark" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -1957,53 +1960,32 @@
         </div>
 
         <div data-wire-list>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="CASE STUDY"
-            data-tint="linear-gradient(135deg,#2A0B8F,#6118EA)">
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
             <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
               style="color:rgba(255,255,255,.4)"><span class="live-dot"></span>26 SEP 2026</span>
             <span class="col-12 col-sm-7 wire-title">How a Tamil daily grew 20× on Blink CMS</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:var(--breaking)">● NEW · GROWTH</span>
+            <span class="mono-xs col-8 col-sm-3 text-end" style="color:var(--breaking)">● NEWS</span>
           </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="PRODUCT"
-            data-tint="linear-gradient(135deg,#1d1d22,#E10600)">
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
             <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">19
               SEP 2026</span>
             <span class="col-12 col-sm-7 wire-title">AI story creation, now in the editor</span>
             <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">PRODUCT</span>
           </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="GUIDE"
-            data-tint="linear-gradient(135deg,#14212b,#00AEEF)">
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
             <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">11
               SEP 2026</span>
             <span class="col-12 col-sm-7 wire-title">Leaving WordPress without losing SEO</span>
             <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">MIGRATION</span>
           </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="ELECTIONS"
-            data-tint="linear-gradient(135deg,#2b2438,#B9A4FF)">
+          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
             <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">02
               SEP 2026</span>
             <span class="col-12 col-sm-7 wire-title">Running a live results desk at scale</span>
             <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">LIVE DESK</span>
           </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="SLOT"
-            data-tint="linear-gradient(135deg,#1a1a1f,#6118EA)">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
-              style="color:rgba(255,255,255,.4)">—</span>
-            <span class="col-12 col-sm-7 wire-title">[ARTICLE SLOT 05]</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">TBD</span>
-          </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6" data-wire-row data-kind="SLOT"
-            data-tint="linear-gradient(135deg,#1a1a1f,#EC008C)">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
-              style="color:rgba(255,255,255,.4)">—</span>
-            <span class="col-12 col-sm-7 wire-title">[ARTICLE SLOT 06]</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">TBD</span>
-          </a>
           <div class="wire-row"></div>
         </div>
-
-        <p class="mono-xs mt-6" style="color:rgba(255,255,255,.3)">ARTICLE SLOTS — HEADLINES SUPPLIED, BODIES NOT YET
-          WRITTEN</p>
       </div>
 
       <div class="wire-thumb-wrap pe-none position-fixed start-0 top-0 z-thumb" data-wire-thumb aria-hidden="true">
@@ -2180,19 +2162,38 @@
     <div class="shell">
       <div class="hair-b d-flex flex-wrap align-items-center justify-content-between gap-4 py-5">
         <div class="d-flex align-items-baseline gap-1">
-          <span class="display" style="font-size:30px;letter-spacing:-.02em">B</span>
-          <span class="brand-dot" style="width:8px;height:8px"></span>
+          <img src="./assets/images/blinkcms-logo.png" width="100px" alt="blinkcms-logo" />
         </div>
         <p class="masthead-serif" style="font-size:clamp(1.2rem,2.4vw,2.1rem)">Every stage of the story.</p>
         <div class="d-flex align-items-center gap-2">
-          <a href="#contact"
-            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">X</a>
-          <a href="#contact"
-            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">IN</a>
-          <a href="#contact"
-            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">FB</a>
-          <a href="#contact"
-            class="mono-xs social-dot rounded-circle d-flex align-items-center justify-content-center">YT</a>
+          <a href="#contact" aria-label="X"
+            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <a href="#contact" aria-label="LinkedIn"
+            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
+            </svg>
+          </a>
+          <a href="#contact" aria-label="Facebook"
+            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.52-.14-2.71-.14-2.72 0-4.79 1.66-4.79 4.93V9.5H7v4h3V22h4v-8.5z" />
+            </svg>
+          </a>
+          <a href="#contact" aria-label="YouTube"
+            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
         </div>
       </div>
 
@@ -2238,7 +2239,6 @@
           <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">COMPANY</span></div>
           <ul class="d-flex flex-column gap-2 list-unstyled">
             <li><a href="/about/" class="footer-link">About Us</a></li>
-            <li><a href="/careers/" class="footer-link">Careers</a></li>
           </ul>
         </nav>
         <nav>
@@ -2281,7 +2281,7 @@
           <div class="position-absolute inset-0" style="background:linear-gradient(140deg,#1b1b21,#3a3a44 55%,#101014)">
           </div>
           <span class="mono-xs footer-photo__note">
-            <img src="./assets/images/contact.jpg" style="width: 100%;height: 100%;object-fit: cover;" />
+            <img src="./assets/images/contact.jpg" style="width: 100%;height: 100%;object-fit: cover;" alt="contact" />
           </span>
         </div>
       </div>
@@ -2296,8 +2296,8 @@
           1st Floor, Rally Infra, H-157, near Noida Electronic City Metro, H Block, Sector 63, Noida, UP 201301
         </p>
         <div class="mt-5 d-flex flex-column gap-1">
-          <span class="mono-sm" style="color:var(--breaking)">[EMAIL]</span>
-          <span class="mono-sm" style="color:var(--breaking)">[PHONE]</span>
+          <span class="mono-sm" style="color:var(--breaking)">sales@blinkcms.ai</span>
+          <span class="mono-sm" style="color:var(--breaking)">+91-88858 58900</span>
         </div>
         <span class="colour-bar mt-6" style="width:56px;height:5px"><i></i><i></i><i></i><i></i></span>
       </div>

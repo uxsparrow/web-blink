@@ -114,8 +114,6 @@ Marked in the UI so nothing reads as finished:
 
 - **Brand film** — the "Watch the film" modal at the bottom of `index.html`
   (the ON AIR section does have its background film: `assets/videos/video_bg.mp4`)
-- **Newsroom footage** — the Front Page thumbnail
-- **Newsroom photo (B&W)** — the footer
 - **Publisher logos** — the masthead wall currently sets the names as
   mastheads; swap in SVGs if you have them
 - **Case-study photos** — the Letters clipping slots
@@ -126,8 +124,7 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 
 - **F.A.Q answers** — the brief supplied the eight questions and one answer
   ("Do you charge more as traffic grows?" → "No. Billing is by features.")
-- **The Wire** — four headlines supplied, two slots empty, no article bodies
-- **Footer email and phone**
+- **The Wire** — four headlines supplied, no article bodies
 
 ## Content rules held
 

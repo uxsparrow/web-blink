@@ -17,7 +17,7 @@ import { initFaq, initTabs, initFilmModal, initWireThumb, initTickers } from './
 
 import { mountPreloader } from './scenes/preloader.js'
 import { mountDesk } from './scenes/desk.js'
-import { mountConveyor } from './scenes/conveyor.js'
+import { mountPlatform } from './scenes/platform.js'
 import { mountPress } from './scenes/press.js'
 import { mountReaderSignal } from './scenes/reader-signal.js'
 import { mountHalftoneWordmark } from './scenes/halftone-wordmark.js'
@@ -43,8 +43,8 @@ function mountScenes() {
   const desk = q('[data-scene="desk"]')
   if (desk) scenes.desk = gate(mountDesk(desk, { mobile }), desk)
 
-  const conveyor = q('[data-scene="conveyor"]')
-  if (conveyor) scenes.conveyor = gate(mountConveyor(conveyor), conveyor)
+  const platform = q('[data-scene="platform"]')
+  if (platform) scenes.platform = gate(mountPlatform(platform), platform)
 
   const press = q('[data-scene="press"]')
   if (press) scenes.press = gate(mountPress(press, { mobile }), press)
@@ -274,7 +274,7 @@ function setupPins(scenes) {
 
   if (reducedMotion()) {
     scenes.desk?.setProgress(0.74)
-    scenes.conveyor?.setProgress(0.5)
+    scenes.platform?.setProgress(0.5)
     scenes.press?.setProgress(0.45)
     gsap.set(qq('[data-platform-card]'), { opacity: 1, rotateX: 0, y: 0 })
     gsap.set(qq('[data-press-feature]'), { opacity: 1, y: 0 })
@@ -311,7 +311,7 @@ function setupPins(scenes) {
           pin: true,
           scrub: true,
           anticipatePin: 1,
-          onUpdate: (self) => scenes.conveyor?.setProgress(self.progress),
+          onUpdate: (self) => scenes.platform?.setProgress(self.progress),
         },
       })
       // the giant word slides against the run of the rail

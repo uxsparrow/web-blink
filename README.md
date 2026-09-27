@@ -68,7 +68,7 @@ sequences to produce or ship:
 | Dotted globe, pings, arcs | `js/scenes/globe.js` — Three.js points placed on **real land geometry**, red ping flares, bezier arcs back to Noida, headline tags projected to screen space |
 | Bureau map + wire feed | `js/scenes/preloader.js` — Natural Earth land rasterised to a dot grid, centred on India |
 | Laptop → tablet → phone | `js/scenes/desk.js` — the headline types into the Blink editor, the finished story lifts off the screen and flies across the desk, then lights up a tablet and a phone with the same article. One article renderer draws all four surfaces, and a dotted world map sways behind them |
-| Delivery line + channel taps | `js/scenes/conveyor.js` — stories of uneven size ride one line; at a junction four taps branch off to the channels the section names; the line tilts top-down into the black strip that carries into LIVE |
+| The platform itself | `js/scenes/platform.js` — a slab in perspective that the six module cards stand on; each column pools its own accent down the surface as its cards land, and the slab rotates edge-on into the ink strip that carries into HOW IT WORKS |
 | The edition going out | `js/scenes/press.js` — the published feed races up a dark bus, hopping through violet-lit relays, then fans out to endpoint screens |
 | The story on every screen | same file — ~320 reader screens burst outward and clear to white |
 | Reader signal | `js/scenes/reader-signal.js` — a return trace that rises as the section scrolls, response marks lighting as it passes them; no axis, scale or number |
@@ -159,10 +159,10 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 ## Verification status
 
 Verified at 1440×900 and 375×812 with no console errors: the preloader, hero
-globe, desk, conveyor, press, masthead tabs, F.A.Q accordion, tickers, custom
+globe, desk, platform, press, masthead tabs, F.A.Q accordion, tickers, custom
 cursor, self-hosted fonts and the full scroll length.
 
 **Not exhaustively verified:** the very end of each pinned scene (the newspaper
-landing on the bundles, the conveyor's tilt to top-down, the press burst into
+landing on the bundles, the platform slab's rotation to edge-on, the press burst into
 flying pages) and the reader signal's full rise. Scroll through those on a
 real screen — they are the first things to look at.

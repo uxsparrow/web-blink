@@ -127,7 +127,7 @@ All drawn in code — no image sequences, no renders to commission.
 | Dotted globe | `js/scenes/globe.js` | Three.js points on **real Natural Earth land**; 23 pings arcing to Noida |
 | Preloader map | `js/scenes/preloader.js` | Same land data, equirectangular, centred on India |
 | Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
-| Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — one delivery line, four channel taps, see §6 |
+| Platform | `js/scenes/platform.js` | **Rebuilt, fourth version** — the slab the modules stand on, see §6 |
 | Press | `js/scenes/press.js` | **Rebuilt digital** — the edition going out, see §6 |
 | Reader signal | `js/scenes/reader-signal.js` | **Rebuilt digital** — the return trace, see §6 |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
@@ -239,77 +239,81 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
   rather than on the spacing scale: the header is fixed, 55px tall and
   `z-index: 900`, so anything above ~60px is painted over by it.
 
-### The Platform rail (05)
+### The platform (05)
 
-One delivery line runs the width of the section. Stories ride it left → right as
-payloads of uneven size, and at a junction two thirds along, four taps branch
-off and carry them to the lower right, where the section's own label names them:
-`WEB · AMP · PWA · APP`. Everything the newsroom publishes goes down one line
-and comes out on every channel — which is the section's whole claim.
+`js/scenes/platform.js`. **The fourth version of this scene, and the first that
+is not about travel.** The user rejected the previous three.
 
-**This is the second attempt.** The first one translated the print conveyor
-element by element: the folded newspapers became a phone, a laptop, a tablet
-and an e-paper reader riding the belt, the rollers became pulsing nodes, and so
-on. Every piece had a counterpart and the result still made no sense — screens
-do not ride conveyors, so it read as a factory belt in digital dress, and a row
-of identical repeats underlined it. The dots below the belt answered to nothing
-at all.
+| version | what it drew | why it failed |
+|---|---|---|
+| 1 | a print conveyor, folded newspapers on a belt | print, and the site is digital-only |
+| 2 | the same belt with a phone, a laptop, a tablet and an e-paper reader riding it, rollers as pulsing nodes | element-by-element translation: screens do not ride conveyors, so it was a factory in digital dress |
+| 3 | a delivery line with a junction and four channel taps to WEB · AMP · PWA · APP | read as a **road** — a black band with dashed white ticks, cards floating above it, four curves peeling off to nowhere |
+| 4 | the slab the modules stand on | — |
 
-> **The lesson worth keeping:** translating a print scene element by element is
-> a good method for a scene whose *structure* still holds (03, 06). Where the
-> structure itself is the print metaphor, the translation inherits the
-> nonsense. Ask what the section actually claims, and draw that.
+> **The diagnosis worth keeping.** All three earlier versions drew
+> **throughput** while the section is about **breadth**. The canvas said "one
+> thing moving along" while the six cards beside it said "six things, side by
+> side" — and the cards win every time, because they carry the words. The fix
+> was not a better line. It was to stop drawing a line.
+>
+> This supersedes the note kept here after version 2, which said to ask what
+> the section claims and draw that. That was right, and version 3 followed it —
+> and still failed, because it answered with the section's *verb* ("publishes
+> to every channel") instead of its *noun* ("one platform"). **Check the noun.**
 
-- **The structure that does hold, and must be kept:** travel runs left → right
-  with scroll, and the tilt at `p 0.82–1` widens the line into the ink strip
-  that hands off to the ink line 06 · HOW IT WORKS opens on, and through it to
-  07 · LIVE's rail. That hand-off is why the tilt exists.
-- The line keeps moving on `time` as well as `p`, or a still section reads as a
-  diagram rather than something live.
-- The payloads are **deliberately uneven** in width, height and gap. The
-  identical repeats were most of why the old scene read as a belt.
-- **The line has to clear the card grid**, which is opaque DOM over this canvas.
-  At desktop widths the cards end near `0.63h` and `0.78h` is clear; two-up on a
-  phone they run to about `0.89h`, and the old lane at `0.78h` was drawn
-  entirely behind them — the scene was invisible on phones, as the belt also
-  was. Narrow canvases put the line at `0.925h` and drop the channel fan, which
-  has no room to read there. Measured clearance: 100px at 1440×900, and the
-  payloads clear the cards at 390×820.
-- The scene draws in **canvas space, not a fitted virtual stage** — it is
-  full-bleed, and a contain-fit would letterbox the line's ends.
+The section reads "Everything your newsroom needs. Under one platform," so the
+canvas draws the platform: one slab in perspective, the card grid standing on
+its far edge, each column pooling its own accent down the surface.
+
+- **06 · HOW IT WORKS now owns the flow.** That is the second reason a flow
+  cannot live here — file → edit → publish is one section further down, and two
+  sections drawing the same journey is worse than one drawing it badly.
+- **The structure is still; only the light moves.** A foundation that slides is
+  not a foundation, and motion is what dragged all three earlier versions back
+  toward a conveyor. The one moving element is a slow violet sweep crossing the
+  surface, which is what keeps a stationary section from reading as a diagram —
+  the rule §6 has always had, satisfied without travel.
+- **The face carries no dashes.** A black band with a broken white centre line
+  is a carriageway before it is anything else; that was most of version 3's
+  problem. 06 opens on a continuous ink line, so a clean band is also the truer
+  hand-off.
+- **The columns reflect because the accents happen to line up.** The six cards
+  cycle ink / violet / red in `index.html`, so at three-up each column is a
+  single accent — 01 and 04 ink, 02 and 05 violet, 03 and 06 red. Re-ordering
+  the cards breaks that. **At two-up they fall out of step** (column 0 holds
+  ink, red *and* violet), so the reflections go neutral there rather than
+  letting one card's colour stand for three.
+- **A column lights as its own cards land.** `columnLit()` reads the card
+  timings straight out of `setupPins` — `0.06 + i * 0.125` over 0.6 — and
+  averages the cards that column holds, so it fills only once all of them are
+  down. This is the first time this canvas has been tied to the DOM above it,
+  and it is what makes "these all stand on one thing" legible.
+- **The grid geometry is recomputed, not measured.** `columnCentre()` redoes
+  Bootstrap's arithmetic — `.shell` at `max-width: 1560px` with
+  `clamp(16px, 3.4vw, 54px)` padding, `row-cols-2 row-cols-lg-3`, lg at 1024px.
+  Measuring the cards instead would couple the loop to layout GSAP is
+  mid-animating. **If those classes change, this file changes with them.**
+  Verified against the real boxes at 1440: columns at 270 / 713 / 1155.
+- **The far edge sits at the cards' feet**, 0.615h against a measured 556px of
+  900, so the block meets the slab instead of hovering over it.
+- **Narrow screens get the slab edge-on.** Two-up, the cards run to 0.89h and
+  the foot labels sit at 0.94h — 44px of clear canvas at 390×820, nowhere near
+  enough to look across a surface. Drawing it edge-on is honest: the platform
+  is still under everything, there is just no room to see it. Each column still
+  registers as a mark on the edge.
+- **The tilt finally has a reason.** `seg(p, 0.82, 1)` was always "the camera
+  goes top-down", with nothing behind it. Now it is the slab rotating away, and
+  the ink strip at the end is its front face seen edge-on — the same hand-off
+  into 06 · HOW IT WORKS and on to 07 · LIVE, but something is doing it.
 - Composed at progress 0, same as the Desk and for the same reason.
-- `js/lib/article.js` now has **one** consumer, the Desk: the rail no longer
-  draws full articles. It still earns its place — it holds the renderer and its
-  copy comes from `content.js` — but the two-consumer argument for extracting
-  it is gone.
-- **The six cards** carry their accent as `--accent`, set inline per card, and
-  the band, the index number, the icon plate and the foot sweep all read from
-  that one value. The body copy is deliberately *not* `.mono-xs`: at 9.5px
-  uppercase it read as a label rather than as a sentence. `margin-top: auto` on
-  the body pins it to the foot so six cards of unequal copy still line up.
-- **Section 04's vertical order is head → ghost word → cards → foot strip, and
-  each clears the one above it.** Measured at 1440×900, 390×820 and 360×640, the
-  head clears the word by 17px at all three. Under 760px tall a `max-height`
-  query tightens the card and halves the row gutter, because otherwise three
-  rows of cards run past the foot strip; that query sits *after* the width one,
-  since a short phone matches both and the later rule wins.
-- **A card's hover state must never animate `transform`.** GSAP owns that
-  property for the flip-in and writes it inline, so a CSS hover transform is
-  overwritten — the same trap as the hero globe in §4. Hover moves colour, and
-  moves children (the foot sweep is its own element).
-- `drawArticle` is now shared: it lives in **`js/lib/article.js`** and both
-  scenes import it, so the claim that 03 and 04 show the same story is enforced
-  by the code rather than by two copies agreeing. Its copy — the headline lines
-  and the dateline — moved to `content.js`, where the project says runtime copy
-  belongs. The dateline is dropped below a 150px surface, where it used to
-  render at its 6px floor and run into the edge; that removed it from the Desk's
-  phone, which is the one intentional visual change from the extraction.
-- **Still duplicated:** `roundRect` and the wake-rim logic in `desk.js` and
-  `conveyor.js`. The contact shadows deliberately differ — the Desk casts a dark
-  shadow on a white desk, the rail pools light on ink — so those are not the
-  same function and should not be merged.
+- **Renamed, like `paper-plane.js` before it.** `conveyor.js` describing a
+  static slab would be a lie; `data-scene` is now `platform`.
+- **Still duplicated:** `roundRect` and the wake-rim logic no longer are —
+  version 3's code went with it. `desk.js` keeps its own.
 
 ---
+
 ### How it works (06) — new section
 
 The first of the three sections the 12-essentials audit found missing. **No
@@ -584,11 +588,20 @@ Still open from that audit, and worth raising before anything else is built:
 **Nothing.** 04, 05, 08 and 09 are all done — see §6. The site draws no paper,
 no press and no newsprint surface anywhere.
 
-Four worked examples now. The method that holds: replace each print element
-with its digital counterpart and keep the scene's structure and its hand-off to
-the next section, rather than deleting and starting over. The scroll timeline in
+Four worked examples now, and **they do not all teach the same lesson.**
+
+For 04, 08 and 09 the method held: replace each print element with its digital
+counterpart and keep the scene's structure and its hand-off to the next
+section, rather than deleting and starting over. The scroll timeline in
 `main.js` expects the phases it already has, so keeping them is what lets the
 scene change without the section's choreography changing.
+
+**05 needed the opposite, and took four attempts to admit it.** Where the
+structure *is* the print metaphor, translating it inherits the nonsense — a
+belt stays a belt whatever rides it, and a line is still a belt. That section's
+canvas had to be thrown away and asked a different question. See §6 for the
+full post-mortem; the short version is that the first three versions all drew
+the section's **verb** and the section is a **noun**.
 
 **Editorial language is not print language.** `THE PRESS` stayed as 08's label:
 the labels are newspaper sections (`FRONT PAGE`, `LIVE`, `CLASSIFIEDS`,

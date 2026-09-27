@@ -1804,6 +1804,14 @@
     <!-- ═══ 11 · ON AIR ═════════════════════════════════════════════ -->
     <section id="on-air" class="position-relative overflow-hidden" data-nav="dark" data-label="CLASSIFIEDS"
       style="background:#111111">
+      <!-- Background film. `data-src` rather than `src`: main.js only loads it
+           once the section is near, so 4.4MB never sits in the critical path,
+           and it is left alone entirely under prefers-reduced-motion. -->
+      <video class="on-air-film pe-none position-absolute inset-0" data-on-air-film
+        data-src="./assets/videos/video_bg.mp4" muted loop playsinline preload="none" aria-hidden="true"
+        tabindex="-1"></video>
+      <div class="on-air-scrim pe-none position-absolute inset-0" aria-hidden="true"></div>
+
       <div class="pe-none position-absolute inset-0 d-flex align-items-center justify-content-center"
         aria-hidden="true">
         <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 0s infinite"></span>

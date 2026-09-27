@@ -39,6 +39,7 @@ js/
 vendor/               GSAP, ScrollTrigger, Lenis, Three.js, topojson-client
 fonts/                Tomorrow, Space Grotesk, Space Mono, Playfair Display
 data/                 Natural Earth 110m land geometry
+assets/               logo, and the ON AIR background film (4.4MB, lazy-loaded)
 server.js             local preview server (not needed in production)
 .claude/              Claude Code preview config — safe to delete
 ```
@@ -112,6 +113,7 @@ knowing before editing `scss/`:
 Marked in the UI so nothing reads as finished:
 
 - **Brand film** — the "Watch the film" modal at the bottom of `index.html`
+  (the ON AIR section does have its background film: `assets/videos/video_bg.mp4`)
 - **Newsroom footage** — the Front Page thumbnail
 - **Newsroom photo (B&W)** — the footer
 - **Publisher logos** — the masthead wall currently sets the names as

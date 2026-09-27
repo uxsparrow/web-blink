@@ -377,6 +377,28 @@ reached from their listings, and 14 · the 404 page is reached by failing.
 
 ---
 
+### 11 · ON AIR — the background film
+
+`assets/videos/video_bg.mp4`, 960×540, 20s, **4.4MB** — by a distance the
+heaviest thing in the repo.
+
+- It carries **`data-src`, not `src`**. `setupOnAirFilm()` in `main.js` only
+  sets the real source when the section comes within 25%, so the 4.4MB never
+  touches first paint. Verified: nothing is requested until you scroll near it,
+  then 4,478KB transfers. Don't "simplify" it back to a plain `src`.
+- It never loads at all under `prefers-reduced-motion`, and it is paused when
+  the section scrolls away, like the canvas loops.
+- **Every failure mode lands on the old design.** The film fades in only on
+  `is-playing`, which is set when `play()` resolves — so a refused autoplay, a
+  failed fetch or reduced motion all leave the flat `#111` the section has
+  always had, with its rings and type intact.
+- **The scrim is measured, not guessed.** The film runs at 14–18 mean luma with
+  under 2% of pixels above 140 — it is already dark, and the heavy scrim I
+  first wrote would have hidden it. It now only takes a little off behind the
+  type and fades the top and bottom edges into `#111`.
+
+---
+
 ## 7 · Open items
 
 ### Still print

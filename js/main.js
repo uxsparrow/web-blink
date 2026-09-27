@@ -256,6 +256,35 @@ function setupPins(scenes) {
   )
 }
 
+/**
+ * 11 · ON AIR — the background film.
+ *
+ * It is 4.4MB, so it carries no `src` until the section is close: the page's
+ * whole point is that nothing heavy blocks first paint. It also never loads
+ * under `prefers-reduced-motion`, and if it cannot play — no autoplay, a failed
+ * fetch — the section keeps the flat #111 it has always had.
+ */
+function setupOnAirFilm() {
+  const film = q('[data-on-air-film]')
+  if (!film || reducedMotion()) return
+
+  onInView(
+    film,
+    (inView) => {
+      if (!inView) {
+        film.pause()
+        return
+      }
+      if (!film.getAttribute('src')) film.setAttribute('src', film.dataset.src)
+      film.play().then(
+        () => film.classList.add('is-playing'),
+        () => {} // autoplay refused; the scrim and #111 carry the section
+      )
+    },
+    '25%'
+  )
+}
+
 /* ── boot ─────────────────────────────────────────────────────── */
 
 function boot() {
@@ -270,6 +299,8 @@ function boot() {
   initFilmModal()
   initWireThumb()
   initTickers()
+
+  setupOnAirFilm()
 
   const scenes = mountScenes()
   setupHero()

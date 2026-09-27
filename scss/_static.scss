@@ -47,11 +47,16 @@
 
 // ── custom cursor ───────────────────────────────────────────────
 
+// The ring, its arc and the centre dot all draw with `currentColor`, so the
+// pointer's colour is this one line.
 .cursor-root {
-  color: #111111;
+  color: var(--breaking);
 
+  // Dark sections used to flip the pointer from ink to white. It is red on
+  // both now, lifted a little so it still carries against near-black — the
+  // class stays meaningful rather than becoming a toggle that does nothing.
   &.is-inverted {
-    color: #ffffff;
+    filter: brightness(1.3);
   }
 }
 

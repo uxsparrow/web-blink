@@ -3567,10 +3567,10 @@ html.lenis body {
 }
 
 .cursor-root {
-  color: #111111;
+  color: var(--breaking);
 }
 .cursor-root.is-inverted {
-  color: #ffffff;
+  filter: brightness(1.3);
 }
 
 .cursor-ring,

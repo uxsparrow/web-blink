@@ -336,6 +336,47 @@ Rebuilt around the rail as a spine rather than three loose columns.
 
 ---
 
+## 6b · Navigation — the approved 15-page IA
+
+The menu and the footer were rewired to the approved sitemap. **The site is
+still one page, so every one of these links 404s until that page exists.** This
+was a deliberate call: the nav now states the agreed structure rather than the
+old in-page anchors. If the pages are not coming soon, point them back at
+anchors or the links should come out.
+
+Every destination referenced, and the approved page it belongs to:
+
+| link | page |
+|---|---|
+| `/` | 1 · Home — this file |
+| `/platform/` (+ `#the-reporter` … `#the-analyst`) | 2 · Platform / Product |
+| `/pricing/` | 3 · Pricing |
+| `/case-studies/` | 4 · Case Studies index |
+| `/case-studies/daily-thanthi/`, `/the-hans-india/`, `/livelaw/`, `/the-federal/`, `/madhyamam/` | 5 · Case Study detail |
+| `/about/` | 6 · About Us |
+| `/contact/` | 7 · Contact / Book a Demo |
+| `/careers/` | 8 · Careers index |
+| `/blog/` | 10 · Blog index |
+| `/reports/` | 11 · Reports listing |
+| `/roundups/` | 12 · Roundups listing |
+| `/legal/privacy/`, `/legal/terms/`, `/legal/cookies/` | 15 · Legal templates |
+
+Not linked, correctly: 9 · job detail and 13 · article detail are templates
+reached from their listings, and 14 · the 404 page is reached by failing.
+
+- The overlay menu is **six top-level items**, which is what the existing
+  reveal was built for — the stagger loop runs `1 through 6`. Three of them
+  carry a `.menu-sub` row. Adding a seventh means extending that loop.
+- The stagger now keys off `.menu-item:nth-child()`, not the link: each link
+  sits in its own wrapper so a submenu can hang under it, which made every
+  `.menu-link` a first child and flattened the delays to one value.
+- **`BOOK A DEMO` still points at `#on-air`**, the on-page section. It was not
+  part of the nav rewire; decide whether it should go to `/contact/`.
+- The header's `LIVE` indicator is gone — the menu button took its place, per
+  the approved change — and the button is no longer absolutely centred.
+
+---
+
 ## 7 · Open items
 
 ### Still print

@@ -13,7 +13,9 @@ import { mountScene } from '../lib/canvas-scene.js'
  * shape the scroll timeline expects:
  *
  *   paper web racing up   → the feed, payload after payload
- *   rollers across the bed → relays the feed hops through
+ *   rollers across the bed → dropped: the relay bars that replaced them ran the
+ *                            full width and cut straight through the headline
+ *                            and the feature copy sitting over this canvas
  *   ink-lit machine bed   → the same violet light, now the network's
  *   burst of flying pages → the story arriving on hundreds of screens
  *
@@ -219,40 +221,6 @@ function drawBroadcast(ctx, w, h, p, time, rows, screens, endpoints) {
   ctx.lineTo(busX + busW, h)
   ctx.stroke()
 
-  /* ── the relays it hops through ──────────────────────────────── */
-  const relayGap = 300
-  const rOffset = (travel * 0.22) % relayGap
-  for (let i = -1; i < Math.ceil(h / relayGap) + 2; i++) {
-    const y = h - (i * relayGap - rOffset) + relayGap
-    if (y < -80 || y > h + 80) continue
-
-    // the bar the feed passes through
-    ctx.fillStyle = '#16121f'
-    ctx.fillRect(-20, y - 20, w + 40, 40)
-    const g = ctx.createLinearGradient(0, y - 20, 0, y + 20)
-    g.addColorStop(0, 'rgba(185,164,255,.42)')
-    g.addColorStop(0.5, 'rgba(97,24,234,.16)')
-    g.addColorStop(1, 'rgba(0,0,0,.5)')
-    ctx.fillStyle = g
-    ctx.fillRect(-20, y - 20, w + 40, 40)
-
-    // the bright line where the payload is actually passing
-    ctx.fillStyle = 'rgba(255,255,255,.5)'
-    ctx.fillRect(busX, y - 20, busW, 1.5)
-
-    // a node at each end of the relay
-    for (const nx of [40, w - 40]) {
-      ctx.strokeStyle = 'rgba(185,164,255,.5)'
-      ctx.lineWidth = 1.5
-      ctx.beginPath()
-      ctx.arc(nx, y, 9, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.fillStyle = `rgba(185,164,255,${0.3 + 0.5 * Math.abs(Math.sin(time * 2 + y * 0.01))})`
-      ctx.beginPath()
-      ctx.arc(nx, y, 3.4, 0, Math.PI * 2)
-      ctx.fill()
-    }
-  }
   ctx.restore()
 
   /* ── the fan-out, once there is room to see it ───────────────── */

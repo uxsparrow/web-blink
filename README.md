@@ -67,7 +67,7 @@ sequences to produce or ship:
 | Dotted globe, pings, arcs | `js/scenes/globe.js` — Three.js points placed on **real land geometry**, red ping flares, bezier arcs back to Noida, headline tags projected to screen space |
 | Bureau map + wire feed | `js/scenes/preloader.js` — Natural Earth land rasterised to a dot grid, centred on India |
 | Laptop → tablet → phone | `js/scenes/desk.js` — the headline types into the Blink editor, the finished story lifts off the screen and flies across the desk, then lights up a tablet and a phone with the same article. One article renderer draws all four surfaces, and a dotted world map sways behind them |
-| Delivery rail + screens | `js/scenes/conveyor.js` — a phone, laptop, tablet and e-paper reader ride the rail, each waking with the same article the Desk wrote; the rail tilts top-down into the black strip that carries into LIVE |
+| Delivery line + channel taps | `js/scenes/conveyor.js` — stories of uneven size ride one line; at a junction four taps branch off to the channels the section names; the line tilts top-down into the black strip that carries into LIVE |
 | The edition going out | `js/scenes/press.js` — the published feed races up a dark bus, hopping through violet-lit relays, then fans out to endpoint screens |
 | The story on every screen | same file — ~320 reader screens burst outward and clear to white |
 | Paper plane | `js/scenes/paper-plane.js` — folded from a front page, print still on the wing, flown along a bezier |

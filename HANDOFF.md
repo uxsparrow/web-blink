@@ -126,7 +126,7 @@ All drawn in code — no image sequences, no renders to commission.
 | Dotted globe | `js/scenes/globe.js` | Three.js points on **real Natural Earth land**; 23 pings arcing to Noida |
 | Preloader map | `js/scenes/preloader.js` | Same land data, equirectangular, centred on India |
 | Desk | `js/scenes/desk.js` | **Rebuilt digital** — see §6 |
-| Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — screens ride the rail, see §6 |
+| Conveyor | `js/scenes/conveyor.js` | **Rebuilt digital** — one delivery line, four channel taps, see §6 |
 | Press | `js/scenes/press.js` | **Rebuilt digital** — the edition going out, see §6 |
 | Paper plane | `js/scenes/paper-plane.js` | Still folded from a front page — see §7 |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` | Real halftone: type sampled, redrawn as dots sized by ink coverage |
@@ -199,29 +199,46 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
 
 ### The Platform rail (04)
 
-Same call, carried downstream: the conveyor now runs screens, not newspapers.
-Every print element was *replaced* rather than dropped, so the scene keeps its
-shape and its job in the scroll story.
+One delivery line runs the width of the section. Stories ride it left → right as
+payloads of uneven size, and at a junction two thirds along, four taps branch
+off and carry them to the lower right, where the section's own label names them:
+`WEB · AMP · PWA · APP`. Everything the newsroom publishes goes down one line
+and comes out on every channel — which is the section's whole claim.
 
-| was | is |
-|---|---|
-| folded newspapers on the belt | a phone, laptop, tablet and e-paper reader, each waking with the article the Desk wrote |
-| rollers with turning spokes | delivery nodes that pulse as a screen passes over, with a feed line up to the rail |
-| CMYK registration marks | `WEB · AMP · PWA · APP` chips — the channels THE EDITION card already names |
-| ink mist under the rollers | violet signal bloom |
-| — | the Desk's dashed violet publish route, running behind the screens |
+**This is the second attempt.** The first one translated the print conveyor
+element by element: the folded newspapers became a phone, a laptop, a tablet
+and an e-paper reader riding the belt, the rollers became pulsing nodes, and so
+on. Every piece had a counterpart and the result still made no sense — screens
+do not ride conveyors, so it read as a factory belt in digital dress, and a row
+of identical repeats underlined it. The dots below the belt answered to nothing
+at all.
 
-- **The structure is unchanged on purpose.** Travel still runs left → right with
-  scroll, and the tilt at `p 0.82–1` still widens the rail into the ink strip
-  that hands off to 05 · LIVE's vertical `.live-rail`. Don't break that handoff.
-- One `drawArticle()` renders every screen, as on the Desk.
-- Riders stay inside the **168px** band the folded papers occupied, so the
-  platform cards above keep the clearance they were laid out with. If you make a
-  rider taller, re-check the cards.
+> **The lesson worth keeping:** translating a print scene element by element is
+> a good method for a scene whose *structure* still holds (03, 06). Where the
+> structure itself is the print metaphor, the translation inherits the
+> nonsense. Ask what the section actually claims, and draw that.
+
+- **The structure that does hold, and must be kept:** travel runs left → right
+  with scroll, and the tilt at `p 0.82–1` widens the line into the ink strip
+  that hands off to 05 · LIVE. That hand-off is why the tilt exists.
+- The line keeps moving on `time` as well as `p`, or a still section reads as a
+  diagram rather than something live.
+- The payloads are **deliberately uneven** in width, height and gap. The
+  identical repeats were most of why the old scene read as a belt.
+- **The line has to clear the card grid**, which is opaque DOM over this canvas.
+  At desktop widths the cards end near `0.63h` and `0.78h` is clear; two-up on a
+  phone they run to about `0.89h`, and the old lane at `0.78h` was drawn
+  entirely behind them — the scene was invisible on phones, as the belt also
+  was. Narrow canvases put the line at `0.925h` and drop the channel fan, which
+  has no room to read there. Measured clearance: 100px at 1440×900, and the
+  payloads clear the cards at 390×820.
 - The scene draws in **canvas space, not a fitted virtual stage** — it is
-  full-bleed, and a contain-fit would letterbox the line's ends. Riders scale off
-  the canvas width instead (`k`).
+  full-bleed, and a contain-fit would letterbox the line's ends.
 - Composed at progress 0, same as the Desk and for the same reason.
+- `js/lib/article.js` now has **one** consumer, the Desk: the rail no longer
+  draws full articles. It still earns its place — it holds the renderer and its
+  copy comes from `content.js` — but the two-consumer argument for extracting
+  it is gone.
 - **The six cards** carry their accent as `--accent`, set inline per card, and
   the band, the index number, the icon plate and the foot sweep all read from
   that one value. The body copy is deliberately *not* `.mono-xs`: at 9.5px

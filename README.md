@@ -26,7 +26,7 @@ nginx, Apache, cPanel, S3, Netlify, GitHub Pages all serve it as-is.
 ## What's in the folder
 
 ```
-index.html            the whole page — all 14 sections as static markup
+index.html            the whole page — all 15 sections as static markup
 css/
   styles.css          compiled from scss/ — edit directly if you prefer
   fonts.css           @font-face rules for the self-hosted fonts
@@ -139,7 +139,7 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 
 ## Behaviour notes
 
-- Total scroll is roughly **31k px** at 1440×900. Pins shorten by about half
+- Total scroll is roughly **32k px** at 1440×900. Pins shorten by about half
   below 900px, via `gsap.matchMedia()` in `js/main.js`.
 - `prefers-reduced-motion` collapses every pinned scene to a single key frame
   and disables smooth scroll.

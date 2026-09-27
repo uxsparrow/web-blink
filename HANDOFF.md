@@ -14,16 +14,17 @@ A single-page marketing site for Blink CMS, built to the structure and motion
 system of unitedcarriers.com but told through a news story rather than a
 shipping container: **Monitor → Gather → Create → Publish → Monetize → Analyze.**
 
-Fourteen sections, in page order:
+Fifteen sections, in page order:
 
 ```
-00 preloader    (overlay)       07 press        (#press)
-01 hero         (#hero)         08 letters      (#letters)
-02 front page   (#front-page)   09 masthead wall(#case-studies)
-03 desk         (#desk)         10 the wire     (#the-wire)
-04 platform     (#platform)     11 faq          (#faq)
-05 how it works (#how-it-works) 12 on air       (#on-air)
-06 live         (#live)         13 footer       (#contact)
+00 preloader    (overlay)       08 press        (#press)
+01 hero         (#hero)         09 letters      (#letters)
+02 front page   (#front-page)   10 masthead wall(#case-studies)
+03 why they go  (#why-leave)    11 the wire     (#the-wire)
+04 desk         (#desk)         12 faq          (#faq)
+05 platform     (#platform)     13 on air       (#on-air)
+06 how it works (#how-it-works) 14 footer       (#contact)
+07 live         (#live)
 ```
 
 ~31,000px of scroll at 1440×900. Four pinned, scroll-scrubbed scenes: desk,
@@ -153,9 +154,50 @@ add cities.
 
 ---
 
-## 6 · The digital scenes (03 and 04)
+## 6 · The digital scenes
 
-### The Desk (03)
+### Why newsrooms leave (03) — new section
+
+The second of the three the audit found missing, and it does **two** of the
+twelve jobs: comparison (6) and problem statement (3). **No canvas.**
+
+- **It carries no claim about anyone else's software.** The user was offered a
+  head-to-head WordPress table and chose this instead. So the left column is a
+  *question a publisher asks* and the right column is Blink's supplied answer.
+  A question is not an assertion about a competitor, which is what let this
+  section be written at all under §10 — a comparison table could not have been.
+  **If anyone later asks for a "WordPress" column, that is a new decision and it
+  needs claims the user will stand behind publicly.** Don't fill it from here.
+- **Every answer is supplied copy**, mostly verbatim: row 01 is 07 · LIVE's
+  auto-scaling entry, 02 is a press feature, 03 is the webmaster-support entry
+  plus The Analyst's H-SEO score, **04 is the one F.A.Q answer the brief gave**
+  ("No. Billing is by features."), 05 is the ON AIR standfirst, 06 is the front
+  page's 400% stat plus Daily Thanthi's case study. Nothing new is asserted.
+- **It sits at 03, before the product, not at 6 in the checklist's order.**
+  Reframed as a problem statement it belongs before the solution, and
+  `#front-page` → `#desk` was one of the few seams on this page with no scene
+  hand-off to break. The front page's "no plugin patchwork, no vendor
+  ping-pong" now reads as the teaser for it.
+- **The architecture is 06's, sliced.** One scrubbed number, and CSS decides
+  what it means — but here `setupLeaves()` gives each row its own slice via
+  `seg(p, i/n, (i+1)/n)`, so the answers arrive one at a time. `easeOut` on
+  each slice, or the wipe runs at a constant rate and reads mechanical.
+- **The question is never the thing withheld.** It is the reader's own thought,
+  so it is readable the moment the row is on screen; only the answer waits.
+- **The wipe is `clip-path`, not a width.** The copy is laid out at its final
+  measure from the start, so no line ever reflows mid-scroll. A width animation
+  would re-wrap the paragraph on every frame.
+- `background: var(--newsprint)` rather than white. It is the editorial page —
+  same stock, different section — and it separates this from the white run of
+  `#front-page` and `#desk` on either side without a hard dark transition.
+  `data-label` is `EDITORIAL`, a new label but a real newspaper section, and it
+  is exactly what this section is: the paper arguing a position.
+- `.leave-head` is sized to its column, not with a `.t-*`. `LEAVE WORDPRESS` is
+  15 characters and cannot wrap — same trap as `.front-head`, see §4.
+
+---
+
+### The Desk (04)
 
 The user confirmed **Blink CMS is digital-only — no print media**. The desk was
 rebuilt around that: laptop writes, three screens publish. No paper, no
@@ -197,7 +239,7 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
   rather than on the spacing scale: the header is fixed, 55px tall and
   `z-index: 900`, so anything above ~60px is painted over by it.
 
-### The Platform rail (04)
+### The Platform rail (05)
 
 One delivery line runs the width of the section. Stories ride it left → right as
 payloads of uneven size, and at a junction two thirds along, four taps branch
@@ -220,8 +262,8 @@ at all.
 
 - **The structure that does hold, and must be kept:** travel runs left → right
   with scroll, and the tilt at `p 0.82–1` widens the line into the ink strip
-  that hands off to the ink line 05 · HOW IT WORKS opens on, and through it to
-  06 · LIVE's rail. That hand-off is why the tilt exists.
+  that hands off to the ink line 06 · HOW IT WORKS opens on, and through it to
+  07 · LIVE's rail. That hand-off is why the tilt exists.
 - The line keeps moving on `time` as well as `p`, or a still section reads as a
   diagram rather than something live.
 - The payloads are **deliberately uneven** in width, height and gap. The
@@ -268,7 +310,7 @@ at all.
   same function and should not be merged.
 
 ---
-### How it works (05) — new section
+### How it works (06) — new section
 
 The first of the three sections the 12-essentials audit found missing. **No
 canvas.** The whole scene is DOM plus one scrubbed number, which is why it costs
@@ -282,7 +324,7 @@ p 1.00          the line has run the full width
 ```
 
 - **Every fact in it is already elsewhere on the page.** The three steps are
-  cards 01, 02 and 03 of section 04 — The Reporter, The AI Editor, The Edition
+  cards 01, 02 and 03 of section 05 — The Reporter, The AI Editor, The Edition
   — and each step carries **that card's `--accent`**, so 04 and 05 name the same
   three things in the same colour. §10 forbids inventing, and nothing here is
   invented; the only new sentences are connective.
@@ -310,7 +352,7 @@ p 1.00          the line has run the full width
 - `.steps-head` is sized to its column, not with a `.t-*`. Same trap as
   `.front-head` and `.live-head`; swept clean at 1024, 1440, 1920 and 2560.
 - **It sits between 04 and 06 and that weakens one hand-off.** 04's tilt widens
-  the delivery line into an ink strip aimed at 06 · LIVE's ink rail. This
+  the delivery line into an ink strip aimed at 07 · LIVE's ink rail. This
   section now takes delivery of it instead — which is why its own line is ink
   on the same axis. The chain still reads strip → line → rail, but if you move
   or remove this section, check that seam.
@@ -318,7 +360,7 @@ p 1.00          the line has run the full width
 ---
 
 
-### Letters (08)
+### Letters (09)
 
 Two print things lived here: a giant paper plane folded from a front page, and
 the results set as clippings — newsprint, with a torn top edge cut from a
@@ -342,7 +384,7 @@ the results set as clippings — newsprint, with a torn top edge cut from a
 - All the copy is untouched, including the standing note that the results are
   as supplied and no quotes are attributed.
 
-### The Press (07)
+### The Press (08)
 
 The machine is gone; the section is not. Each print element was replaced, so
 the scene still has the shape `main.js` scrubs it through:
@@ -365,7 +407,7 @@ the scene still has the shape `main.js` scrubs it through:
 - The burst particles are screens now, not sheets, so they tumble far less —
   paper flutters, a phone does not.
 
-### 06 · LIVE
+### 07 · LIVE
 
 Rebuilt around the rail as a spine rather than three loose columns.
 
@@ -427,7 +469,7 @@ reached from their listings, and 14 · the 404 page is reached by failing.
 
 ---
 
-### 12 · ON AIR — the background film
+### 13 · ON AIR — the background film
 
 `assets/videos/video_bg.mp4`, 960×540, 20s, **4.4MB** — by a distance the
 heaviest thing in the repo.
@@ -458,16 +500,17 @@ heaviest thing in the repo.
 
 ## 7 · Open items
 
-### The 12-essentials audit — two sections still missing
+### The 12-essentials audit — one section still missing
 
 The user checked the page against a 12-section home-page checklist. Seven were
-already there, two were partial, three were missing. **How it works landed as
-05** (see §6). Still to build, both blocked on facts the brief does not contain:
+already there, two were partial, three were missing. Two of the three have
+landed; **only Pricing is left**, and it is blocked on facts the brief does not
+contain.
 
 | # | section | state |
 |---|---|---|
-| 5 | How It Works | **done** — 05, see §6 |
-| 6 | Comparison vs WordPress | **missing.** Needs claims the user will stand behind publicly; only an F.A.Q question and a Wire headline mention WordPress today |
+| 5 | How It Works | **done** — 06, see §6 |
+| 6 | Comparison vs WordPress | **done** — 03, see §6, but *as a problem statement, not a comparison*. The user chose the "why newsrooms leave" framing over a head-to-head table, so the page makes no claim about anyone else's software. It also covers job 3 |
 | 8 | Pricing | **missing.** Needs real tier names and what is in each. The only pricing fact on the page is the supplied F.A.Q answer, "No. Billing is by features." |
 
 Also found by that audit, not yet acted on:
@@ -476,16 +519,16 @@ Also found by that audit, not yet acted on:
   the footer has no newsletter signup. There is no lead capture at all.
 - **The final CTA has one button, not two**, and it points at `#on-air` — its
   own section, so it does nothing. Same open question as `BOOK A DEMO` in §6b.
-- **Problem statement and use-cases-by-segment are partial**: the segments exist
-  only as the footer ticker, and the newsroom pain is one sentence in the front
-  page aside. A comparison section would carry most of the second job.
+- **Use cases by segment is still partial**: the seven segments exist only as
+  the footer marquee, never as a section. The problem-statement job that used
+  to sit alongside it is covered by 03.
 - **The front page's `IN THIS EDITION` index still lists six sections** and has
   not been touched. It is the page's own table of contents, so decide once,
-  after the last new section lands, whether it should carry nine.
+  after the last new section lands, whether it should carry ten.
 
 ### Still print
 
-**Nothing.** 03, 04, 07 and 08 are all done — see §6. The site draws no paper,
+**Nothing.** 04, 05, 08 and 09 are all done — see §6. The site draws no paper,
 no press and no newsprint surface anywhere.
 
 Four worked examples now. The method that holds: replace each print element
@@ -494,7 +537,7 @@ the next section, rather than deleting and starting over. The scroll timeline in
 `main.js` expects the phases it already has, so keeping them is what lets the
 scene change without the section's choreography changing.
 
-**Editorial language is not print language.** `THE PRESS` stayed as 07's label:
+**Editorial language is not print language.** `THE PRESS` stayed as 08's label:
 the labels are newspaper sections (`FRONT PAGE`, `LIVE`, `CLASSIFIEDS`,
 `BACK PAGE`), and the press means the news media. What changed there was the
 machine, not the word. Same reasoning as masthead and front page below.
@@ -542,7 +585,7 @@ by frame at p = 0 / 0.46 / 0.62 / 0.99 (both layouts), masthead tabs, F.A.Q
 accordion, tickers, custom cursor, header at scroll 0, no horizontal overflow,
 headline fit from 1024px to 2560px.
 
-**Also verified** (section 04, via the frame-capture method in §9): the rail at
+**Also verified** (the platform rail, now 05, via the frame-capture method in §9): the rail at
 1440×900 and 375×812 across p = 0 / 0.15 / 0.3 / 0.45 / 0.55 / 0.6 / 0.82 / 0.9 /
 0.96 / 1, including the tilt to top-down and the channel chips, no console
 errors. And the hero globe's return trip — the wrap keeps its CSS opacity while

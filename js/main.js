@@ -6,7 +6,7 @@
  * WebGL never blocks first paint.
  */
 
-import { gsap, ScrollTrigger, onInView, reducedMotion } from './lib/motion.js'
+import { gsap, ScrollTrigger, onInView, reducedMotion, seg, easeOut } from './lib/motion.js'
 import { liveTicks } from './lib/content.js'
 
 import { initSmoothScroll } from './ui/smooth-scroll.js'
@@ -109,7 +109,40 @@ function setupHero() {
 }
 
 /**
- * 05 · HOW IT WORKS — the delivery line draws itself.
+ * 03 · WHY NEWSROOMS LEAVE — the answers arrive as you scroll.
+ *
+ * Same architecture as 06's delivery line: one scrubbed number, and CSS decides
+ * what it means. Here it is sliced per row, so each answer wipes in over its
+ * own share of the section while the question stays readable throughout — the
+ * question is the reader's own thought and should never be the thing withheld.
+ */
+function setupLeaves() {
+  const list = q('[data-leaves]')
+  const rows = qq('[data-leave]')
+  if (!list || !rows.length) return
+
+  const draw = (p) =>
+    rows.forEach((row, i) =>
+      // eased, or the wipe runs at a constant rate and reads mechanical
+      row.style.setProperty('--reveal', easeOut(seg(p, i / rows.length, (i + 1) / rows.length)))
+    )
+
+  if (reducedMotion()) {
+    draw(1)
+    return
+  }
+
+  const state = { p: 0 }
+  gsap.to(state, {
+    p: 1,
+    ease: 'none',
+    onUpdate: () => draw(state.p),
+    scrollTrigger: { trigger: list, start: 'top 82%', end: 'bottom 72%', scrub: 0.5 },
+  })
+}
+
+/**
+ * 06 · HOW IT WORKS — the delivery line draws itself.
  *
  * One scrubbed value does all of it: `--draw` goes 0 → 1 across the section
  * and CSS decides what that means, so the line runs left-to-right on a desktop
@@ -224,7 +257,7 @@ function setupPins(scenes) {
     const { isDesktop } = context.conditions
     const len = isDesktop ? long : short
 
-    /* 03 · THE DESK */
+    /* 04 · THE DESK */
     if (desk) {
       ScrollTrigger.create({
         trigger: desk,
@@ -238,7 +271,7 @@ function setupPins(scenes) {
       })
     }
 
-    /* 04 · OUR PLATFORM */
+    /* 05 · OUR PLATFORM */
     if (platform) {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -264,7 +297,7 @@ function setupPins(scenes) {
       })
     }
 
-    /* 06 · THE PRESS */
+    /* 08 · THE PRESS */
     if (press) {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -306,7 +339,7 @@ function setupPins(scenes) {
 }
 
 /**
- * 11 · ON AIR — the background film.
+ * 13 · ON AIR — the background film.
  *
  * It is 4.4MB, so it carries no `src` until the section is close: the page's
  * whole point is that nothing heavy blocks first paint. It also never loads
@@ -354,6 +387,7 @@ function boot() {
   const scenes = mountScenes()
   setupHero()
   setupPins(scenes)
+  setupLeaves()
   setupSteps()
   setupLive()
   setupLetters(scenes)

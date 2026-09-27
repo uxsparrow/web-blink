@@ -218,7 +218,91 @@
   }
 }
 
-// ── 04 our platform ─────────────────────────────────────────────
+// ── 03 why newsrooms leave ──────────────────────────────────────
+
+// Sized to its 7-column well, not with a `.t-*`. `LEAVE WORDPRESS` is the
+// longest line at 15 characters and cannot wrap, so the same trap that sliced
+// `.front-head` and `.live-head` applies — see §4 of the handoff.
+.leave-head {
+  font-size: clamp(1.9rem, 4.6vw, 4.6rem);
+
+  .line-inner {
+    white-space: nowrap;
+  }
+}
+
+// `--reveal` is this row's own slice of the section's scroll, written by
+// setupLeaves() in main.js. The question is readable from the moment the row
+// is on screen — it is the reader's own thought, so it never waits — and only
+// the answer arrives with the scroll.
+.leave-row {
+  --reveal: 0;
+  position: relative;
+  border-top: 1px solid var(--hairline);
+}
+
+// the accent rail, drawn top-down as the row is reached
+.leave-row__rail {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleY(var(--reveal));
+  transform-origin: top center;
+}
+
+.leave-row__num {
+  color: rgba(17, 17, 17, 0.3);
+  padding-top: 0.5rem;
+}
+
+.leave-row__q {
+  font-size: clamp(1.15rem, 1.7vw, 1.7rem);
+  color: var(--ink);
+  padding-right: 1.5rem;
+}
+
+// The wipe. `clip-path` rather than a width, so the copy is laid out at its
+// final measure from the start and no line ever reflows mid-scroll.
+.leave-row__a {
+  clip-path: inset(0 calc(100% - 100% * var(--reveal)) 0 0);
+  opacity: calc(0.2 + 0.8 * var(--reveal));
+}
+
+.leave-row__copy {
+  max-width: 42ch;
+  color: rgba(17, 17, 17, 0.62);
+}
+
+.leave-row__tag {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: var(--accent);
+}
+
+// Stacked, the number and the question share a line so the row does not become
+// three tall blocks, and the rail still runs the full height beside them.
+@include media-breakpoint-down(sm) {
+  .leave-row {
+    padding-left: 1.25rem;
+  }
+  .leave-row__num {
+    padding-top: 0;
+  }
+  .leave-row__q {
+    padding-right: 0;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .leave-row {
+    padding-left: 1.5rem;
+  }
+}
+
+// ── 05 our platform ─────────────────────────────────────────────
 
 // The ghost word starts below the head rather than behind it. At 6% its
 // letterforms ran straight through the section label and the standfirst, which
@@ -403,7 +487,7 @@
   }
 }
 
-// ── 05 how it works ─────────────────────────────────────────────
+// ── 06 how it works ─────────────────────────────────────────────
 
 // Same trap as `.front-head` and `.live-head`: the headline sits in a
 // 7-column well that stops growing at the shell's max-width, so it is sized
@@ -612,7 +696,7 @@
   }
 }
 
-// ── 06 live ─────────────────────────────────────────────────────
+// ── 07 live ─────────────────────────────────────────────────────
 
 // Same trap as `.front-head`: this headline sits in a third-width sticky
 // column, but `.t-lg` sized it against the viewport, so past about 1024px the
@@ -771,7 +855,7 @@
   background: linear-gradient(180deg, rgba(17, 17, 17, 0) 0%, rgba(17, 17, 17, 0.6) 45%, #111111 100%);
 }
 
-// ── 07 the press ────────────────────────────────────────────────
+// ── 08 the press ────────────────────────────────────────────────
 
 .press-feature {
   position: absolute;
@@ -808,7 +892,7 @@
   padding-inline: 1.25rem;
 }
 
-// ── 08 letters ──────────────────────────────────────────────────
+// ── 09 letters ──────────────────────────────────────────────────
 
 // `.t-xl` kept scaling with the viewport, but this headline's 7-column well
 // stops growing once the shell hits its 1560px cap, so above about 1615px the
@@ -859,7 +943,7 @@
   border: 1px solid rgba(17, 17, 17, 0.16);
 }
 
-// ── 09 masthead wall ────────────────────────────────────────────
+// ── 10 masthead wall ────────────────────────────────────────────
 
 .tab-btn {
   border: 1px solid var(--hairline);
@@ -868,7 +952,7 @@
     color 0.3s;
 }
 
-// ── 10 the wire ─────────────────────────────────────────────────
+// ── 11 the wire ─────────────────────────────────────────────────
 
 .wire-sky {
   height: 34vh;
@@ -900,7 +984,7 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-// ── 11 faq ──────────────────────────────────────────────────────
+// ── 12 faq ──────────────────────────────────────────────────────
 
 .faq-q {
   font-size: clamp(1rem, 1.5vw, 1.35rem);
@@ -936,7 +1020,7 @@
   max-width: 52ch;
 }
 
-// ── 12 on air ───────────────────────────────────────────────────
+// ── 13 on air ───────────────────────────────────────────────────
 
 // The background film, and the scrim that keeps white type readable over it.
 // The section's own #111 stays underneath, so if the film never loads — no
@@ -1017,7 +1101,7 @@
   }
 }
 
-// ── 13 footer ───────────────────────────────────────────────────
+// ── 14 footer ───────────────────────────────────────────────────
 
 .footer-photo {
   aspect-ratio: 4 / 3;

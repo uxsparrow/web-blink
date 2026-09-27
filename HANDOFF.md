@@ -396,6 +396,13 @@ heaviest thing in the repo.
   under 2% of pixels above 140 — it is already dark, and the heavy scrim I
   first wrote would have hidden it. It now only takes a little off behind the
   type and fades the top and bottom edges into `#111`.
+- **The blur and the crop are a pair.** 960×540 upscales about 1.5× on a
+  desktop and its compression shows, so the film carries a light blur — sized
+  in `vw`, because a fixed radius that reads as a haze at 1440px smears a
+  phone. `scale(1.12)` then crops off the feathered edge the blur leaves around
+  the element; the feather runs about 3× the radius, so the crop has to stay
+  ahead of it at every width. If you raise the blur, check the crop still wins
+  on the narrowest screen.
 
 ---
 

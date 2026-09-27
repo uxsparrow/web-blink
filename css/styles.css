@@ -3380,6 +3380,8 @@ html.lenis body {
   object-fit: cover;
   opacity: 0;
   transition: opacity 1.2s ease-out;
+  filter: blur(clamp(3px, 0.45vw, 7px));
+  transform: scale(1.12);
 }
 .on-air-film.is-playing {
   opacity: 1;

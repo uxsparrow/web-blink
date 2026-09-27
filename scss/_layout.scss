@@ -739,6 +739,20 @@
   opacity: 0;
   transition: opacity 1.2s ease-out;
 
+  // The source is 960×540, so on a desktop it is upscaled about 1.5× and its
+  // compression shows. A light blur hides that; the scale crops off the
+  // feathered edge the blur leaves around the element.
+  //
+  // The blur scales with the viewport. A fixed radius is a very different
+  // effect at 375px than at 1440px — the same 6px that reads as a light haze on
+  // a desktop smears a phone. This holds the softening roughly constant.
+  //
+  // The crop has to beat the feather, which runs about 3× the radius: 7px of
+  // blur feathers ~21px, and 6% of even a 320px screen is 19px, with 86px of
+  // room at 1440. 8% would not have been enough on a phone.
+  filter: blur(clamp(3px, 0.45vw, 7px));
+  transform: scale(1.12);
+
   &.is-playing {
     opacity: 1;
   }

@@ -36,8 +36,14 @@ export function initHeader() {
   const menu = document.querySelector('[data-menu]')
   const toggles = [...document.querySelectorAll('[data-menu-toggle]')]
   const demoPill = document.querySelector('[data-demo-pill]')
+  const logo = header.querySelector('[data-header-logo]') || header.querySelector('img')
   const ticker = document.querySelector('[data-header-ticker]')
   if (!header) return
+
+  const darkLogoSrc = './assets/images/blinkcms-logo-transparent.png'
+  const lightLogoSrc = './assets/images/blinkcms-logo.png'
+  const preloadImg = new Image()
+  preloadImg.src = lightLogoSrc
 
   // Present from the first frame and at the very top of the page, not revealed
   // on scroll. It slides in behind the preloader, so it is already in place by
@@ -54,6 +60,9 @@ export function initHeader() {
       if (demoPill) {
         demoPill.classList.toggle('pill-white', dark)
         demoPill.classList.toggle('pill-ink', !dark)
+      }
+      if (logo) {
+        logo.src = dark ? darkLogoSrc : lightLogoSrc
       }
       // the breaking ticker rides along under the header on dark sections
       if (ticker) ticker.style.maxHeight = dark ? '34px' : '0px'

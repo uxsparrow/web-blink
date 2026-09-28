@@ -550,6 +550,49 @@ heaviest thing in the repo.
 
 ---
 
+## 6c · The F.A.Q answers — where they came from
+
+All eight are written. **They are sourced from outside the brief**, so unlike
+the rest of the page they cannot be checked against it:
+
+| source | what it gave |
+|---|---|
+| `Docs/Blink CMS - Feature List.pdf` | the whole feature inventory: the eight process groups, the reporter/stringer module, the election and cricket modules, the headless API, webmaster support, SEO and schema surface |
+| blinkcms.ai/pricing-page | the Demo plan's limits, the Custom Suite's custom modules and hosting, and "plans differ by storage, bandwidth and seats" |
+| the page itself | 150+ newsrooms, 43K concurrent with zero downtime, the publisher names on the masthead wall, and the footer's real email and phone |
+
+- **Answer 05 keeps the brief's own sentence first.** "No. Billing is by
+  features." is the one answer the brief supplied, verbatim; the plan detail
+  sits behind it rather than replacing it.
+- **Answer 03 still carries a marked gap.** The five decks say nothing about
+  redirects or URL mapping, which is the actual mechanism behind "migrate
+  without losing SEO". The answer states the SEO surface and the webmaster
+  support truthfully and marks the rest `[REDIRECT AND URL-MAPPING PLAN — NOT
+  IN THE SUPPLIED DOCS]`. **Do not fill that in from inference.**
+- `.faq-gap` exists for exactly that case: a gap inside an answer that is
+  otherwise written. It cannot reuse `.faq-answer.is-slot` — nesting that class
+  would apply the answer's own 44px indent a second time.
+
+### Reading those PDFs
+
+Four of the five resisted extraction, and it cost real time:
+
+- **`pdftoppm` is not installed**, so the Read tool cannot render PDF pages
+  here at all. Everything below was done by parsing the files directly.
+- **The pitch deck, the brochure and the deck have no text layer** — their type
+  is outlined to vectors. Nothing will extract from them short of OCR. Don't
+  try again; ask for the source files instead.
+- **The feature list and the comparison list use subset fonts.** The feature
+  list is a uniform +29 shift on 2-byte CID codes with NUL high bytes, so
+  stripping the NULs and shifting gives clean text. The comparison list uses
+  per-font CMaps that a shift cannot crack; it needs real `/ToUnicode` parsing
+  and was left unread.
+- The scratch extractor is not in the repo. If it is needed again the approach
+  is: inflate every stream, keep the ones with `BT` + `Tf` + a show operator,
+  pull the literals, strip NULs, shift.
+
+---
+
 ## 7 · Open items
 
 ### The 12-essentials audit — all three sections landed
@@ -624,8 +667,8 @@ appear elsewhere, flagged to the user but not changed:
 
 ### Content gaps — all render in red mono as `[BRACKETS]`
 
-- **F.A.Q answers** — 7 of 8 missing. The brief supplied only the questions plus
-  one answer ("Do you charge more as traffic grows?" → "No. Billing is by features.")
+- **F.A.Q answers** — all eight written now, from the feature list; see §6c. One
+  gap remains marked inside answer 03.
 - **The Wire** — 4 headlines supplied, no article bodies
 
 ### Asset slots

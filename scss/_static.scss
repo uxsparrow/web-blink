@@ -330,14 +330,14 @@
   background: linear-gradient(115deg, #1a1a22 0%, #2b2438 42%, #120f1c 100%);
 }
 
-// ── 07 letters ──────────────────────────────────────────────────
+// ── 09 letters ──────────────────────────────────────────────────
 
 .result__metric {
   font-size: clamp(1.7rem, 3vw, 2.9rem);
   line-height: 0.9;
 }
 
-// ── 08 masthead wall ────────────────────────────────────────────
+// ── 10 masthead wall ────────────────────────────────────────────
 
 .masthead-name {
   font-size: clamp(0.82rem, 1.05vw, 1.05rem);
@@ -364,7 +364,7 @@
   }
 }
 
-// ── 09 the wire ─────────────────────────────────────────────────
+// ── 11 the wire ─────────────────────────────────────────────────
 
 .wire-title {
   color: #ffffff;
@@ -399,20 +399,42 @@
   z-index: 2;
 }
 
-// ── 06 press ────────────────────────────────────────────────────
+// ── 08 press ────────────────────────────────────────────────────
 
 .press-flash {
   background: #fff;
   opacity: 0;
 }
 
-// ── 10 faq ──────────────────────────────────────────────────────
+// ── 13 faq ──────────────────────────────────────────────────────
 
 .faq-answer.is-slot {
   color: var(--breaking);
   font-family: var(--font-spacemono), ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.12em;
+}
+
+// A gap inside an answer that is otherwise written. The whole answer is not a
+// slot, so it cannot take `.faq-answer.is-slot` — and nesting that class would
+// also apply the answer's own 44px indent a second time.
+.faq-gap {
+  color: var(--breaking);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+// answers that point back into the page
+.faq-link {
+  color: var(--blink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.28s;
+
+  &:hover {
+    color: var(--breaking);
+  }
 }
 
 [data-faq-item].is-open .faq-q {
@@ -422,7 +444,7 @@
   transform: rotate(45deg);
 }
 
-// ── 12 footer ───────────────────────────────────────────────────
+// ── 15 footer ───────────────────────────────────────────────────
 
 .footer-photo__note {
   position: absolute;

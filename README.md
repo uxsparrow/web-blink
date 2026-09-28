@@ -122,8 +122,6 @@ Marked in the UI so nothing reads as finished:
 
 Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 
-- **F.A.Q answers** — the brief supplied the eight questions and one answer
-  ("Do you charge more as traffic grows?" → "No. Billing is by features.")
 - **The Wire** — four headlines supplied, no article bodies
 
 ## Content rules held
@@ -133,7 +131,10 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
   are attributed.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - Every headline is live HTML — nothing is baked into an image.
-- **The rate card is the one section sourced from outside the brief.** Its four
+- **The F.A.Q answers and the rate card are sourced from outside the brief.**
+  The answers come from `Docs/Blink CMS - Feature List.pdf` plus copy already on
+  the page; one gap is still marked in answer 03.
+- **The rate card is sourced from outside the brief too.** Its four
   plans, prices, limits and small print come from
   <https://www.blinkcms.ai/pricing-page>, read 27 Sep 2026. Nothing in the
   build checks that against the live page, so if the rates move this section

@@ -4251,6 +4251,23 @@ html.lenis body {
   letter-spacing: 0.12em;
 }
 
+.faq-gap {
+  color: var(--breaking);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.faq-link {
+  color: var(--blink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.28s;
+}
+.faq-link:hover {
+  color: var(--breaking);
+}
+
 [data-faq-item].is-open .faq-q {
   color: var(--blink);
 }

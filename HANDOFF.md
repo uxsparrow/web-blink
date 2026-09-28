@@ -629,25 +629,33 @@ those publishers are not among the four the user wants shown. **They live at
 commit `761d3c3`.** The LiveLaw one is usable today as-is.
 ### The read-through
 
-The section was a lead letter over three small ones. It is now four equal
-letters, each a slug column and a quote, and **the quote lights word by word as
-you scroll it**. That is the one device on this page about *reading*, which is
-what a letter is for — every other section animates delivery, structure or
-arrival.
+Four equal letters, each a masthead slug beside a quote, and **the quote lights
+word by word as you scroll it** — then the name, then the role. That is the one
+device on this page about *reading*, which is what a letter is for; every other
+section animates delivery, structure or arrival.
 
-- **Each letter owns its trigger**, over its own height, so the reading rate
-  follows the letter rather than the section. One trigger across all four made
-  the long ones crawl and the short ones flash past.
+- **One trigger across the whole block, sliced per letter.** `seg(p, i/n,
+  (i+1)/n)` means a letter cannot begin until the one above it has finished.
+  It was four separate triggers first, one per letter, and they overlapped —
+  two or three letters lit at once. Measured after the change: never more than
+  one letter mid-reveal at any progress, and each reaches its full word count
+  before the next leaves zero.
+- **The order is the DOM order**, which is also reading order: quote, then
+  name, then role. Nothing sorts them. The slug column (number, masthead, kind)
+  sits earlier in the DOM but carries no `.lw` spans, so it never joins in.
+- **`.lw` is `color: inherit`, not `--ink`.** The spans now wrap the role too,
+  which is muted at 45%; a hard colour there would light it to full ink along
+  with the quote and flatten the hierarchy. Verified: quote and name resolve to
+  `rgb(17,17,17)`, role to `rgba(17,17,17,.45)`, dim to `rgba(17,17,17,.17)`.
 - **Words rest lit in the stylesheet and are dimmed by JS on mount.** Backwards
   and a dead script leaves four unreadable grey blocks. Same rule as the ON AIR
-  film and the old `--rise`.
-- **`color`, not `opacity`.** An opacity transition on 122 inline spans promotes
-  each to its own layer; colour animates on the same layer and stays cheap.
-- **Only the words that crossed are touched**, not all 30 every frame: the
-  handler tracks how many are lit and walks the difference. Without that it is
-  ~120 class writes per frame per letter.
-- **The tail finishes at `p / 0.82`**, so the last words land before the letter
-  leaves the viewport rather than lighting as it exits.
+  film.
+- **`color` animates, not `opacity`.** An opacity transition on ~140 inline
+  spans promotes each to its own layer; colour animates on the same one.
+- **Only the words that crossed are touched**, not all thirty-five every frame:
+  the painter tracks how many are lit and walks the difference.
+- **Each letter finishes at `t / 0.88` of its own slice**, so the last words
+  land while the letter is still settled rather than on its way out.
 - Each letter carries its masthead’s accent on the rule beside it, drawn down
   with `--read` as the quote is read.
 

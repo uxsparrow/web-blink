@@ -3598,7 +3598,7 @@ html.lenis body {
  * promotes each one to its own layer, and the section janked on a phone.
  */
 .lw {
-  color: var(--ink);
+  color: inherit;
   transition: color 0.45s ease-out;
 }
 

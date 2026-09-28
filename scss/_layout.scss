@@ -1018,7 +1018,9 @@
  * promotes each one to its own layer, and the section janked on a phone.
  */
 .lw {
-  color: var(--ink);
+  // `inherit`, not `--ink`: these spans now wrap the role too, which is muted,
+  // and a hard colour here would light it to full ink along with the quote.
+  color: inherit;
   transition: color 0.45s ease-out;
 }
 

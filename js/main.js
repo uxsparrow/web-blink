@@ -250,48 +250,55 @@ function setupLetters(scenes) {
   const section = q('#letters')
   if (!section) return
 
+  const track = q('[data-letters]')
+  const letters = qq('[data-letter]')
+
   /*
-   * The quotes light word by word as you scroll through them — reading, which
-   * is the one thing a letter is for, and the only device on this page that is
-   * about it. Each letter owns its own trigger over its own height, so the
-   * reading rate follows the letter rather than the section.
+   * The letters are read one at a time, in order: a single scrubbed value
+   * across the whole block, sliced per letter, so a letter cannot begin until
+   * the one above it has finished. Four separate triggers — what this was
+   * before — overlap, and two or three letters light at once.
+   *
+   * Each letter lights its quote, then the name, then the role, because that
+   * is the order the spans sit in the DOM and the order you would read them.
    *
    * Words rest lit in the stylesheet. Dimming them here is what arms the
    * effect, so a dead script leaves four readable letters rather than four
    * grey blocks — the same rule the ON AIR film follows.
    */
-  qq('[data-letter]').forEach((letter) => {
-    const words = qq('.lw', letter)
-    const rule = letter.querySelector('.letter__rule')
-    if (!words.length) return
+  if (track && letters.length) {
+    const groups = letters.map((el) => ({
+      words: qq('.lw', el),
+      rule: el.querySelector('.letter__rule'),
+      lit: 0,
+    }))
+
+    const paint = (g, t) => {
+      g.rule?.style.setProperty('--read', t)
+      // finishes a little before its slice ends, so the last words land while
+      // the letter is still settled rather than on its way out
+      const want = Math.round(clamp(t / 0.88) * g.words.length)
+      if (want === g.lit) return
+      // only the words that actually crossed, not all thirty every frame
+      if (want > g.lit) for (let k = g.lit; k < want; k++) g.words[k].classList.remove('is-dim')
+      else for (let k = want; k < g.lit; k++) g.words[k].classList.add('is-dim')
+      g.lit = want
+    }
 
     if (reducedMotion()) {
-      rule?.style.setProperty('--read', '1')
-      return
+      groups.forEach((g) => paint(g, 1))
+    } else {
+      groups.forEach((g) => g.words.forEach((w) => w.classList.add('is-dim')))
+      const n = groups.length
+      const state = { p: 0 }
+      gsap.to(state, {
+        p: 1,
+        ease: 'none',
+        onUpdate: () => groups.forEach((g, i) => paint(g, seg(state.p, i / n, (i + 1) / n))),
+        scrollTrigger: { trigger: track, start: 'top 80%', end: 'bottom 90%', scrub: 0.4 },
+      })
     }
-
-    words.forEach((w) => w.classList.add('is-dim'))
-    let lit = 0
-
-    const read = (p) => {
-      rule?.style.setProperty('--read', p)
-      // the last few words land before the letter leaves, or the tail never lights
-      const want = Math.round(clamp(p / 0.82) * words.length)
-      if (want === lit) return
-      // only the words that actually crossed, not all 30 every frame
-      if (want > lit) for (let k = lit; k < want; k++) words[k].classList.remove('is-dim')
-      else for (let k = want; k < lit; k++) words[k].classList.add('is-dim')
-      lit = want
-    }
-
-    const state = { p: 0 }
-    gsap.to(state, {
-      p: 1,
-      ease: 'none',
-      onUpdate: () => read(state.p),
-      scrollTrigger: { trigger: letter, start: 'top 78%', end: 'bottom 62%', scrub: 0.4 },
-    })
-  })
+  }
 
   if (!scenes.signal) return
 

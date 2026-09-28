@@ -127,10 +127,11 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 ## Content rules held
 
 - **The four letters in 09 are placeholder copy — invented names, roles and
-  quotes, attached to four real mastheads at the user’s request.** The section
-  flags itself as sample in red mono, and that flag must stay until real quotes
-  replace them. Real verbatim ones, from the case studies published at
-  blinkcms.ai, are recoverable at commit 761d3c3.
+  quotes.** The mastheads are real customers (all four are on the publisher
+  wall), but the words are not theirs. **Nothing on screen says so any more**:
+  this build is for internal review and the sample flag was removed on request.
+  Restore that flag or swap in real quotes before this goes public — see
+  HANDOFF §6d. Real verbatim quotes are recoverable at commit 761d3c3.
 - Nothing else on the page invents a person, a quote or a number.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - Every headline is live HTML — nothing is baked into an image.

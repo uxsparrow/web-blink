@@ -3537,10 +3537,6 @@ html.lenis body {
   position: relative;
 }
 
-.letters-flag {
-  color: var(--breaking);
-}
-
 .letter {
   position: relative;
   padding: 2.5rem 0 2.75rem 2rem;

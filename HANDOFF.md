@@ -601,28 +601,32 @@ Four of the five resisted extraction, and it cost real time:
 
 ## 6d · 09 · LETTERS — the read-through, and a content warning
 
-### ⚠ The quotes here are fabricated, and the page says so
+### ⚠ The quotes here are fabricated, and nothing on screen says so
 
-**The four letters are placeholder copy.** The names, roles and quotes are
-invented; only the four mastheads — LiveLaw, Deccan Chronicle, Daily Thanthi,
-The Federal — are ones the user named. This was asked for explicitly, and the
-concern was raised before it was built: a fabricated quote attributed to a real
-publisher reads as an endorsement that publisher never gave.
+**The names, roles and quotes in the four letters are invented.** This build is
+for the Blink CMS team to review, and the user asked for sample copy and for
+the on-screen warning to come off, after the concern was raised. That is their
+call for an internal build. **This file is now the only record**, so read the
+next two paragraphs before anything here goes public.
 
-**That is what `.letters-flag` is for.** It prints
-`[SAMPLE LETTERS — NAMES AND QUOTES ARE PLACEHOLDERS]` in the same red mono as
-every other unsupplied slot on the page. **Do not remove it until real quotes
-replace the sample ones.** It is the only thing standing between this section
-and four invented endorsements from named companies.
+**What is real:** all four mastheads — LiveLaw, Deccan Chronicle, Daily Thanthi
+and The Federal — appear on the publisher wall in 10, so the customer
+relationships are not invented, only the words put in their mouths. That is the
+narrower risk, but it is still the serious one: a fabricated quote against a
+real customer’s name reads as an endorsement that customer never gave.
+
+**Before this ships publicly, one of two things has to happen.** Either real
+quotes replace the sample ones, or the sample flag goes back — it printed
+`[SAMPLE LETTERS — NAMES AND QUOTES ARE PLACEHOLDERS]` in red mono and is in
+git history alongside its `.letters-flag` rule. Do not let this section reach
+production in its current state.
 
 **There were real quotes here, and they are recoverable.** Four verbatim ones
 — Advocate P V Dinesh (Co-Founder, LiveLaw), the Editorial Head of Tax Scan,
-the Hari Bhoomi digital team and the EVO India team — lifted from the case
-studies published at blinkcms.ai under `/case-study/`. They were replaced
-because three of those four publishers are not the four the user wanted shown.
-**They live at commit `761d3c3`** and should go back the moment real quotes
-exist for these mastheads.
-
+the Hari Bhoomi digital team and the EVO India team — from the case studies
+published at blinkcms.ai under `/case-study/`. They came out because three of
+those publishers are not among the four the user wants shown. **They live at
+commit `761d3c3`.** The LiveLaw one is usable today as-is.
 ### The read-through
 
 The section was a lead letter over three small ones. It is now four equal

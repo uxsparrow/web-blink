@@ -14,15 +14,11 @@
     content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.">
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/styles.css">
-  <!-- the hero globe's WebGL, fetched while the intro plays -->
   <link rel="modulepreload" href="vendor/three.module.min.js">
   <link rel="modulepreload" href="vendor/three.core.min.js">
   <link rel="preload" href="data/countries-110m.json" as="fetch" crossorigin>
   <noscript>
     <style>
-      /* Without scripts the intro can never lift itself, the accordion can never
-       open and the second tab panel can never be revealed — so hand the reader
-       the whole page instead. */
       .preloader {
         display: none;
       }
@@ -529,22 +525,6 @@
         </div>
       </div>
     </div>
-
-    <!-- <div class="site-header__ticker" data-header-ticker>
-    <div class="ticker d-flex w-100 align-items-stretch overflow-hidden ticker--dark">
-      <div class="mono-xs ticker__tab d-flex flex-shrink-0 align-items-center gap-2 px-3 ticker-pad fw-bold">
-        <span class="live-dot" style="background:#fff"></span>BREAKING
-      </div>
-      <div class="marquee flex-grow-1" style="--marquee-dur:30s" data-marquee>
-        <div class="marquee-track align-items-center ticker-pad">
-          <span class="mono-xs d-flex align-items-center gap-4">150+ NEWSROOMS<span style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">43K CONCURRENT READERS<span style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">ZERO DOWNTIME<span style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">20+ FACT-CHECK SITES<span style="color:var(--breaking)">·</span></span>
-        </div>
-      </div>
-    </div>
-  </div> -->
   </header>
 
   <!-- overlay menu -->
@@ -606,16 +586,10 @@
     <!-- ═══ 01 · HERO ═══════════════════════════════════════════════ -->
     <section id="hero" class="hero position-relative" data-nav="dark" data-label="FRONT PAGE">
       <div class="position-sticky top-0 h-svh overflow-hidden">
-
-        <!-- the wrap's opacity is the lazy reveal (CSS, .is-ready); the inner
-             layer is what the hero scroll dims, so the two never fight over
-             the same property -->
         <div class="hero-globe z-1" data-globe-wrap>
           <div class="position-absolute inset-0" data-globe-dim>
             <canvas class="w-100 h-100" data-scene="globe"></canvas>
 
-            <!-- city names for every ping without a headline tag; the globe
-                 writes these in, since they only mean anything with it running -->
             <div class="pe-none position-absolute inset-0" data-ping-labels aria-hidden="true"></div>
 
             <div class="pe-none position-absolute inset-0">
@@ -812,9 +786,6 @@
     </section>
 
     <!-- ═══ 03 · WHY NEWSROOMS LEAVE ════════════════════════════════ -->
-    <!-- The problem statement, framed as the six things publishers raise when
-         they move rather than as claims about anyone else's software. Every
-         answer is supplied copy; the questions are the brief's own. -->
     <section id="why-leave" class="tex-halftone position-relative" data-nav="light" data-label="EDITORIAL"
       style="background:var(--newsprint)">
       <div class="shell sec-pad">
@@ -842,8 +813,7 @@
           </div>
         </div>
 
-        <!-- One scrubbed value per row: the question is readable throughout and
-             the answer wipes in as the scroll reaches it. -->
+
         <ol class="leaves list-unstyled mt-vh-7" data-leaves>
           <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#111111">
             <span class="leave-row__rail" aria-hidden="true"></span>
@@ -924,9 +894,6 @@
       style="background:#fff">
       <div class="pin-stage">
         <canvas class="position-absolute inset-0 h-100 w-100" data-scene="desk"></canvas>
-        <!-- Both of the desk's labels sit together, top right and clear of the
-             55px fixed header, which outranks them on z-index. Keeping the
-             second one at the foot left it crowding the next section's head. -->
         <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex flex-column gap-2" style="top:76px">
           <div class="d-flex align-items-end justify-content-between gap-6">
             <div class="d-flex align-items-center gap-3">
@@ -1089,11 +1056,6 @@
               every screen you publish on.</p>
           </div>
         </div>
-
-        <!-- The steps hang off the delivery line 04 ends on: it runs across the
-             row from md up and stands up as a spine below that. Each step takes
-             the accent of the module card that does the work, so 04 and 05 name
-             the same three things in the same colour. -->
         <ol class="steps row row-cols-1 row-cols-md-3 g-0 list-unstyled mt-vh-7" data-steps>
           <span class="steps__ink" aria-hidden="true"></span>
           <span class="steps__head" aria-hidden="true"></span>
@@ -1128,7 +1090,8 @@
                 <span class="mono-xs step__num">02 / 03</span>
               </div>
               <h3 class="display step__title">EDIT IT</h3>
-              <p class="body-copy step__copy">Auto-tagging, story suggestions and full AI drafts, inside the editor the desk
+              <p class="body-copy step__copy">Auto-tagging, story suggestions and full AI drafts, inside the editor the
+                desk
                 already works in.</p>
               <a href="/platform/#the-ai-editor" class="mono-xs step__module">THE AI EDITOR <span
                   aria-hidden="true">→</span></a>
@@ -1222,9 +1185,6 @@
           </div>
         </div>
 
-        <!-- The three entries hang off a spine that answers the live rail to
-             their left, so the column reads as one run of the same log rather
-             than three loose rows. -->
         <div class="col-12 col-lg-4">
           <div class="live-entries">
             <article class="live-entry">
@@ -1817,9 +1777,6 @@
     </section>
 
     <!-- ═══ 11 · THE RATE CARD ══════════════════════════════════════ -->
-    <!-- Overview only, deliberately: the plans, what each one holds and where
-         to go for the rest. Figures are from blinkcms.ai/pricing-page. The full
-         feature matrix and the add-on rates live on /pricing/, not here. -->
     <section id="pricing" class="tex-halftone position-relative" data-nav="light" data-label="RATE CARD"
       style="background:#fff">
       <div class="shell sec-pad">
@@ -1925,7 +1882,6 @@
           </div>
         </div>
 
-        <!-- the small print a rate card carries under the rates -->
         <div class="hair-t row g-6 mt-10 pt-6">
           <div class="col-12 col-lg-4">
             <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">ADD-ONS · FROM BASIC UPWARDS</div>
@@ -2138,9 +2094,6 @@
     <!-- ═══ 14 · ON AIR ═════════════════════════════════════════════ -->
     <section id="on-air" class="position-relative overflow-hidden" data-nav="dark" data-label="CLASSIFIEDS"
       style="background:#111111">
-      <!-- Background film. `data-src` rather than `src`: main.js only loads it
-           once the section is near, so 4.4MB never sits in the critical path,
-           and it is left alone entirely under prefers-reduced-motion. -->
       <video class="on-air-film pe-none position-absolute inset-0" data-on-air-film
         data-src="./assets/videos/video_bg.mp4" muted loop playsinline preload="none" aria-hidden="true"
         tabindex="-1"></video>

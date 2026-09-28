@@ -701,11 +701,21 @@ note under them, and `chore: remove careers link` unlinked `/careers/` from
 both the menu and the footer — page 8 of the §6b map is now unreferenced,
 correctly, since there is nothing to link to yet.
 
-### User's own edit — leave alone
+### User's own edits — leave alone
 
-The **breaking-ticker strip under the header is commented out** in `index.html`.
-That was the user's change, not ours. `initHeader()` already guards for it being
-absent. Don't restore it without asking.
+The **breaking-ticker strip under the header is gone**. It had been commented
+out for a while, and `chore: remove comments and dead code` deleted the
+commented block with it, so the markup is no longer in the file at all — check
+git history if it is ever wanted back. `initHeader()` still guards for
+`[data-header-ticker]` being absent, so nothing breaks.
+
+That same commit **stripped the explanatory HTML comments** from `index.html`.
+The section dividers survived; the prose did not. Several of those comments
+recorded bugs that cost real time — why the globe dim runs on an inner layer,
+why the desk labels sit at `top: 76px`, why the ON AIR film carries `data-src`
+and not `src`. **All of that reasoning is still in this file**, in §4 and §6, so
+nothing is lost; just do not assume an unexplained line in the markup is
+arbitrary. Check here first.
 
 ---
 

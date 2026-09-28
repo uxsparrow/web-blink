@@ -3533,6 +3533,75 @@ html.lenis body {
   border: 1px solid rgba(17, 17, 17, 0.16);
 }
 
+.letter {
+  --rise: 1;
+  position: relative;
+  padding-left: 1.75rem;
+  opacity: calc(0.15 + 0.85 * var(--rise));
+  transform: translateY(calc(18px * (1 - var(--rise))));
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.letter::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  bottom: 0.15em;
+  width: 2px;
+  background: rgba(17, 17, 17, 0.16);
+}
+
+.letter--lead {
+  padding-left: 2.25rem;
+  margin-bottom: 3rem;
+  max-width: 46ch;
+}
+.letter--lead::before {
+  width: 3px;
+  background: var(--blink);
+}
+
+.letter__quote {
+  color: rgba(17, 17, 17, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.letter--lead .letter__quote {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.15rem, 2.1vw, 1.9rem);
+  line-height: 1.38;
+  color: var(--ink);
+}
+
+.letter__by {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.letter__name {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.letter--lead .letter__name {
+  display: inline-block;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+}
+
+.letter__role {
+  display: block;
+  margin-top: 0.25rem;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.letter--lead .letter__role {
+  display: inline-block;
+  margin-top: 0;
+}
+
 .tab-btn {
   border: 1px solid var(--hairline);
   transition: background 0.3s, color 0.3s;

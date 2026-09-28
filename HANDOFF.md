@@ -596,6 +596,49 @@ Four of the five resisted extraction, and it cost real time:
 
 ---
 
+## 6d · The quotes in 09 · LETTERS — where they came from
+
+The section was built to hold correspondence and, for most of its life, held
+none: the brief supplied no quotes and §10 forbids inventing them, so it ran as
+measured results under a standing note reading `NO QUOTES ATTRIBUTED`.
+
+**There were four all along, published on blinkcms.ai.** They sit at the foot
+of the case studies under `/case-study/`, and are quoted verbatim here:
+
+| who | where |
+|---|---|
+| Advocate P V Dinesh, Co-Founder, LiveLaw | `/case-study/client-success-story-…-livelaw-…-766351` |
+| Editorial Head, Tax Scan | `/case-study/how-blinkcms-helped-tax-scan-…-838661` |
+| Hari Bhoomi Digital Team | `/case-study/how-blinkcms-helped-hari-bhoomi-…-838310` |
+| EVO India Team | `/case-study/evo-india-…-838108` |
+
+- **Only the LiveLaw one names a person**, which is why it is the lead letter
+  and the other three are set small. The rest attribute to a team or a role
+  because **that is how their source attributes them** — do not promote them to
+  named people, and do not invent titles.
+- **All four run in full.** The lead was briefly trimmed of its closing
+  "Highly recommended!" because a sales exclamation reads as ad copy in a
+  letters column — and then restored, because the page claims
+  `NOTHING PARAPHRASED` under the quotes and an unmarked cut would make that
+  claim false. If a quote ever has to be shortened, mark the cut.
+- **LiveLaw appears twice in this section** — once as a `.result` row with its
+  supplied metrics, once as the lead letter. That is deliberate: the numbers
+  and the quote come from different sources and say different things.
+- **Two of the four open with "game-changer"** (LiveLaw and Tax Scan). They are
+  deliberately not adjacent; the lead sits alone and Tax Scan opens the row
+  beneath it, so the repeat is a column apart rather than side by side.
+- **Playfair on the lead** is deliberate and within the rule `_type.scss` sets
+  for it — newspaper props only, never UI. A published letter is a newspaper
+  prop; a button is not.
+- **`--rise` rests at 1 in the stylesheet**, not 0. `setupLetters()` drops it to
+  0 on mount and only then animates it back, so a dead script leaves four
+  legible letters rather than four invisible ones. Same rule as the ON AIR film.
+  Getting this backwards is easy and the failure is silent.
+- The reveal is `once: true` rather than scrubbed, unlike everything else added
+  recently. These are somebody else's words; they arrive and they stay.
+
+---
+
 ## 7 · Open items
 
 ### The 12-essentials audit — all three sections landed
@@ -805,8 +848,9 @@ These cost a lot of time; they are about the tooling, not the site.
 
 ## 10 · Content rules — hold these
 
-- **No invented testimonials, people or quotes.** Section 07 shows results only,
-  exactly as supplied, with a standing note that no quotes are attributed.
+- **No invented testimonials, people or quotes.** The four quotes in 09 are
+  verbatim from the case studies published at blinkcms.ai — see §6d. Anything
+  that is not traceable to a published source does not go on this page.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - **Every headline is live HTML** — nothing baked into an image.
 - Only facts from the Blink CMS brief. Anything else is a marked placeholder.

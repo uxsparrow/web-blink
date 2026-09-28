@@ -248,7 +248,33 @@ function setupLive() {
 
 function setupLetters(scenes) {
   const section = q('#letters')
-  if (!section || !scenes.signal) return
+  if (!section) return
+
+  /*
+   * The published quotes rise as they come in. They are the only thing on this
+   * page that is somebody else's words, so they are not scrubbed back and
+   * forth with the scroll like the rest — they arrive once and stay, which is
+   * what `once: true` on the batch is for.
+   */
+  const letters = qq('[data-letter]')
+  if (letters.length) {
+    // `--rise` rests at 1 in the stylesheet so the quotes survive a dead
+    // script; taking it to 0 here is what arms the reveal.
+    if (!reducedMotion()) {
+      letters.forEach((l) => l.style.setProperty('--rise', '0'))
+      letters.forEach((l, i) => {
+        ScrollTrigger.create({
+          trigger: l,
+          start: 'top 88%',
+          once: true,
+          // the lead letter leads; the three under it follow in order
+          onEnter: () => setTimeout(() => l.style.setProperty('--rise', '1'), i === 0 ? 0 : 90 * i),
+        })
+      })
+    }
+  }
+
+  if (!scenes.signal) return
 
   if (reducedMotion()) {
     scenes.signal.setProgress(0.42)

@@ -943,6 +943,92 @@
   border: 1px solid rgba(17, 17, 17, 0.16);
 }
 
+// ── 09 letters · the quotes ─────────────────────────
+
+// This section carried no quotes for most of its life, because the brief
+// supplied none and §10 forbids inventing them. These four are lifted verbatim
+// from the case studies published at blinkcms.ai — see §6d.
+.letter {
+  // 1, not 0: the quotes are readable with no JavaScript at all. setupLetters
+  // drops it to 0 on mount and only then animates it back, so a failed script
+  // leaves four legible letters rather than four invisible ones — the same
+  // rule the ON AIR film follows.
+  --rise: 1;
+  position: relative;
+  padding-left: 1.75rem;
+  opacity: calc(0.15 + 0.85 * var(--rise));
+  transform: translateY(calc(18px * (1 - var(--rise))));
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // the rule a letters page sets beside its correspondence
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    bottom: 0.15em;
+    width: 2px;
+    background: rgba(17, 17, 17, 0.16);
+  }
+}
+
+// the lead letter, set large the way a letters page sets its first
+.letter--lead {
+  padding-left: 2.25rem;
+  margin-bottom: 3rem;
+  max-width: 46ch;
+
+  &::before {
+    width: 3px;
+    background: var(--blink);
+  }
+}
+
+.letter__quote {
+  color: rgba(17, 17, 17, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+// Playfair, because `_type.scss` reserves it for newspaper props and a
+// published letter is one. It is never used for UI.
+.letter--lead .letter__quote {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.15rem, 2.1vw, 1.9rem);
+  line-height: 1.38;
+  color: var(--ink);
+}
+
+.letter__by {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.letter__name {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.letter--lead .letter__name {
+  display: inline-block;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+}
+
+.letter__role {
+  display: block;
+  margin-top: 0.25rem;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.letter--lead .letter__role {
+  display: inline-block;
+  margin-top: 0;
+}
+
 // ── 10 masthead wall ────────────────────────────────────────────
 
 .tab-btn {

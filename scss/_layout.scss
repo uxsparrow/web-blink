@@ -1471,10 +1471,10 @@
 
 // ── 14 on air ───────────────────────────────────────────────────
 
-// The background film, and the scrim that keeps white type readable over it.
-// The section's own #111 stays underneath, so if the film never loads — no
+// The background video, and the scrim that keeps white type readable over it.
+// The section's own #111 stays underneath, so if the video never loads — no
 // autoplay, reduced motion, a failed fetch — nothing about the section breaks.
-.on-air-film {
+.on-air-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1500,7 +1500,7 @@
   }
 }
 
-// Measured against the film rather than guessed: it runs at 14–18 mean luma
+// Measured against the video rather than guessed: it runs at 14–18 mean luma
 // with under 2% of pixels above 140, so it is already dark and a heavy scrim
 // would simply hide it. This takes a little off behind the type and fades the
 // top and bottom edges into the section's own #111 so it joins its neighbours.
@@ -1572,12 +1572,22 @@
 
 // ── video modal ─────────────────────────────────────────────────
 
-.film-modal {
+.video-modal {
   padding: 5vw;
   background: rgba(0, 0, 0, 0.92);
   transition: opacity 0.5s;
 }
-.film-frame {
+// the embed fills the frame; the registration marks sit over its corners
+.video-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.video-frame {
   width: 100%;
   max-width: 1100px;
   aspect-ratio: 16 / 9;
@@ -1585,7 +1595,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.film-close {
+.video-close {
   position: absolute;
   top: -36px;
   right: 0;

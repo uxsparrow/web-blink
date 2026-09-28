@@ -466,9 +466,9 @@
   color: #fff;
 }
 
-// ── film modal ──────────────────────────────────────────────────
+// ── video modal ──────────────────────────────────────────────────
 
-.film-modal {
+.video-modal {
   opacity: 0;
   pointer-events: none;
 
@@ -478,30 +478,30 @@
   }
 }
 
-.film-frame {
+.video-frame {
   transform: scale(0.96);
 }
-.film-modal.is-open .film-frame {
+.video-modal.is-open .video-frame {
   transform: scale(1);
 }
 
-.film-corner {
+.video-corner {
   position: absolute;
   color: rgba(255, 255, 255, 0.3);
 }
-.film-corner--tl {
+.video-corner--tl {
   left: 12px;
   top: 12px;
 }
-.film-corner--tr {
+.video-corner--tr {
   right: 12px;
   top: 12px;
 }
-.film-corner--bl {
+.video-corner--bl {
   left: 12px;
   bottom: 12px;
 }
-.film-corner--br {
+.video-corner--br {
   right: 12px;
   bottom: 12px;
 }

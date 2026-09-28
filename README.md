@@ -39,12 +39,16 @@ js/
 vendor/               GSAP, ScrollTrigger, Lenis, Three.js, topojson-client
 fonts/                Tomorrow, Space Grotesk, Space Mono, Playfair Display
 data/                 Natural Earth 110m land geometry
-assets/               logo, and the ON AIR background film (4.4MB, lazy-loaded)
+assets/               logo, and the ON AIR background video (4.4MB, lazy-loaded)
 server.js             local preview server (not needed in production)
 .claude/              Claude Code preview config — safe to delete
 ```
 
-Nothing is fetched from a CDN. The page works offline and behind a firewall.
+Nothing is fetched from a CDN **except the brand video**, which is a YouTube
+embed in the "Watch video" modal. It is `youtube-nocookie.com` and carries no
+`src` until someone opens the modal, so a reader who never presses play never
+contacts YouTube — but behind a firewall that blocks it, the modal will be the
+one thing on the page that does not work. Everything else still runs offline.
 
 ## Libraries
 
@@ -113,8 +117,6 @@ knowing before editing `scss/`:
 
 Marked in the UI so nothing reads as finished:
 
-- **Brand film** — the "Watch the film" modal at the bottom of `index.html`
-  (the ON AIR section does have its background film: `assets/videos/video_bg.mp4`)
 - **Publisher logos** — the masthead wall currently sets the names as
   mastheads; swap in SVGs if you have them
 - **Case-study photos** — the Letters clipping slots

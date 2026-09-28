@@ -35,7 +35,15 @@ platform, press, plus the hero's sky transition.
 ## 2 · Current state
 
 **Plain HTML, CSS and JavaScript. No framework, no build step, no runtime
-dependencies, no CDN.** 61 files. Drop the folder on any static host.
+dependencies.** 61 files. Drop the folder on any static host.
+
+**One exception to "no CDN":** the brand video in the "Watch video" modal is a
+YouTube embed (`youtube-nocookie.com`, id `5y7foaqXDiA`). It carries `data-src`
+rather than `src` and `initVideoModal()` only sets the real source when the
+modal opens — so nothing is requested from YouTube on load, and closing strips
+the `src` again, which is what stops playback rather than just hiding it.
+**Behind a firewall that blocks YouTube the modal is the only thing that
+breaks**; the rest of the page still runs with no network at all.
 
 It must be *served* (ES modules + `fetch` don't work from `file://`):
 
@@ -80,7 +88,7 @@ complete; there are no leftovers from either.
 - **The utilities API is imported last** in `scss/main.scss`, so utilities
   override component classes. New component CSS goes in the partials, never
   below that import.
-- **No Bootstrap JS.** Accordion, tabs, menu and film modal are hand-written
+- **No Bootstrap JS.** Accordion, tabs, menu and video modal are hand-written
   event handlers in `js/ui/widgets.js` / `chrome.js`. Bootstrap's JS manipulates
   the DOM and there is no React here to fight, but the hand-rolled versions are
   smaller and already done.
@@ -525,27 +533,27 @@ reached from their listings, and 14 · the 404 page is reached by failing.
 
 ---
 
-### 14 · ON AIR — the background film
+### 14 · ON AIR — the background video
 
 `assets/videos/video_bg.mp4`, 960×540, 20s, **4.4MB** — by a distance the
 heaviest thing in the repo.
 
-- It carries **`data-src`, not `src`**. `setupOnAirFilm()` in `main.js` only
+- It carries **`data-src`, not `src`**. `setupOnAirVideo()` in `main.js` only
   sets the real source when the section comes within 25%, so the 4.4MB never
   touches first paint. Verified: nothing is requested until you scroll near it,
   then 4,478KB transfers. Don't "simplify" it back to a plain `src`.
 - It never loads at all under `prefers-reduced-motion`, and it is paused when
   the section scrolls away, like the canvas loops.
-- **Every failure mode lands on the old design.** The film fades in only on
+- **Every failure mode lands on the old design.** The video fades in only on
   `is-playing`, which is set when `play()` resolves — so a refused autoplay, a
   failed fetch or reduced motion all leave the flat `#111` the section has
   always had, with its rings and type intact.
-- **The scrim is measured, not guessed.** The film runs at 14–18 mean luma with
+- **The scrim is measured, not guessed.** The video runs at 14–18 mean luma with
   under 2% of pixels above 140 — it is already dark, and the heavy scrim I
   first wrote would have hidden it. It now only takes a little off behind the
   type and fades the top and bottom edges into `#111`.
 - **The blur and the crop are a pair.** 960×540 upscales about 1.5× on a
-  desktop and its compression shows, so the film carries a light blur — sized
+  desktop and its compression shows, so the video carries a light blur — sized
   in `vw`, because a fixed radius that reads as a haze at 1440px smears a
   phone. `scale(1.12)` then crops off the feathered edge the blur leaves around
   the element; the feather runs about 3× the radius, so the crop has to stay
@@ -701,7 +709,7 @@ section animates delivery, structure or arrival.
   `rgb(17,17,17)`, role to `rgba(17,17,17,.45)`, dim to `rgba(17,17,17,.17)`.
 - **Words rest lit in the stylesheet and are dimmed by JS on mount.** Backwards
   and a dead script leaves four unreadable grey blocks. Same rule as the ON AIR
-  film.
+  video.
 - **`color` animates, not `opacity`.** An opacity transition on ~140 inline
   spans promotes each to its own layer; colour animates on the same one.
 - **Only the words that crossed are touched**, not all thirty-five every frame:
@@ -792,7 +800,7 @@ appear elsewhere, flagged to the user but not changed:
 
 ### Asset slots
 
-Brand film (modal), publisher logos (masthead wall currently sets names as
+Publisher logos (masthead wall currently sets names as
 type), case-study photos (Letters). The front page thumb and the footer photo
 are both supplied now.
 
@@ -831,7 +839,7 @@ git history if it is ever wanted back. `initHeader()` still guards for
 That same commit **stripped the explanatory HTML comments** from `index.html`.
 The section dividers survived; the prose did not. Several of those comments
 recorded bugs that cost real time — why the globe dim runs on an inner layer,
-why the desk labels sit at `top: 76px`, why the ON AIR film carries `data-src`
+why the desk labels sit at `top: 76px`, why the ON AIR video carries `data-src`
 and not `src`. **All of that reasoning is still in this file**, in §4 and §6, so
 nothing is lost; just do not assume an unexplained line in the markup is
 arbitrary. Check here first.

@@ -13,7 +13,7 @@ import { initSmoothScroll } from './ui/smooth-scroll.js'
 import { initReveals } from './ui/reveal.js'
 import { initCounters } from './ui/counter.js'
 import { initCursor, initHeader, initSectionLabel } from './ui/chrome.js'
-import { initFaq, initTabs, initFilmModal, initWireThumb, initTickers } from './ui/widgets.js'
+import { initFaq, initTabs, initVideoModal, initWireThumb, initTickers } from './ui/widgets.js'
 
 import { mountPreloader } from './scenes/preloader.js'
 import { mountDesk } from './scenes/desk.js'
@@ -343,7 +343,7 @@ function setupLetters(scenes) {
    *
    * Words rest lit in the stylesheet. Dimming them here is what arms the
    * effect, so a dead script leaves four readable letters rather than four
-   * grey blocks — the same rule the ON AIR film follows.
+   * grey blocks — the same rule the ON AIR video follows.
    */
   if (track && letters.length) {
     const groups = letters.map((el) => ({
@@ -500,27 +500,27 @@ function setupPins(scenes) {
 }
 
 /**
- * 14 · ON AIR — the background film.
+ * 14 · ON AIR — the background video.
  *
  * It is 4.4MB, so it carries no `src` until the section is close: the page's
  * whole point is that nothing heavy blocks first paint. It also never loads
  * under `prefers-reduced-motion`, and if it cannot play — no autoplay, a failed
  * fetch — the section keeps the flat #111 it has always had.
  */
-function setupOnAirFilm() {
-  const film = q('[data-on-air-film]')
-  if (!film || reducedMotion()) return
+function setupOnAirVideo() {
+  const video = q('[data-on-air-video]')
+  if (!video || reducedMotion()) return
 
   onInView(
-    film,
+    video,
     (inView) => {
       if (!inView) {
-        film.pause()
+        video.pause()
         return
       }
-      if (!film.getAttribute('src')) film.setAttribute('src', film.dataset.src)
-      film.play().then(
-        () => film.classList.add('is-playing'),
+      if (!video.getAttribute('src')) video.setAttribute('src', video.dataset.src)
+      video.play().then(
+        () => video.classList.add('is-playing'),
         () => {} // autoplay refused; the scrim and #111 carry the section
       )
     },
@@ -539,11 +539,11 @@ function boot() {
   initCounters()
   initFaq()
   initTabs()
-  initFilmModal()
+  initVideoModal()
   initWireThumb()
   initTickers()
 
-  setupOnAirFilm()
+  setupOnAirVideo()
 
   const scenes = mountScenes()
   setupHero()

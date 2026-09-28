@@ -1,6 +1,6 @@
 /**
  * The small interactive pieces that used to be React state: the F.A.Q
- * accordion, the masthead-wall tabs, the film modal and the wire's
+ * accordion, the masthead-wall tabs, the video modal and the wire's
  * cursor-following thumbnail.
  */
 
@@ -48,20 +48,31 @@ export function initTabs() {
   select(buttons[0].dataset.tab)
 }
 
-/* ── "Watch the film" modal ───────────────────────────────────── */
-export function initFilmModal() {
-  const modal = document.querySelector('[data-film-modal]')
+/* ── "Watch the video" modal ───────────────────────────────────── */
+export function initVideoModal() {
+  const modal = document.querySelector('[data-video-modal]')
   if (!modal) return
 
+  const embed = modal.querySelector('[data-video-embed]')
+
+  /*
+   * The embed carries `data-src`, never `src`, so YouTube is not contacted at
+   * all until someone opens the modal — the same rule the ON AIR background
+   * video follows. Stripping it again on close is what stops playback: hiding
+   * the modal would leave the video running behind it.
+   */
   const set = (open) => {
     modal.classList.toggle('is-open', open)
     modal.setAttribute('aria-hidden', String(!open))
+    if (!embed) return
+    if (open) embed.setAttribute('src', embed.dataset.src)
+    else embed.removeAttribute('src')
   }
 
-  document.querySelectorAll('[data-open-film]').forEach((b) =>
+  document.querySelectorAll('[data-open-video]').forEach((b) =>
     b.addEventListener('click', () => set(true))
   )
-  document.querySelectorAll('[data-close-film]').forEach((b) =>
+  document.querySelectorAll('[data-close-video]').forEach((b) =>
     b.addEventListener('click', () => set(false))
   )
   modal.addEventListener('click', (e) => {

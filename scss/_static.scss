@@ -415,16 +415,6 @@
   letter-spacing: 0.12em;
 }
 
-// A gap inside an answer that is otherwise written. The whole answer is not a
-// slot, so it cannot take `.faq-answer.is-slot` — and nesting that class would
-// also apply the answer's own 44px indent a second time.
-.faq-gap {
-  color: var(--breaking);
-  font-family: var(--font-spacemono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-}
-
 // answers that point back into the page
 .faq-link {
   color: var(--blink);

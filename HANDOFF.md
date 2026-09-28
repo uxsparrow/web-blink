@@ -567,14 +567,17 @@ the rest of the page they cannot be checked against it:
 - **Answer 05 keeps the brief's own sentence first.** "No. Billing is by
   features." is the one answer the brief supplied, verbatim; the plan detail
   sits behind it rather than replacing it.
-- **Answer 03 still carries a marked gap.** The five decks say nothing about
-  redirects or URL mapping, which is the actual mechanism behind "migrate
-  without losing SEO". The answer states the SEO surface and the webmaster
-  support truthfully and marks the rest `[REDIRECT AND URL-MAPPING PLAN — NOT
-  IN THE SUPPLIED DOCS]`. **Do not fill that in from inference.**
-- `.faq-gap` exists for exactly that case: a gap inside an answer that is
-  otherwise written. It cannot reuse `.faq-answer.is-slot` — nesting that class
-  would apply the answer's own 44px indent a second time.
+- **Answer 03 no longer carries a gap marker.** It was written with
+  `[REDIRECT AND URL-MAPPING PLAN — NOT IN THE SUPPLIED DOCS]` under it,
+  because none of the five decks describe redirects or URL mapping — the
+  actual mechanism behind "migrate without losing SEO". **The user removed
+  that marker**, so the answer now stands on the SEO surface and the webmaster
+  support alone. The migration mechanism is still undocumented anywhere in
+  this repo; if it is ever written up, answer 03 is where it belongs.
+- The `.faq-gap` class went with it. It existed for one case — a gap inside an
+  answer that is otherwise written — and could not reuse `.faq-answer.is-slot`,
+  which would have applied the answer’s own 44px indent twice. Reinstate it
+  from history rather than nesting those two classes.
 
 ### Reading those PDFs
 

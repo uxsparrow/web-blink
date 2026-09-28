@@ -1074,37 +1074,44 @@
 
           <div class="pipe__spine">
             <span class="pipe__rail" aria-hidden="true"></span>
+            <span class="pipe__pulse" aria-hidden="true"></span>
             <span class="pipe__ink" aria-hidden="true"></span>
             <ol class="pipe__stages list-unstyled" style="--n:6">
               <li class="pipe__stage" data-pipe-stage style="--i:0">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Gather</span>
+                <span class="pipe__desc">Reporters, stringers, agency feeds, RSS and reader contributions, all into one queue.</span>
               </li>
               <li class="pipe__stage" data-pipe-stage style="--i:1">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Create</span>
+                <span class="pipe__desc">The editor: auto-tagging, story suggestions, full AI drafts, schema built in.</span>
               </li>
               <li class="pipe__stage" data-pipe-stage style="--i:2">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Approve</span>
+                <span class="pipe__desc">Roles and permissions, approval workflows, and story checkpoints that track TAT.</span>
               </li>
               <li class="pipe__stage" data-pipe-stage style="--i:3">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Publish</span>
+                <span class="pipe__desc">One story out to web, AMP, PWA, Android and iOS.</span>
               </li>
               <li class="pipe__stage" data-pipe-stage style="--i:4">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Monetize</span>
+                <span class="pipe__desc">Ad inventory and networks, plus time, dynamic and hard paywalls.</span>
               </li>
               <li class="pipe__stage" data-pipe-stage style="--i:5">
                 <span class="pipe__stem" aria-hidden="true"></span>
                 <span class="pipe__node" aria-hidden="true"></span>
                 <span class="pipe__pill">Analyze</span>
+                <span class="pipe__desc">Real-time analytics, GA4 and publisher metrics on every story.</span>
               </li>
             </ol>
           </div>
@@ -1124,6 +1131,15 @@
           </div>
         </div>
 
+          <!-- Follows the stage the scroll has reached, and switches to
+               whatever you point at. The same copy also sits inside each
+               stage as `.pipe__desc`, which is what a phone shows and what
+               is there with no JavaScript. -->
+          <div class="pipe-readout" data-pipe-readout>
+            <span class="mono-xs pipe-readout__num" data-pipe-readout-num>01 / 06</span>
+            <span class="display pipe-readout__name" data-pipe-readout-name>GATHER</span>
+            <p class="body-copy pipe-readout__copy" data-pipe-readout-copy>Reporters, stringers, agency feeds, RSS and reader contributions, all into one queue.</p>
+          </div>
         <!-- <ol class="steps row row-cols-1 row-cols-md-3 g-6 list-unstyled mt-vh-7" data-steps>
           <li class="col step" data-step style="--accent:#111111">
             <div class="step__body">

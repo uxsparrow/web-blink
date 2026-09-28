@@ -185,22 +185,24 @@ function setupPipeline() {
     const leftX = rail.left - box.left
     const rightX = rail.right - box.left
 
+    // keyed to the pill that owns it, so hovering one can light just that curve
     const d = []
-    for (const el of ins) {
+    ins.forEach((el, i) => {
       const r = el.getBoundingClientRect()
-      d.push(curve(r.right - box.left, r.top + r.height / 2 - box.top, leftX, midY))
-    }
-    for (const el of outs) {
+      d.push({ key: 'in-' + i, path: curve(r.right - box.left, r.top + r.height / 2 - box.top, leftX, midY) })
+    })
+    outs.forEach((el, i) => {
       const r = el.getBoundingClientRect()
-      d.push(curve(rightX, midY, r.left - box.left, r.top + r.height / 2 - box.top))
-    }
+      d.push({ key: 'out-' + i, path: curve(rightX, midY, r.left - box.left, r.top + r.height / 2 - box.top) })
+    })
 
     wires.setAttribute('width', box.width)
     wires.setAttribute('height', box.height)
     wires.replaceChildren()
-    for (const path of d) {
+    for (const w of d) {
       const p = document.createElementNS(NS, 'path')
-      p.setAttribute('d', path)
+      p.setAttribute('d', w.path)
+      p.dataset.wire = w.key
       p.setAttribute('fill', 'none')
       p.setAttribute('stroke', 'rgba(97,24,234,.34)')
       p.setAttribute('stroke-width', '1.5')
@@ -220,8 +222,58 @@ function setupPipeline() {
     const landed = seg(p, 0.82, 0.94) > 0
     outs.forEach((o) => o.classList.toggle('is-on', landed))
     ins.forEach((o) => o.classList.toggle('is-on', p > 0.06))
+
+    // the readout follows the furthest stage the flow has reached
+    const reached = stages.filter((_, i) => draw >= (i + 0.5) / stages.length).length
+    const next = Math.max(0, reached - 1)
+    if (next !== pinned) {
+      pinned = next
+      if (!pipe.querySelector('.pipe__stage:hover')) show(pinned)
+    }
+
+    // traffic only runs once there is a line for it to run on
+    pipe.classList.toggle('is-flowing', draw > 0.98)
   }
 
+  /*
+   * The readout. By default it follows the stage the scroll has reached, so
+   * it reads as a commentary on the flow; pointing at any stage overrides it
+   * until the pointer leaves. `pinned` is which stage the scroll last lit, so
+   * leaving a hover falls back to that rather than to nothing.
+   */
+  // the readout sits outside `.pipe` on purpose — inside, the grid would make
+  // it a fourth column — so these are document-scoped, not pipe-scoped
+  const rNum = q('[data-pipe-readout-num]')
+  const rName = q('[data-pipe-readout-name]')
+  const rCopy = q('[data-pipe-readout-copy]')
+  let pinned = 0
+
+  const show = (i) => {
+    const st = stages[i]
+    if (!st || !rNum) return
+    rNum.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(stages.length).padStart(2, '0')
+    rName.textContent = q('.pipe__pill', st).firstChild.textContent.trim().toUpperCase()
+    rCopy.textContent = q('.pipe__desc', st).textContent.trim()
+  }
+
+  stages.forEach((st, i) => {
+    st.addEventListener('pointerenter', () => show(i))
+    st.addEventListener('pointerleave', () => show(pinned))
+  })
+
+  // an edge pill lights the curve it owns
+  const wire = (key, on) => {
+    const p = wires && wires.querySelector(`[data-wire="${key}"]`)
+    if (p) p.classList.toggle('is-hot', on)
+  }
+  ins.forEach((el, i) => {
+    el.addEventListener('pointerenter', () => wire('in-' + i, true))
+    el.addEventListener('pointerleave', () => wire('in-' + i, false))
+  })
+  outs.forEach((el, i) => {
+    el.addEventListener('pointerenter', () => wire('out-' + i, true))
+    el.addEventListener('pointerleave', () => wire('out-' + i, false))
+  })
   drawWires()
   // a grid column changing width moves every endpoint
   window.addEventListener('resize', drawWires)

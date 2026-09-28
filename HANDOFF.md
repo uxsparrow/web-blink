@@ -645,6 +645,33 @@ it passes through, where it goes out on the right.
   at 390px, so the rail stands up, the curves are dropped, and the stages become
   what they are — an ordered list. Measured at 390: pills at 13.6px, no overflow.
 
+### Space, and the interaction
+
+With the step cards commented out, 06 is the pipeline alone, so it was given
+the room a main section needs: the spine is 360px rather than 250, and the
+stems run 86px rather than 46, which is most of what pushes the pills clear of
+the rail.
+
+- **Each stage carries a one-line description**, all six from the feature list.
+  They live inside the stage as `.pipe__desc`, so they are in the markup with
+  no JavaScript and are what a phone shows inline.
+- **The readout below the diagram follows the flow** — it names the furthest
+  stage the scroll has reached — and **switches to whatever you point at**,
+  falling back when the pointer leaves. `pinned` is what it falls back to.
+- **The readout sits outside `.pipe`, and its lookups are document-scoped.**
+  Inside, the three-column grid would make it a fourth column. Scoping the
+  queries to `pipe` returned null and `show()` bailed on every call — the
+  readout simply never moved, with no error to show for it.
+- **Hovering a stage dims the others** (`.pipe:hover .pipe__stage:not(:hover)`),
+  so pointing at one is answered by the whole diagram rather than just that pill.
+- **Each edge pill lights its own curve.** The paths carry `data-wire="in-0"`,
+  `"out-3"` and so on, keyed to the pill that owns them when they are drawn.
+- **The pulse only runs once the line is drawn.** JS adds `.is-flowing` at
+  `draw > 0.98`; a dot travelling a line that has not been drawn yet reads as a
+  glitch. This is the section satisfying §6’s "keeps moving on time as well as
+  p" — without it a stationary diagram is just a diagram. It is off under
+  `prefers-reduced-motion` and on phones.
+
 ### The three module cards are commented out
 
 **The user has since commented the whole `<ol class="steps">` block out**, so 06

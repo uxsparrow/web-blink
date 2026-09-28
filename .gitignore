@@ -1,1 +1,4 @@
+# Leftover from the removed Sass toolchain (see HANDOFF §3.5). Nothing in the
+# project uses it any more — safe to delete from your checkout.
+node_modules
 .DS_Store

@@ -645,9 +645,14 @@ it passes through, where it goes out on the right.
   at 390px, so the rail stands up, the curves are dropped, and the stages become
   what they are — an ordered list. Measured at 390: pills at 13.6px, no overflow.
 
-### The three module cards lost their line
+### The three module cards are commented out
 
-They had a drawn rule and a node each. **The pipeline draws the flow now, and
+**The user has since commented the whole `<ol class="steps">` block out**, so 06
+is the pipeline alone. `setupSteps()` guards on `[data-steps]` and returns
+early, and the `.step*` rules are left in place against the block coming back.
+If it stays out, those rules and that function can go with it.
+
+Before that they had a drawn rule and a node each. **The pipeline draws the flow now, and
 two scroll-drawn lines stacked in one section say the same thing twice** — the
 trap §6 records for 05, in a smaller form. `.steps__ink`, `.steps__head`,
 `.step__node` and `.step::before` are gone; the cards keep their copy, which is

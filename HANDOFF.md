@@ -241,76 +241,79 @@ p 0.66/0.75/0.84  laptop → tablet → phone light up with the same article
 
 ### The platform (05)
 
-`js/scenes/platform.js`. **The fourth version of this scene, and the first that
-is not about travel.** The user rejected the previous three.
+`js/scenes/platform.js`. **The fifth version.** A field of dots runs away to a
+horizon and moves like a slow sea; along that horizon sits a hard ink rule, and
+the six module cards stand on it. **The sea moves; the deck does not.**
 
-| version | what it drew | why it failed |
+| # | drew | rejected because |
 |---|---|---|
-| 1 | a print conveyor, folded newspapers on a belt | print, and the site is digital-only |
-| 2 | the same belt with a phone, a laptop, a tablet and an e-paper reader riding it, rollers as pulsing nodes | element-by-element translation: screens do not ride conveyors, so it was a factory in digital dress |
-| 3 | a delivery line with a junction and four channel taps to WEB · AMP · PWA · APP | read as a **road** — a black band with dashed white ticks, cards floating above it, four curves peeling off to nowhere |
-| 4 | the slab the modules stand on | — |
+| 1 | a print conveyor, newspapers on a belt | print, and the product is digital-only |
+| 2 | the same belt carrying phones and tablets | element-by-element translation: screens do not ride conveyors |
+| 3 | a delivery line, a junction, four channel taps | read as a **road** — black band, dashed ticks, curves to nowhere |
+| 4 | a lit slab in perspective with colour washes | right subject, wrong material: ruled floor + three gradient triangles read as a lit stage |
+| 5 | the dotted swell under a level deck | — |
 
-> **The diagnosis worth keeping.** All three earlier versions drew
-> **throughput** while the section is about **breadth**. The canvas said "one
-> thing moving along" while the six cards beside it said "six things, side by
-> side" — and the cards win every time, because they carry the words. The fix
-> was not a better line. It was to stop drawing a line.
+> **Two separate mistakes, and it is worth keeping them apart.**
 >
-> This supersedes the note kept here after version 2, which said to ask what
-> the section claims and draw that. That was right, and version 3 followed it —
-> and still failed, because it answered with the section's *verb* ("publishes
-> to every channel") instead of its *noun* ("one platform"). **Check the noun.**
+> Versions 1–3 got the **subject** wrong: they drew *throughput* while the
+> section is about *breadth*, and the six cards said "six things, side by side"
+> louder because they carry the words. Version 4 fixed that — a platform is a
+> foundation, so draw a foundation — and got the **material** wrong instead.
+> Ruled floors and gradient washes are not this site's language. **Dots are.**
+> The globe, the preloader map, the desk's wall map and the halftone wordmark
+> are all dot fields. The platform is one now too.
+>
+> The user named the material directly: "dotted ocean waves or something". They
+> had raised the same idea once before, for 02's background, and picked the
+> dotted world map that time.
 
-The section reads "Everything your newsroom needs. Under one platform," so the
-canvas draws the platform: one slab in perspective, the card grid standing on
-its far edge, each column pooling its own accent down the surface.
-
-- **06 · HOW IT WORKS now owns the flow.** That is the second reason a flow
-  cannot live here — file → edit → publish is one section further down, and two
-  sections drawing the same journey is worse than one drawing it badly.
-- **The structure is still; only the light moves.** A foundation that slides is
-  not a foundation, and motion is what dragged all three earlier versions back
-  toward a conveyor. The one moving element is a slow violet sweep crossing the
-  surface, which is what keeps a stationary section from reading as a diagram —
-  the rule §6 has always had, satisfied without travel.
-- **The face carries no dashes.** A black band with a broken white centre line
-  is a carriageway before it is anything else; that was most of version 3's
-  problem. 06 opens on a continuous ink line, so a clean band is also the truer
-  hand-off.
-- **The columns reflect because the accents happen to line up.** The six cards
-  cycle ink / violet / red in `index.html`, so at three-up each column is a
-  single accent — 01 and 04 ink, 02 and 05 violet, 03 and 06 red. Re-ordering
-  the cards breaks that. **At two-up they fall out of step** (column 0 holds
-  ink, red *and* violet), so the reflections go neutral there rather than
-  letting one card's colour stand for three.
-- **A column lights as its own cards land.** `columnLit()` reads the card
-  timings straight out of `setupPins` — `0.06 + i * 0.125` over 0.6 — and
-  averages the cards that column holds, so it fills only once all of them are
-  down. This is the first time this canvas has been tied to the DOM above it,
-  and it is what makes "these all stand on one thing" legible.
-- **The grid geometry is recomputed, not measured.** `columnCentre()` redoes
-  Bootstrap's arithmetic — `.shell` at `max-width: 1560px` with
+- **The argument is the contrast, not the sea.** A swell under a deck that
+  never tilts is a picture of the uptime claim the page already makes in words:
+  traffic spikes scale automatically, 43K concurrent, zero downtime. Without
+  the level rule it is just a wave.
+- This **sharpens** version 4's rule rather than replacing it. "The structure
+  is still and only the surface moves" was already right; there it was light
+  crossing a static floor, which was decoration. Here the stillness of the deck
+  is the point being made.
+- **Colour comes from `mixInk()`, not from alpha.** A column's water is ink
+  until its cards land and mixes toward the accent as they do. Fading alpha
+  alone leaves an unlit column already fully coloured, just fainter, and the
+  modules then look lit before they have arrived — that was a real bug here.
+- **Size is the only per-dot channel.** The field is four `fill()` calls for
+  ~4,500 dots — one for open water, one per column — the same batching
+  `desk.js` uses for its wall map. Per-dot alpha would mean per-dot fills, so
+  the swell, the distance fade and the near-edge dissolve all ride on dot size.
+  That is what a halftone does anyway, which is why it belongs to this family.
+- **The trough floor is load-bearing.** `crest` bottoms out at 0.7 − 0.15; any
+  lower and troughs fall under the `s < 0.22` cull and vanish, and the swell
+  then reads as patchy density rather than as water.
+- **`v` must cover 0 to 1.** An earlier curve, `r / (r + 7)`, never reached the
+  foreground, so the near water came out empty and the field looked like a
+  smear under the deck. `1 - (1 - r/ROWS) ** 2.6` spans the region and still
+  bunches rows toward the horizon.
+- **The water stops short of the foot labels.** `nearY` is `0.985h` and the
+  near rows dissolve over the last 14% of depth, so the biggest dots never sit
+  behind `DELIVERY LINE · EDITION LIVE`.
+- **Narrow screens get the deck alone.** Two-up the cards run to 0.89h and the
+  labels sit at 0.94h — 44px, nowhere near enough to look across water. Each
+  column still registers as a mark on the deck's edge.
+- **The grid geometry is recomputed, not measured.** `columnEdges()` redoes
+  Bootstrap's arithmetic: `.shell` at `max-width: 1560px` with
   `clamp(16px, 3.4vw, 54px)` padding, `row-cols-2 row-cols-lg-3`, lg at 1024px.
-  Measuring the cards instead would couple the loop to layout GSAP is
-  mid-animating. **If those classes change, this file changes with them.**
-  Verified against the real boxes at 1440: columns at 270 / 713 / 1155.
-- **The far edge sits at the cards' feet**, 0.615h against a measured 556px of
-  900, so the block meets the slab instead of hovering over it.
-- **Narrow screens get the slab edge-on.** Two-up, the cards run to 0.89h and
-  the foot labels sit at 0.94h — 44px of clear canvas at 390×820, nowhere near
-  enough to look across a surface. Drawing it edge-on is honest: the platform
-  is still under everything, there is just no room to see it. Each column still
-  registers as a mark on the edge.
-- **The tilt finally has a reason.** `seg(p, 0.82, 1)` was always "the camera
-  goes top-down", with nothing behind it. Now it is the slab rotating away, and
-  the ink strip at the end is its front face seen edge-on — the same hand-off
-  into 06 · HOW IT WORKS and on to 07 · LIVE, but something is doing it.
+  Measuring the cards would couple the loop to layout GSAP is mid-animating.
+  **If those classes change, this file changes with them.**
+- **The accents line up per column only at three-up.** 01 and 04 are ink, 02
+  and 05 violet, 03 and 06 red. At two-up column 0 holds ink, red *and* violet,
+  so the water stays ink there rather than letting one card's colour stand for
+  three.
+- **The deck carries no dashes**, and that is deliberate: a black band with a
+  broken white centre line is a carriageway before it is anything else, which
+  was most of version 3's problem. 06 opens on a continuous ink line anyway.
+- The tilt at `seg(p, 0.82, 1)` slides the deck down and thickens it into that
+  strip while the water fades out under it.
+- `reducedMotion()` freezes the swell by holding `time` at 0; the field still
+  draws, it just stops moving.
 - Composed at progress 0, same as the Desk and for the same reason.
-- **Renamed, like `paper-plane.js` before it.** `conveyor.js` describing a
-  static slab would be a lie; `data-scene` is now `platform`.
-- **Still duplicated:** `roundRect` and the wake-rim logic no longer are —
-  version 3's code went with it. `desk.js` keeps its own.
 
 ---
 

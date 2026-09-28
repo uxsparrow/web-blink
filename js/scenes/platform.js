@@ -1,37 +1,43 @@
-import { clamp, easeOut, lerp, seg } from '../lib/motion.js'
+import { clamp, easeOut, lerp, seg, reducedMotion } from '../lib/motion.js'
 import { mountScene } from '../lib/canvas-scene.js'
 
 /**
- * 05 · OUR PLATFORM — the surface the modules stand on.
+ * 05 · OUR PLATFORM — the swell, and the deck that holds level above it.
  *
- * The section says "Everything your newsroom needs. Under one platform," and
- * shows six module cards. So the canvas draws the platform itself: a single
- * slab in perspective, running the full width, with the card grid standing on
- * its far edge. Each column of cards casts a reflection down the surface in
- * its own accent, and a plinth lights under it as its cards land.
+ * A field of dots runs away to a horizon in perspective and moves like a slow
+ * sea. Along that horizon sits a hard ink rule, and the six module cards stand
+ * on it. **The sea moves; the deck does not.** That contrast is the section's
+ * argument, and it is one the page already makes in words a few sections down:
+ * traffic spikes scale automatically, 43K concurrent readers, zero downtime.
  *
- * **This is the fourth version, and the first that is not about travel.** The
- * first was a print conveyor. The second translated it element by element —
- * screens riding a belt — which was a factory in digital dress. The third made
- * it a delivery line with four channel taps, and it still read as a road: a
- * black band with dashes, cards floating above it, and four curves peeling off
- * to nowhere.
+ * Each column's accent falls on the water beneath it as its cards land, so the
+ * six modules are visibly the things the deck is carrying.
  *
- * > The diagnosis worth keeping: all three drew **throughput** while the
- * > section is about **breadth**. The canvas said "one thing moving along"
- * > while the six cards beside it said "six things, side by side", and the
- * > cards won, because they carry the words. Worse, 06 · HOW IT WORKS now owns
- * > the flow — so a flow here says the same thing twice. A platform is a
- * > foundation, so draw a foundation.
+ * ── the versions before this one ──────────────────────────────────
  *
- * The structure is deliberately still. Only the light moves across it: a
- * foundation that slides is not a foundation, and movement here is what
- * dragged the three earlier versions back toward a conveyor.
+ * | # | drew | failed because |
+ * |---|---|---|
+ * | 1 | a print conveyor, newspapers on a belt | print; the product is digital-only |
+ * | 2 | the same belt carrying phones and tablets | screens do not ride conveyors — a factory in digital dress |
+ * | 3 | a delivery line, a junction, four channel taps | read as a **road**: black band, dashed ticks, curves to nowhere |
+ * | 4 | a lit slab in perspective with colour washes | right idea, wrong surface — gridlines and three big gradient triangles read as a lit stage floor |
  *
- * At the end the slab rotates edge-on and becomes the ink strip that carries
- * into 06 · HOW IT WORKS and on to 07 · LIVE. That hand-off is why the tilt
- * exists — and a plane turning away from the viewer is finally a reason for it,
- * rather than a camera move with nothing behind it.
+ * > **What versions 1–3 got wrong** was subject: they drew *throughput* while
+ * > the section is about *breadth*, and the six cards beside them said
+ * > "six things, side by side" louder, because they carry the words. Version 4
+ * > fixed the subject — a platform is a foundation, so draw a foundation — and
+ * > got the material wrong instead. Ruled floors and gradient washes are not
+ * > this site's language. **Dots are.** The globe, the preloader map, the
+ * > desk's wall map and the wordmark are all dot fields, so the platform is one
+ * > too.
+ *
+ * The rule from version 4 still stands and is sharpened here: the structure is
+ * still and only the surface moves. Earlier it was light crossing a static
+ * floor; now the sea moves under a deck that does not, which is the same
+ * principle doing visible work rather than just decorating.
+ *
+ * At the end the deck rule thickens into the ink strip that carries into
+ * 06 · HOW IT WORKS and on to 07 · LIVE, and the sea fades under it.
  */
 
 const INK = '#111111'
@@ -42,57 +48,15 @@ const RED = '#E10600'
  * The accent each grid column carries, left to right.
  *
  * The six cards cycle ink / violet / red in `index.html`, and at three-up that
- * happens to put one accent per column — 01 and 04 are both ink, 02 and 05 both
- * violet, 03 and 06 both red. That is what lets a column have a single colour
- * to reflect. Re-ordering the cards breaks it.
+ * puts one accent per column — 01 and 04 ink, 02 and 05 violet, 03 and 06 red.
+ * Re-ordering the cards breaks it.
  */
 const COLUMN_ACCENTS = [INK, VIOLET, RED]
 
-/** How much wider the near edge is than the far edge. */
-const SPREAD = 1.85
-
-/**
- * Bootstrap's grid, recomputed in canvas space, because the reflections and
- * plinths have to land under the real columns. `.shell` is `max-width: 1560px`
- * with `clamp(16px, 3.4vw, 54px)` of inline padding, and `.platform-cards` is
- * `row-cols-lg-3`. **If either changes, this changes with it** — there is no
- * way to read it off the DOM from inside a canvas scene, and measuring the
- * cards would couple the loop to layout that GSAP is mid-animating.
- */
-function columnCentre(w, i, cols) {
-  const pad = clamp(w * 0.034, 16, 54)
-  const shellW = Math.min(w, 1560)
-  return (w - shellW) / 2 + pad + (i + 0.5) * ((shellW - pad * 2) / cols)
-}
-
-/**
- * World depth → screen depth.
- *
- * A floor's transverse lines bunch toward the horizon. Spacing them evenly
- * reads as a flat chequerboard standing on its edge, not as a plane going away
- * from you.
- */
-const depthToV = (z) => z / (z + 1)
-
-/** A point on the slab's surface: u across (−1…1), v depth (0 near, 1 far). */
-function surf(u, v, w, nearY, farY) {
-  const k = lerp(SPREAD, 1, v)
-  return [w / 2 + u * (w / 2) * k, lerp(nearY, farY, v)]
-}
-
-/** The slab's outline, near edge first, for clipping the light to it. */
-function slabPath(ctx, w, nearY, farY) {
-  const [lNear, yNear] = surf(-1, 0, w, nearY, farY)
-  const [rNear] = surf(1, 0, w, nearY, farY)
-  const [lFar, yFar] = surf(-1, 1, w, nearY, farY)
-  const [rFar] = surf(1, 1, w, nearY, farY)
-  ctx.beginPath()
-  ctx.moveTo(lNear, yNear)
-  ctx.lineTo(rNear, yNear)
-  ctx.lineTo(rFar, yFar)
-  ctx.lineTo(lFar, yFar)
-  ctx.closePath()
-}
+const ROWS = 54
+const COLS = 84
+/** How much wider the near edge of the water is than the horizon. */
+const SPREAD = 2.3
 
 /**
  * How many columns the card grid is in. `.platform-cards` is
@@ -102,11 +66,24 @@ function slabPath(ctx, w, nearY, farY) {
 const gridCols = (w) => (w >= 1024 ? 3 : 2)
 
 /**
+ * Bootstrap's grid, recomputed in canvas space, because the accents have to
+ * fall under the real columns. `.shell` is `max-width: 1560px` with
+ * `clamp(16px, 3.4vw, 54px)` of inline padding. **If that changes, this does.**
+ * Reading it off the DOM is not an option from inside a canvas loop, and
+ * measuring the cards would couple this to layout GSAP is mid-animating.
+ */
+function columnEdges(w, i, cols) {
+  const pad = clamp(w * 0.034, 16, 54)
+  const shellW = Math.min(w, 1560)
+  const x0 = (w - shellW) / 2 + pad
+  const colW = (shellW - pad * 2) / cols
+  return [x0 + i * colW, x0 + (i + 1) * colW]
+}
+
+/**
  * How lit a column is. Its cards unfold at `0.06 + i * 0.125` over 0.6 of the
  * pinned timeline (see `setupPins` in main.js), and column j holds every card
- * from j on in steps of `cols`. Each contributes equally, so a column reaches
- * full only once all of its cards have landed — which is the point of drawing
- * it at all.
+ * from j on in steps of `cols`.
  */
 function columnLit(p, j, cols) {
   let sum = 0
@@ -119,202 +96,12 @@ function columnLit(p, j, cols) {
 }
 
 /**
- * The accent a column reflects.
- *
- * At three-up the cards' ink / violet / red cycle lines up with the columns —
- * 01 and 04 are both ink, 02 and 05 violet, 03 and 06 red — so a column has a
- * single colour and can reflect it. At two-up the cycle and the columns fall
- * out of step (column 0 holds ink, red *and* violet), so the reflections go
- * neutral rather than letting one card's colour stand for three.
+ * The accent a column's water takes. At three-up the card cycle lines up with
+ * the columns so each has one colour. At two-up it does not — column 0 holds
+ * ink, red *and* violet — so the water stays ink rather than letting one
+ * card's colour stand for three.
  */
 const columnAccent = (j, cols) => (cols === 3 ? COLUMN_ACCENTS[j] : INK)
-
-function drawPlatform(ctx, w, h, p, time) {
-  const tilt = seg(p, 0.82, 1) // the slab rotates edge-on at the end
-
-  /*
-   * Narrow screens have no surface to show. Two-up, the six cards run to about
-   * 0.89h and the foot labels sit at 0.94h — 44px of clear canvas at 390×820.
-   * The slab is drawn edge-on there for the whole scene, which is honest: the
-   * platform is still under everything, there is just no room to look across
-   * it. It still widens for the hand-off.
-   */
-  const narrow = w < 700
-  const cols = gridCols(w)
-
-  if (narrow) {
-    const top = h * 0.893
-    const faceH = lerp(14, 30, tilt)
-    drawFace(ctx, w, top, faceH)
-    // each column still registers, as a mark on the edge rather than a
-    // reflection — there is no surface for one to fall on
-    for (let j = 0; j < cols; j++) {
-      const cx = columnCentre(w, j, cols)
-      ctx.globalAlpha = columnLit(p, j, cols) * (1 - tilt)
-      ctx.fillStyle = columnAccent(j, cols)
-      ctx.fillRect(cx - 16, top - 3, 32, 3)
-    }
-    ctx.globalAlpha = 1
-    return
-  }
-
-  /*
-   * The far edge sits where the card grid's feet are — 0.615h against a
-   * measured 556px of 900 — so the block meets the slab rather than hovering
-   * over it. The near edge bleeds toward the viewer, and both collapse onto
-   * the strip as the slab turns.
-   */
-  const farY = lerp(h * 0.615, h * 0.72, tilt)
-  const nearY = lerp(h * 0.895, h * 0.72, tilt)
-  const faceTop = nearY
-  const faceH = lerp(26, Math.min(w * 0.12, 180), tilt)
-  const open = 1 - tilt
-
-  if (open > 0.01) {
-    ctx.save()
-    slabPath(ctx, w, nearY, farY)
-    ctx.clip()
-    ctx.globalAlpha = open
-
-    /* the surface: lighter as it goes away, so it reads as lying down */
-    const g = ctx.createLinearGradient(0, nearY, 0, farY)
-    g.addColorStop(0, 'rgba(17,17,17,.055)')
-    g.addColorStop(1, 'rgba(17,17,17,.012)')
-    ctx.fillStyle = g
-    ctx.fillRect(0, farY, w, nearY - farY)
-
-    drawGrid(ctx, w, nearY, farY)
-    drawSweep(ctx, w, nearY, farY, time)
-    drawReflections(ctx, w, nearY, farY, p, cols)
-
-    ctx.restore()
-    ctx.globalAlpha = 1
-
-    drawSeating(ctx, w, farY, nearY, p, open, cols)
-  }
-
-  drawFace(ctx, w, faceTop, faceH)
-}
-
-/** The slab's own structure: rules running away, and rules across it. */
-function drawGrid(ctx, w, nearY, farY) {
-  ctx.strokeStyle = 'rgba(17,17,17,.10)'
-  ctx.lineWidth = 1
-
-  for (let i = -6; i <= 6; i++) {
-    const u = i / 6
-    const [x0, y0] = surf(u, 0, w, nearY, farY)
-    const [x1, y1] = surf(u, 1, w, nearY, farY)
-    ctx.beginPath()
-    ctx.moveTo(x0, y0)
-    ctx.lineTo(x1, y1)
-    ctx.stroke()
-  }
-
-  // transverse, at perspective depths rather than even ones
-  for (let z = 0.12; z < 14; z *= 1.62) {
-    const v = depthToV(z)
-    const [xl, y] = surf(-1, v, w, nearY, farY)
-    const [xr] = surf(1, v, w, nearY, farY)
-    ctx.beginPath()
-    ctx.moveTo(xl, y)
-    ctx.lineTo(xr, y)
-    ctx.stroke()
-  }
-}
-
-/**
- * The only thing that moves. A foundation that slides is not a foundation, so
- * the structure stays put and the light crosses it — which is also what keeps
- * a stationary section from reading as a diagram.
- */
-function drawSweep(ctx, w, nearY, farY, time) {
-  const cx = w * (0.5 + 0.62 * Math.sin(time * 0.22))
-  const r = w * 0.4
-  const g = ctx.createRadialGradient(cx, (nearY + farY) / 2, 0, cx, (nearY + farY) / 2, r)
-  g.addColorStop(0, 'rgba(97,24,234,.13)')
-  g.addColorStop(0.55, 'rgba(97,24,234,.05)')
-  g.addColorStop(1, 'rgba(97,24,234,0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, farY, w, nearY - farY)
-}
-
-/** One reflection per column, falling from the cards' feet toward the viewer. */
-function drawReflections(ctx, w, nearY, farY, p, cols) {
-  for (let j = 0; j < cols; j++) {
-    const lit = columnLit(p, j, cols)
-    if (lit < 0.01) continue
-
-    const cx = columnCentre(w, j, cols)
-    const u = (cx - w / 2) / (w / 2)
-    const halfU = ((w / cols) * 0.34) / (w / 2)
-
-    const [xlF, yF] = surf(u - halfU, 1, w, nearY, farY)
-    const [xrF] = surf(u + halfU, 1, w, nearY, farY)
-    const [xlN, yN] = surf(u - halfU * 1.5, 0, w, nearY, farY)
-    const [xrN] = surf(u + halfU * 1.5, 0, w, nearY, farY)
-
-    const g = ctx.createLinearGradient(0, yF, 0, yN)
-    const c = columnAccent(j, cols)
-    g.addColorStop(0, hexA(c, 0.3 * lit))
-    g.addColorStop(0.45, hexA(c, 0.1 * lit))
-    g.addColorStop(1, hexA(c, 0))
-    ctx.fillStyle = g
-    ctx.beginPath()
-    ctx.moveTo(xlF, yF)
-    ctx.lineTo(xrF, yF)
-    ctx.lineTo(xrN, yN)
-    ctx.lineTo(xlN, yN)
-    ctx.closePath()
-    ctx.fill()
-  }
-}
-
-/** Where the grid meets the slab: a contact shadow, and a plinth per column. */
-function drawSeating(ctx, w, farY, nearY, p, open, cols) {
-  ctx.save()
-  ctx.globalAlpha = open
-
-  // the shadow the whole block casts, softening away from its feet
-  const g = ctx.createLinearGradient(0, farY, 0, farY + (nearY - farY) * 0.22)
-  g.addColorStop(0, 'rgba(17,17,17,.19)')
-  g.addColorStop(1, 'rgba(17,17,17,0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, farY, w, (nearY - farY) * 0.22)
-
-  ctx.fillStyle = 'rgba(17,17,17,.22)'
-  ctx.fillRect(0, farY - 1, w, 1.5)
-
-  for (let j = 0; j < cols; j++) {
-    const lit = columnLit(p, j, cols)
-    const cx = columnCentre(w, j, cols)
-    const half = Math.min(w / cols, 470) * 0.5 - 6
-
-    ctx.fillStyle = 'rgba(17,17,17,.3)'
-    ctx.fillRect(cx - half, farY - 2, half * 2, 2.5)
-
-    if (lit > 0.01) {
-      ctx.fillStyle = hexA(columnAccent(j, cols), 0.9 * lit)
-      ctx.fillRect(cx - half * lit, farY - 2, half * 2 * lit, 2.5)
-    }
-  }
-  ctx.restore()
-}
-
-/**
- * The slab's front face — its thickness, seen edge-on. At rest it is a 26px
- * lip under the surface; by the end it has grown into the ink strip 06 opens
- * on.
- *
- * It carries **no dashes**. The old delivery line ran ticks along here and
- * they were most of why the whole thing read as a road — a black band with a
- * broken white centre line is a carriageway before it is anything else. 06
- * opens on a continuous ink line, so a clean band is also the truer hand-off.
- */
-function drawFace(ctx, w, top, faceH) {
-  ctx.fillStyle = INK
-  ctx.fillRect(0, top, w, faceH)
-}
 
 /** #rrggbb + alpha, since the accents are shared with the DOM as hex. */
 function hexA(hex, a) {
@@ -322,7 +109,159 @@ function hexA(hex, a) {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`
 }
 
-/** 05 · OUR PLATFORM — one slab, six modules standing on it. */
+/**
+ * Ink → accent by `t`, so a column's water only takes colour as its cards
+ * land. Fading alpha alone is not enough: it leaves an unlit column already
+ * fully coloured, just fainter, and the six cards then look lit before they
+ * have arrived.
+ */
+function mixInk(hex, t, a) {
+  const n = parseInt(hex.slice(1), 16)
+  const r = Math.round(lerp(17, (n >> 16) & 255, t))
+  const g = Math.round(lerp(17, (n >> 8) & 255, t))
+  const b = Math.round(lerp(17, n & 255, t))
+  return `rgba(${r},${g},${b},${a})`
+}
+
+/**
+ * The water.
+ *
+ * Dots are bucketed by the column they fall under and filled one path per
+ * bucket — four fills for ~3,300 dots, the same batching `desk.js` uses for
+ * its wall map. Per-dot alpha would mean per-dot fills, so the fade toward the
+ * horizon is carried by dot *size* instead, which is what a halftone does
+ * anyway and is why this reads as part of the same family.
+ */
+function drawWater(ctx, w, h, horizonY, nearY, time, p, cols, fade) {
+  const buckets = [[], [], [], []] // 0 = open water, 1..3 = under a column
+  const edges = []
+  for (let j = 0; j < cols; j++) edges.push(columnEdges(w, j, cols))
+
+  const amp = (nearY - horizonY) * 0.115
+  const unit = clamp(w / 1440, 0.72, 1.35)
+
+  for (let r = 0; r <= ROWS; r++) {
+    /*
+     * v has to cover 0 to 1, or the field never reaches the foreground and the
+     * near water comes out empty. The power is what bunches rows toward the
+     * horizon — spacing them evenly reads as a chequerboard standing on edge.
+     */
+    const v = 1 - Math.pow(1 - r / ROWS, 2.6)
+    const rowY = lerp(nearY, horizonY, v)
+    const spread = lerp(SPREAD, 1, v)
+    // the swell flattens with distance, as a real one does
+    const near = 1 - v
+    // the field dissolves at the very front instead of ending on a line, which
+    // also keeps the biggest dots off the foot labels
+    const hem = clamp(v / 0.14)
+
+    for (let c = 0; c <= COLS; c++) {
+      const u = (c / COLS) * 2 - 1
+      const x = w / 2 + u * (w / 2) * spread
+      if (x < -20 || x > w + 20) continue
+
+      const swell =
+        Math.sin(u * 3.1 + v * 5.4 - time * 0.55) + 0.62 * Math.sin(u * 1.7 - v * 3.1 + time * 0.37)
+      const y = rowY - swell * amp * near
+
+      /*
+       * Crests carry bigger dots. Size is the only channel available for the
+       * swell and the distance fade both, because a per-dot alpha would mean a
+       * per-dot fill — the whole field is four paths, not 3,000.
+       *
+       * The floor matters: at a lower one the troughs fall under the cull
+       * below and drop out entirely, and the swell then reads as patchy
+       * density rather than as water moving.
+       */
+      const crest = 0.7 + 0.3 * swell * 0.5
+      const s = lerp(5.2, 0.62, v) * crest * hem * unit
+      if (s < 0.22 || y > h + 4 || y < horizonY - 2) continue
+
+      let b = 0
+      for (let j = 0; j < cols; j++) {
+        if (x >= edges[j][0] && x <= edges[j][1]) {
+          b = j + 1
+          break
+        }
+      }
+      buckets[b].push(x, y, s)
+    }
+  }
+
+  const paint = (arr, style) => {
+    if (!arr.length) return
+    ctx.fillStyle = style
+    ctx.beginPath()
+    for (let i = 0; i < arr.length; i += 3) ctx.rect(arr[i], arr[i + 1], arr[i + 2], arr[i + 2])
+    ctx.fill()
+  }
+
+  paint(buckets[0], hexA(INK, 0.42 * fade))
+  for (let j = 0; j < cols; j++) {
+    const lit = columnLit(p, j, cols)
+    // an unlit column's water is the same ink as the open sea around it
+    paint(buckets[j + 1], mixInk(columnAccent(j, cols), lit, (0.42 + 0.34 * lit) * fade))
+  }
+}
+
+/**
+ * The deck: a hard ink rule the cards stand on, and at the end the strip that
+ * hands off to 06. It never moves with the water — that is the whole point —
+ * and it carries no dashes, which is what made version 3 read as a road.
+ */
+function drawDeck(ctx, w, top, height, fade) {
+  if (fade > 0.01) {
+    // the water darkens where it meets the hull
+    const g = ctx.createLinearGradient(0, top + height, 0, top + height + 34)
+    g.addColorStop(0, `rgba(17,17,17,${0.16 * fade})`)
+    g.addColorStop(1, 'rgba(17,17,17,0)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, top + height, w, 34)
+  }
+  ctx.fillStyle = INK
+  ctx.fillRect(0, top, w, height)
+}
+
+function drawPlatform(ctx, w, h, p, time) {
+  const still = reducedMotion()
+  const t = still ? 0 : time
+  const tilt = seg(p, 0.82, 1)
+  const cols = gridCols(w)
+
+  /*
+   * Narrow screens have no water to show. Two-up the six cards run to 0.89h and
+   * the foot labels sit at 0.94h — 44px of clear canvas at 390×820. The deck is
+   * drawn alone there, which is honest: it is still holding everything up,
+   * there is just no room to see what it is holding it above.
+   */
+  if (w < 700) {
+    const top = h * 0.893
+    drawDeck(ctx, w, top, lerp(14, 30, tilt), 0)
+    for (let j = 0; j < cols; j++) {
+      const [a, b] = columnEdges(w, j, cols)
+      ctx.globalAlpha = columnLit(p, j, cols) * (1 - tilt)
+      ctx.fillStyle = columnAccent(j, cols)
+      ctx.fillRect(a + 6, top - 3, b - a - 12, 3)
+    }
+    ctx.globalAlpha = 1
+    return
+  }
+
+  /*
+   * The horizon sits where the card grid's feet are — 0.615h against a measured
+   * 556px of 900 — so the block stands on the deck rather than hovering over
+   * it. As the scene ends the deck slides down and thickens into the strip,
+   * and the water goes with it.
+   */
+  const horizonY = lerp(h * 0.615, h * 0.72, tilt)
+  const deckH = lerp(5, Math.min(w * 0.12, 180), tilt)
+  const water = 1 - seg(p, 0.82, 0.95)
+
+  if (water > 0.01) drawWater(ctx, w, h, horizonY + deckH, h * 0.985, t, p, cols, water)
+  drawDeck(ctx, w, horizonY, deckH, water)
+}
+
+/** 05 · OUR PLATFORM — a deck that holds level over a moving sea. */
 export function mountPlatform(canvas) {
   return mountScene(canvas, (ctx, w, h, p, t) => drawPlatform(ctx, w, h, p, t))
 }

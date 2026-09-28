@@ -935,6 +935,47 @@ plane's full flight path. Scroll those on a real screen.
 
 ---
 
+
+## 8.5 · The boot failsafe
+
+Added when the client opened `index.html` from disk and got a permanent black
+screen.
+
+The preloader is a full-screen black overlay in the markup that `js/main.js`
+removes. Anything stopping that module from running therefore leaves the
+overlay over the site forever — which is exactly what the client saw when they
+double-clicked `index.html`: STANDBY / 000 / LOADING BUREAUS, permanently.
+
+**`<noscript>` does not cover this**, and that is the whole point. Scripting is
+enabled; only the module fails — `file://` blocks ES modules, as does a strict
+CSP, as does a 404 after an integration moves files. The preloader's own
+7-second failsafe is *inside* the module, so it cannot help either.
+
+The guard: `js/main.js` sets `window.__blinkBooted` as its first statement
+after the imports, and a **classic** (non-module) script at the end of
+`index.html` checks it 1.5s after load, adding `.boot-failed` to `<html>` and
+logging the reason if it is missing. Classic on purpose — a module guard would
+be blocked by the failure it is meant to catch. Putting the flag after the
+imports is also deliberate: if any import 404s, the flag never lands and the
+fallback fires.
+
+`.boot-failed` mirrors the `<noscript>` rules. **If you add anything that
+starts hidden and is revealed by JS, add it to both blocks** at the top of
+`index.html`, or it will be invisible in the fallback.
+
+Two things stay hidden on purpose: `.ping-tag` and `.press-feature` are
+`position: absolute` and placed by JS, so revealing them unplaced stacks them
+in a corner. `.platform-card` *was* in that state and is not decorative — the
+six module names in 05 — so it was added to both blocks.
+
+Verified by pointing the module at a 404: preloader `display: none`, FAQ open
+at 268px, tab panels `display: block`, all six platform cards at opacity 1,
+29,683px of readable page, and only decorative absolutes left hidden. The
+healthy path was re-checked in the same pass — `booted: true`, `.boot-failed`
+absent, cards still animating in on scroll.
+
+---
+
 ## 9 · Environment gotchas
 
 These cost a lot of time; they are about the tooling, not the site.

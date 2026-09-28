@@ -18,9 +18,15 @@ GitHub Pages and any CMS that serves static files will all take it as-is.
 
 It does have to be *served over http*, though. The page uses ES modules and
 `fetch`, and both are blocked on the `file://` origin, so **double-clicking
-`index.html` will not work** — you get the shell of the page with no scroll
-story. This is a browser security rule, not a missing dependency; serving the
-folder over http is all it needs.
+`index.html` will not give you the real page.** This is a browser security
+rule, not a missing dependency — serving the folder is all it needs.
+
+Opened from disk you get the static page instead: all the copy, none of the
+scroll story, and a warning in the console explaining why. That fallback is
+there to catch a worse case — if `js/main.js` ever fails to load after an
+integration (moved files, a 404, a CSP that forbids modules), the preloader
+would otherwise cover the site with a black screen forever. See "The boot
+failsafe" below.
 
 Anything that serves a directory will do:
 
@@ -103,6 +109,39 @@ sequences to produce or ship:
 
 The 12 pixel-dot icons and the registration marks are an inline SVG sprite at
 the top of `index.html`; elements reference them with `<use href="#px-mic">`.
+
+## The boot failsafe
+
+The preloader is a full-screen black overlay in the markup, and `js/main.js`
+is what removes it. So anything that stops that module running leaves the
+overlay covering the site permanently — the page looks dead.
+
+`<noscript>` does not catch this. Scripting is *enabled* in the cases that
+matter; it is the module specifically that fails to load:
+
+- the page was opened from disk (`file://` blocks ES modules)
+- a Content-Security-Policy forbids modules
+- an integration moved the files and the path 404s
+
+So there is a second guard. `js/main.js` sets `window.__blinkBooted` as its
+first statement, and a small **classic** script at the end of `index.html`
+checks the flag 1.5s after load. If it is missing, it puts `.boot-failed` on
+`<html>` and logs why. That class applies the same rules `<noscript>` does:
+drop the preloader, and open anything whose open state is normally
+JavaScript's job.
+
+It is deliberately not a module — a module guard would be blocked by the very
+failure it exists to catch.
+
+The result is the page as static markup: every headline, every answer, the
+rate card and all the copy, with no scroll story and no canvas scenes. Two
+groups of elements stay hidden on purpose, because JavaScript positions them
+and showing them unplaced looks broken: the globe's `.ping-tag` labels and the
+press scene's `.press-feature` callouts.
+
+If you change what the preloader covers, or add anything that starts hidden
+and is revealed by JS, add it to **both** style blocks at the top of
+`index.html` — the `.boot-failed` one and the `<noscript>` one.
 
 ## Editing content
 
@@ -203,6 +242,8 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 - Canvas and WebGL loops pause when their section scrolls out of view.
 - The preloader is timer-driven with a 7-second failsafe, so a backgrounded tab
   can never leave the page scroll-locked.
+  That failsafe is inside the module, though, so it cannot help when the module
+  itself never runs — see "The boot failsafe".
 - The native cursor is only hidden once the custom cursor has mounted, so a
   script failure leaves a normal pointer rather than none.
 - `window.__lenis` and `window.__ST` are exposed for console debugging. Plain

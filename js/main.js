@@ -23,6 +23,12 @@ import { mountReaderSignal } from './scenes/reader-signal.js'
 import { mountHalftoneWordmark } from './scenes/halftone-wordmark.js'
 import { mountBackPageMap } from './scenes/back-page-map.js'
 
+// Tells the boot failsafe at the end of index.html that the module ran. Must
+// stay the first statement after the imports: if any import above fails this
+// never executes, and the page falls back to static markup rather than sitting
+// under the preloader forever.
+window.__blinkBooted = true
+
 const q = (sel, root = document) => root.querySelector(sel)
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 const isMobile = () => window.matchMedia('(max-width: 899px)').matches

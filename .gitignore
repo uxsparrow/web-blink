@@ -1,4 +1,4 @@
-# Leftover from the removed Sass toolchain (see HANDOFF §3.5). Nothing in the
-# project uses it any more — safe to delete from your checkout.
+# Nothing in the project uses npm any more (see HANDOFF §3.5); this stays only
+# so a stray install cannot land in a commit.
 node_modules
 .DS_Store

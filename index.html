@@ -17,6 +17,47 @@
   <link rel="modulepreload" href="vendor/three.module.min.js">
   <link rel="modulepreload" href="vendor/three.core.min.js">
   <link rel="preload" href="data/countries-110m.json" as="fetch" crossorigin>
+  <!--
+    Two separate failure modes, both of which would otherwise leave the
+    preloader covering the page forever:
+
+    1. Scripting disabled  -> <noscript> below.
+    2. Scripting enabled but js/main.js never runs. This is NOT covered by
+       <noscript>. It happens when the page is opened from disk (ES modules
+       are blocked on the file:// origin), behind a CSP that forbids modules,
+       or after an integration moves the files and the path 404s. The inline
+       script at the end of <body> detects it and sets .boot-failed.
+
+    Both land on the same rules: drop the preloader, and open anything whose
+    open state is normally JavaScript's job.
+  -->
+  <style>
+    .boot-failed .preloader {
+      display: none;
+    }
+
+    .boot-failed .faq-panel {
+      grid-template-rows: 1fr;
+    }
+
+    .boot-failed [data-tab-panel] {
+      display: block !important;
+    }
+
+    .boot-failed .tab-btn {
+      display: none;
+    }
+
+    .boot-failed [data-globe-wrap] {
+      opacity: 1;
+    }
+
+    /* the six module cards in 05 are revealed by the platform scene */
+    .boot-failed .platform-card {
+      opacity: 1;
+    }
+  </style>
+
   <noscript>
     <style>
       .preloader {
@@ -36,6 +77,10 @@
       }
 
       [data-globe-wrap] {
+        opacity: 1;
+      }
+
+      .platform-card {
         opacity: 1;
       }
     </style>
@@ -2560,6 +2605,29 @@
   <script src="vendor/lenis.min.js"></script>
   <script src="vendor/topojson-client.min.js"></script>
   <script type="module" src="js/main.js"></script>
+
+  <!--
+    The boot failsafe. Deliberately a classic script, not a module: a module
+    here would be blocked by the very failure it exists to catch.
+
+    js/main.js sets window.__blinkBooted as its first statement. If that has
+    not happened shortly after load, the module never ran and the preloader
+    would sit over the page indefinitely, so fall back to the same rules
+    <noscript> uses. The page then reads as static markup — all copy present,
+    no scroll story.
+  -->
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (!window.__blinkBooted) {
+          document.documentElement.classList.add('boot-failed')
+          if (window.console && console.warn) {
+            console.warn('Blink CMS: js/main.js did not run, falling back to static markup. ' + (location.protocol === 'file:' ? 'The page is open from disk — ES modules need http. Serve the folder instead.' : 'Check the script path and any Content-Security-Policy.'))
+          }
+        }
+      }, 1500)
+    })
+  </script>
 </body>
 
 </html>

@@ -126,11 +126,12 @@ Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
 
 ## Content rules held
 
-- No invented testimonials, people or quotes. The four in Letters are quoted
-  **verbatim** from the case studies published at blinkcms.ai, and the section
-  says so on the page. Only one has a named person behind it; the other three
-  are attributed as their source attributes them, to a team or a role. The
-  measured results beside them are still the ones supplied with the brief.
+- **The four letters in 09 are placeholder copy — invented names, roles and
+  quotes, attached to four real mastheads at the user’s request.** The section
+  flags itself as sample in red mono, and that flag must stay until real quotes
+  replace them. Real verbatim ones, from the case studies published at
+  blinkcms.ai, are recoverable at commit 761d3c3.
+- Nothing else on the page invents a person, a quote or a number.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - Every headline is live HTML — nothing is baked into an image.
 - **The F.A.Q answers and the rate card are sourced from outside the brief.**

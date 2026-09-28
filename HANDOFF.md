@@ -599,62 +599,55 @@ Four of the five resisted extraction, and it cost real time:
 
 ---
 
-## 6d · The quotes in 09 · LETTERS — where they came from
+## 6d · 09 · LETTERS — the read-through, and a content warning
 
-The section was built to hold correspondence and, for most of its life, held
-none: the brief supplied no quotes and §10 forbids inventing them, so it ran as
-measured results under a standing note reading `NO QUOTES ATTRIBUTED`.
+### ⚠ The quotes here are fabricated, and the page says so
 
-**There were four all along, published on blinkcms.ai.** They sit at the foot
-of the case studies under `/case-study/`, and are quoted verbatim here:
+**The four letters are placeholder copy.** The names, roles and quotes are
+invented; only the four mastheads — LiveLaw, Deccan Chronicle, Daily Thanthi,
+The Federal — are ones the user named. This was asked for explicitly, and the
+concern was raised before it was built: a fabricated quote attributed to a real
+publisher reads as an endorsement that publisher never gave.
 
-| who | where |
-|---|---|
-| Advocate P V Dinesh, Co-Founder, LiveLaw | `/case-study/client-success-story-…-livelaw-…-766351` |
-| Editorial Head, Tax Scan | `/case-study/how-blinkcms-helped-tax-scan-…-838661` |
-| Hari Bhoomi Digital Team | `/case-study/how-blinkcms-helped-hari-bhoomi-…-838310` |
-| EVO India Team | `/case-study/evo-india-…-838108` |
+**That is what `.letters-flag` is for.** It prints
+`[SAMPLE LETTERS — NAMES AND QUOTES ARE PLACEHOLDERS]` in the same red mono as
+every other unsupplied slot on the page. **Do not remove it until real quotes
+replace the sample ones.** It is the only thing standing between this section
+and four invented endorsements from named companies.
 
-- **Only the LiveLaw one names a person**, which is why it is the lead letter
-  and the other three are set small. The rest attribute to a team or a role
-  because **that is how their source attributes them** — do not promote them to
-  named people, and do not invent titles.
-- **All four run in full.** The lead was briefly trimmed of its closing
-  "Highly recommended!" because a sales exclamation reads as ad copy in a
-  letters column — and then restored, because the page claims
-  `NOTHING PARAPHRASED` under the quotes and an unmarked cut would make that
-  claim false. If a quote ever has to be shortened, mark the cut.
-- **LiveLaw appears twice in this section** — once as a `.result` row with its
-  supplied metrics, once as the lead letter. That is deliberate: the numbers
-  and the quote come from different sources and say different things.
-- **Two of the four open with "game-changer"** (LiveLaw and Tax Scan). They are
-  deliberately not adjacent; the lead sits alone and Tax Scan opens the row
-  beneath it, so the repeat is a column apart rather than side by side.
-- **Playfair on the lead** is deliberate and within the rule `_type.scss` sets
-  for it — newspaper props only, never UI. A published letter is a newspaper
-  prop; a button is not.
-- **The lead is a 7/5 row, and the `max-width` is gone.** It first capped at
-  `46ch`, which at that type size ran the quote eleven lines down the left
-  third and left two thirds of the row empty. The grid column sets the measure
-  now: seven of twelve for the quote, five for the attribution and two figures,
-  bottom-aligned with its last line. Measured at 1440: 7 lines, 740px of quote
-  against 551px of aside, the full 1327px row used.
-- **Those two figures come from the same case study as the quote**, not from
-  the brief — 100× revenue growth, and 3M → 50M readers over five years. The
-  `.result` row further up carries LiveLaw’s *supplied* numbers (−30% bounce,
-  10s faster pages), which are different figures from a different source, so
-  the two do not duplicate. Keep them straight if either is edited.
-- `.letter__figure` is sized **below** `.result__metric` on purpose. The
-  measured results are the section’s headline numbers; these support a quote.
-- **`--rise` rests at 1 in the stylesheet**, not 0. `setupLetters()` drops it to
-  0 on mount and only then animates it back, so a dead script leaves four
-  legible letters rather than four invisible ones. Same rule as the ON AIR film.
-  Getting this backwards is easy and the failure is silent.
-- The reveal is `once: true` rather than scrubbed, unlike everything else added
-  recently. These are somebody else's words; they arrive and they stay.
+**There were real quotes here, and they are recoverable.** Four verbatim ones
+— Advocate P V Dinesh (Co-Founder, LiveLaw), the Editorial Head of Tax Scan,
+the Hari Bhoomi digital team and the EVO India team — lifted from the case
+studies published at blinkcms.ai under `/case-study/`. They were replaced
+because three of those four publishers are not the four the user wanted shown.
+**They live at commit `761d3c3`** and should go back the moment real quotes
+exist for these mastheads.
+
+### The read-through
+
+The section was a lead letter over three small ones. It is now four equal
+letters, each a slug column and a quote, and **the quote lights word by word as
+you scroll it**. That is the one device on this page about *reading*, which is
+what a letter is for — every other section animates delivery, structure or
+arrival.
+
+- **Each letter owns its trigger**, over its own height, so the reading rate
+  follows the letter rather than the section. One trigger across all four made
+  the long ones crawl and the short ones flash past.
+- **Words rest lit in the stylesheet and are dimmed by JS on mount.** Backwards
+  and a dead script leaves four unreadable grey blocks. Same rule as the ON AIR
+  film and the old `--rise`.
+- **`color`, not `opacity`.** An opacity transition on 122 inline spans promotes
+  each to its own layer; colour animates on the same layer and stays cheap.
+- **Only the words that crossed are touched**, not all 30 every frame: the
+  handler tracks how many are lit and walks the difference. Without that it is
+  ~120 class writes per frame per letter.
+- **The tail finishes at `p / 0.82`**, so the last words land before the letter
+  leaves the viewport rather than lighting as it exits.
+- Each letter carries its masthead’s accent on the rule beside it, drawn down
+  with `--read` as the quote is read.
 
 ---
-
 ## 7 · Open items
 
 ### The 12-essentials audit — all three sections landed

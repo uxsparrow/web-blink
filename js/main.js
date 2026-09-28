@@ -6,7 +6,7 @@
  * WebGL never blocks first paint.
  */
 
-import { gsap, ScrollTrigger, onInView, reducedMotion, seg, easeOut } from './lib/motion.js'
+import { gsap, ScrollTrigger, onInView, reducedMotion, seg, easeOut, clamp } from './lib/motion.js'
 import { liveTicks } from './lib/content.js'
 
 import { initSmoothScroll } from './ui/smooth-scroll.js'
@@ -251,28 +251,47 @@ function setupLetters(scenes) {
   if (!section) return
 
   /*
-   * The published quotes rise as they come in. They are the only thing on this
-   * page that is somebody else's words, so they are not scrubbed back and
-   * forth with the scroll like the rest — they arrive once and stay, which is
-   * what `once: true` on the batch is for.
+   * The quotes light word by word as you scroll through them — reading, which
+   * is the one thing a letter is for, and the only device on this page that is
+   * about it. Each letter owns its own trigger over its own height, so the
+   * reading rate follows the letter rather than the section.
+   *
+   * Words rest lit in the stylesheet. Dimming them here is what arms the
+   * effect, so a dead script leaves four readable letters rather than four
+   * grey blocks — the same rule the ON AIR film follows.
    */
-  const letters = qq('[data-letter]')
-  if (letters.length) {
-    // `--rise` rests at 1 in the stylesheet so the quotes survive a dead
-    // script; taking it to 0 here is what arms the reveal.
-    if (!reducedMotion()) {
-      letters.forEach((l) => l.style.setProperty('--rise', '0'))
-      letters.forEach((l, i) => {
-        ScrollTrigger.create({
-          trigger: l,
-          start: 'top 88%',
-          once: true,
-          // the lead letter leads; the three under it follow in order
-          onEnter: () => setTimeout(() => l.style.setProperty('--rise', '1'), i === 0 ? 0 : 90 * i),
-        })
-      })
+  qq('[data-letter]').forEach((letter) => {
+    const words = qq('.lw', letter)
+    const rule = letter.querySelector('.letter__rule')
+    if (!words.length) return
+
+    if (reducedMotion()) {
+      rule?.style.setProperty('--read', '1')
+      return
     }
-  }
+
+    words.forEach((w) => w.classList.add('is-dim'))
+    let lit = 0
+
+    const read = (p) => {
+      rule?.style.setProperty('--read', p)
+      // the last few words land before the letter leaves, or the tail never lights
+      const want = Math.round(clamp(p / 0.82) * words.length)
+      if (want === lit) return
+      // only the words that actually crossed, not all 30 every frame
+      if (want > lit) for (let k = lit; k < want; k++) words[k].classList.remove('is-dim')
+      else for (let k = want; k < lit; k++) words[k].classList.add('is-dim')
+      lit = want
+    }
+
+    const state = { p: 0 }
+    gsap.to(state, {
+      p: 1,
+      ease: 'none',
+      onUpdate: () => read(state.p),
+      scrollTrigger: { trigger: letter, start: 'top 78%', end: 'bottom 62%', scrub: 0.4 },
+    })
+  })
 
   if (!scenes.signal) return
 

@@ -1052,15 +1052,74 @@
             </h2>
           </div>
           <div class="col-12 col-lg-5 front-aside">
-            <p class="body-copy" style="color:rgba(17,17,17,.6)">Three steps on one platform, from a reporter's phone to
-              every screen you publish on.</p>
+            <p class="body-copy" style="color:rgba(17,17,17,.6)">Everything a story passes through, from the moment it reaches the
+              desk to the moment it reaches a reader. Three of those stages are modules you'll
+              recognise.</p>
           </div>
         </div>
-        <ol class="steps row row-cols-1 row-cols-md-3 g-0 list-unstyled mt-vh-7" data-steps>
-          <span class="steps__ink" aria-hidden="true"></span>
-          <span class="steps__head" aria-hidden="true"></span>
+        <!-- The journey end to end: what comes in, the six stages it passes
+             through, and where it goes out. The curves are drawn by
+             setupPipeline() from the pills' measured positions, so they stay
+             exact at any width. Below lg it becomes a plain vertical list. -->
+        <div class="pipe mt-vh-7" data-pipe>
+          <svg class="pipe__wires" aria-hidden="true" data-pipe-wires preserveAspectRatio="none"></svg>
+
+          <div class="pipe__col pipe__col--in">
+            <span class="mono-xs pipe__coltitle">NEWSROOM INPUTS</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Reporters</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Stringers</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Wires &amp; alerts</span>
+          </div>
+
+          <div class="pipe__spine">
+            <span class="pipe__rail" aria-hidden="true"></span>
+            <span class="pipe__ink" aria-hidden="true"></span>
+            <ol class="pipe__stages list-unstyled" style="--n:6">
+              <li class="pipe__stage" data-pipe-stage style="--i:0">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Gather</span>
+              </li>
+              <li class="pipe__stage" data-pipe-stage style="--i:1">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Create</span>
+              </li>
+              <li class="pipe__stage" data-pipe-stage style="--i:2">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Approve</span>
+              </li>
+              <li class="pipe__stage" data-pipe-stage style="--i:3">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Publish</span>
+              </li>
+              <li class="pipe__stage" data-pipe-stage style="--i:4">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Monetize</span>
+              </li>
+              <li class="pipe__stage" data-pipe-stage style="--i:5">
+                <span class="pipe__stem" aria-hidden="true"></span>
+                <span class="pipe__node" aria-hidden="true"></span>
+                <span class="pipe__pill">Analyze</span>
+              </li>
+            </ol>
+          </div>
+
+          <div class="pipe__col pipe__col--out">
+            <span class="mono-xs pipe__coltitle">AUDIENCE CHANNELS</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Website</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Mobile app</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Google News</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Social &amp; push</span>
+            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Newsletter</span>
+          </div>
+        </div>
+
+        <ol class="steps row row-cols-1 row-cols-md-3 g-6 list-unstyled mt-vh-7" data-steps>
           <li class="col step" data-step style="--accent:#111111">
-            <span class="step__node" aria-hidden="true"></span>
             <div class="step__body">
               <div class="d-flex align-items-center justify-content-between gap-3">
                 <span class="step__plate d-flex align-items-center justify-content-center">
@@ -1079,7 +1138,6 @@
           </li>
 
           <li class="col step" data-step style="--accent:#6118EA">
-            <span class="step__node" aria-hidden="true"></span>
             <div class="step__body">
               <div class="d-flex align-items-center justify-content-between gap-3">
                 <span class="step__plate d-flex align-items-center justify-content-center">
@@ -1099,7 +1157,6 @@
           </li>
 
           <li class="col step" data-step style="--accent:#E10600">
-            <span class="step__node" aria-hidden="true"></span>
             <div class="step__body">
               <div class="d-flex align-items-center justify-content-between gap-3">
                 <span class="step__plate d-flex align-items-center justify-content-center">
@@ -1120,7 +1177,7 @@
 
         <div class="hair-t mt-12 d-flex flex-wrap align-items-center justify-content-between gap-3 pt-5">
           <span class="mono-xs" style="color:rgba(17,17,17,.4)">ONE PLATFORM · NO HAND-OFFS BETWEEN VENDORS</span>
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">FILE → EDIT → PUBLISH</span>
+          <span class="mono-xs" style="color:rgba(17,17,17,.4)">GATHER → CREATE → APPROVE → PUBLISH → MONETIZE → ANALYZE</span>
         </div>
       </div>
     </section>

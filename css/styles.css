@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
@@ -3196,55 +3197,10 @@ html.lenis body {
   position: relative;
   padding-top: 2rem;
 }
-.step::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(17, 17, 17, 0.14);
-}
 @media (min-width: 768px) {
   .step {
     padding-right: 2rem;
   }
-}
-
-.steps__ink {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 3px;
-  width: calc(100% * var(--draw));
-  background: var(--ink);
-}
-
-.steps__head {
-  position: absolute;
-  top: -3px;
-  left: calc(100% * var(--draw));
-  width: 9px;
-  height: 9px;
-  background: var(--breaking);
-  transform: translateX(-50%);
-  opacity: calc(var(--draw) * 6);
-}
-
-.step__node {
-  position: absolute;
-  top: -5px;
-  left: 0;
-  width: 13px;
-  height: 13px;
-  background: #fff;
-  box-shadow: inset 0 0 0 3px rgba(17, 17, 17, 0.18);
-  outline: 4px solid #fff;
-  transition: background 0.4s, box-shadow 0.4s;
-}
-.step.is-on .step__node {
-  background: var(--accent);
-  box-shadow: inset 0 0 0 3px var(--accent);
 }
 
 .step__body {
@@ -3302,36 +3258,239 @@ html.lenis body {
 @media (max-width: 767.98px) {
   .step {
     padding-top: 0;
-    padding-left: 2.5rem;
-    padding-bottom: 2.5rem;
-  }
-  .step::before {
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: auto;
-    height: auto;
-    width: 3px;
-  }
-  .step:last-child::before {
-    bottom: auto;
-    height: 2.5rem;
-  }
-  .steps__ink {
-    width: 3px;
-    height: calc(100% * var(--draw));
-  }
-  .steps__head {
-    top: calc(100% * var(--draw));
-    left: -3px;
-    transform: translateY(-50%);
-  }
-  .step__node {
-    top: 0;
-    left: -5px;
+    padding-bottom: 0.5rem;
   }
   .step__body {
     padding-top: 0;
+  }
+}
+.pipe {
+  --draw: 1;
+  --in: 1;
+  --out: 1;
+  position: relative;
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .pipe {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2.5rem;
+  }
+}
+.pipe__wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.pipe__col {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.pipe__coltitle {
+  color: rgba(17, 17, 17, 0.4);
+  margin-bottom: 0.25rem;
+}
+
+.pipe__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px -14px rgba(17, 17, 17, 0.5);
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.pipe__col--in .pipe__pill {
+  opacity: calc(0.25 + 0.75 * var(--in));
+  transform: translateX(calc(-10px * (1 - var(--in))));
+  transition: opacity 0.5s, transform 0.5s, border-color 0.4s;
+}
+
+.pipe__col--out .pipe__pill {
+  opacity: calc(0.25 + 0.75 * var(--out));
+  transform: translateX(calc(10px * (1 - var(--out))));
+  transition: opacity 0.5s, transform 0.5s, border-color 0.4s;
+}
+
+.pipe__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(17, 17, 17, 0.18);
+  flex: none;
+  transition: background 0.4s;
+}
+
+.pipe__pill--edge.is-on {
+  border-color: rgba(97, 24, 234, 0.4);
+}
+.pipe__pill--edge.is-on .pipe__dot {
+  background: var(--blink);
+}
+
+.pipe__spine {
+  position: relative;
+  z-index: 1;
+  min-height: 250px;
+}
+
+.pipe__rail,
+.pipe__ink {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+}
+
+.pipe__rail {
+  right: 0;
+  background: rgba(17, 17, 17, 0.12);
+}
+
+.pipe__ink {
+  width: calc(100% * var(--draw));
+  background: linear-gradient(90deg, #6118ea 0%, #6118ea 58%, #e10600 100%);
+}
+
+.pipe__stages {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.pipe__stage {
+  position: absolute;
+  top: 50%;
+  left: calc((var(--i) + 0.5) / var(--n) * 100%);
+  transform: translateX(-50%);
+}
+
+.pipe__node {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 3px rgba(17, 17, 17, 0.18);
+  transition: box-shadow 0.4s, background 0.4s;
+}
+
+.pipe__stem {
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: rgba(17, 17, 17, 0.16);
+}
+
+.pipe__stage .pipe__pill {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.3;
+  transition: opacity 0.45s, border-color 0.4s, box-shadow 0.4s;
+}
+
+.pipe__stage.is-on .pipe__node {
+  background: var(--blink);
+  box-shadow: inset 0 0 0 3px var(--blink);
+}
+.pipe__stage.is-on .pipe__pill {
+  opacity: 1;
+  border-color: rgba(97, 24, 234, 0.45);
+  box-shadow: 0 10px 26px -16px rgba(97, 24, 234, 0.8);
+}
+
+.pipe__stage:nth-child(odd) .pipe__stem {
+  bottom: 0;
+  height: 46px;
+}
+.pipe__stage:nth-child(odd) .pipe__pill {
+  bottom: 46px;
+}
+
+.pipe__stage:nth-child(even) .pipe__stem {
+  top: 0;
+  height: 46px;
+}
+.pipe__stage:nth-child(even) .pipe__pill {
+  top: 46px;
+}
+
+/*
+ * Below lg the flow straightens out. A 1300px-wide diagram scaled to a phone
+ * puts its labels at about 3px; nothing about this reads sideways on a 390px
+ * screen, so it becomes what it actually is — a list, in order, against one
+ * rule. The curves go with it.
+ */
+@media (max-width: 1023.98px) {
+  .pipe__wires {
+    display: none;
+  }
+  .pipe__spine {
+    min-height: 0;
+    padding-left: 1.5rem;
+  }
+  .pipe__rail,
+  .pipe__ink {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: auto;
+    width: 3px;
+    height: auto;
+    margin: 0;
+  }
+  .pipe__ink {
+    bottom: auto;
+    height: calc(100% * var(--draw));
+    background: linear-gradient(180deg, #6118ea 0%, #6118ea 58%, #e10600 100%);
+  }
+  .pipe__stages {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .pipe__stage {
+    position: static;
+    transform: none;
+  }
+  .pipe__stem {
+    display: none;
+  }
+  .pipe__node {
+    left: -1.5rem;
+    top: 50%;
+  }
+  .pipe__stage .pipe__pill {
+    position: static;
+    transform: none;
+  }
+  .pipe__col--in .pipe__pill,
+  .pipe__col--out .pipe__pill {
+    transform: none;
   }
 }
 .live-head {

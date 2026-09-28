@@ -142,51 +142,130 @@ function setupLeaves() {
 }
 
 /**
- * 06 · HOW IT WORKS — the delivery line draws itself.
+ * 06 · HOW IT WORKS — the pipeline.
  *
- * One scrubbed value does all of it: `--draw` goes 0 → 1 across the section
- * and CSS decides what that means, so the line runs left-to-right on a desktop
- * and top-to-bottom on a phone without this function knowing which. A step
- * lights when the line reaches its node — the nodes are evenly spaced, so
- * that is simply `i / steps.length`.
+ * What comes in, the six stages it passes through, where it goes out. One
+ * scrubbed value again, split three ways: the inputs arrive, the spine draws
+ * left to right lighting each stage as it reaches it, and the channels light
+ * once it gets to them. The edges overlap the spine slightly so the thing
+ * reads as one movement rather than three.
+ *
+ * The curves are the only part that cannot be CSS. They are drawn into an SVG
+ * sized in real pixels from the pills' own measured positions, so they stay
+ * exact at any width — and redrawn on resize, since a grid column changing
+ * width moves every endpoint.
+ */
+function setupPipeline() {
+  const pipe = q('[data-pipe]')
+  if (!pipe) return
+
+  const wires = q('[data-pipe-wires]', pipe)
+  const stages = qq('[data-pipe-stage]', pipe)
+  const ins = qq('[data-pipe-in]', pipe)
+  const outs = qq('[data-pipe-out]', pipe)
+  const spine = q('.pipe__spine', pipe)
+  if (!stages.length) return
+
+  const NS = 'http://www.w3.org/2000/svg'
+
+  /** A flat S-curve from one point to another, horizontal at both ends. */
+  const curve = (x1, y1, x2, y2) => {
+    const dx = Math.max(28, (x2 - x1) * 0.55)
+    return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`
+  }
+
+  const drawWires = () => {
+    if (!wires || !spine) return
+    const box = pipe.getBoundingClientRect()
+    // below lg the diagram is a plain list and the curves are hidden by CSS
+    if (getComputedStyle(wires).display === 'none') return
+
+    const rail = spine.getBoundingClientRect()
+    const midY = rail.top + rail.height / 2 - box.top
+    const leftX = rail.left - box.left
+    const rightX = rail.right - box.left
+
+    const d = []
+    for (const el of ins) {
+      const r = el.getBoundingClientRect()
+      d.push(curve(r.right - box.left, r.top + r.height / 2 - box.top, leftX, midY))
+    }
+    for (const el of outs) {
+      const r = el.getBoundingClientRect()
+      d.push(curve(rightX, midY, r.left - box.left, r.top + r.height / 2 - box.top))
+    }
+
+    wires.setAttribute('width', box.width)
+    wires.setAttribute('height', box.height)
+    wires.replaceChildren()
+    for (const path of d) {
+      const p = document.createElementNS(NS, 'path')
+      p.setAttribute('d', path)
+      p.setAttribute('fill', 'none')
+      p.setAttribute('stroke', 'rgba(97,24,234,.34)')
+      p.setAttribute('stroke-width', '1.5')
+      wires.appendChild(p)
+    }
+  }
+
+  const paint = (p) => {
+    const draw = seg(p, 0.12, 0.82)
+    pipe.style.setProperty('--draw', draw)
+    pipe.style.setProperty('--in', easeOut(seg(p, 0, 0.2)))
+    pipe.style.setProperty('--out', easeOut(seg(p, 0.78, 1)))
+
+    // a stage lights when the spine reaches it; the stages sit at
+    // (i + 0.5) / n across the rail, which is where CSS puts them too
+    stages.forEach((st, i) => st.classList.toggle('is-on', draw >= (i + 0.5) / stages.length))
+    const landed = seg(p, 0.82, 0.94) > 0
+    outs.forEach((o) => o.classList.toggle('is-on', landed))
+    ins.forEach((o) => o.classList.toggle('is-on', p > 0.06))
+  }
+
+  drawWires()
+  // a grid column changing width moves every endpoint
+  window.addEventListener('resize', drawWires)
+  ScrollTrigger.addEventListener('refreshInit', drawWires)
+
+  if (reducedMotion()) {
+    paint(1)
+    return
+  }
+
+  const state = { p: 0 }
+  gsap.to(state, {
+    p: 1,
+    ease: 'none',
+    onUpdate: () => paint(state.p),
+    scrollTrigger: { trigger: pipe, start: 'top 82%', end: 'bottom 72%', scrub: 0.5 },
+  })
+}
+
+/**
+ * 06 · HOW IT WORKS — the three module cards under the pipeline.
+ *
+ * They had a drawn line and a node each once. The pipeline above them draws
+ * the flow now, and two scroll-drawn lines stacked in one section said the
+ * same thing twice — so all that is left here is bringing the cards in as
+ * they are reached.
  */
 function setupSteps() {
   const track = q('[data-steps]')
   const steps = qq('[data-step]')
   if (!track || !steps.length) return
 
-  const draw = (p) => {
-    track.style.setProperty('--draw', p)
-    // The nodes are evenly spaced, so the head reaches node i at i/length and
-    // the step lights exactly there. The p > 0.02 is only to keep the first
-    // one — whose node is the line's own origin — dark until the line moves.
-    steps.forEach((s, i) => s.classList.toggle('is-on', p > 0.02 && p >= i / steps.length))
-  }
-
   if (reducedMotion()) {
-    draw(1)
+    steps.forEach((s) => s.classList.add('is-on'))
     return
   }
 
-  /*
-   * The scrub is on a tween of a plain object, not on the element. A bare
-   * ScrollTrigger.create takes `scrub` but has no animation to scrub, so its
-   * onUpdate would run at raw scroll position and the line would track the
-   * wheel 1:1 — the one thing the rest of this page never does. Tweening a
-   * proxy gives the same eased catch-up as the pinned scenes, and writing the
-   * custom property by hand keeps it off CSSPlugin's custom-property support.
-   */
-  const state = { p: 0 }
-  gsap.to(state, {
-    p: 1,
-    ease: 'none',
-    onUpdate: () => draw(state.p),
-    scrollTrigger: {
-      trigger: track,
-      start: 'top 78%',
-      end: 'bottom 76%',
-      scrub: 0.5,
-    },
+  steps.forEach((s, i) => {
+    ScrollTrigger.create({
+      trigger: s,
+      start: 'top 86%',
+      once: true,
+      onEnter: () => setTimeout(() => s.classList.add('is-on'), i * 90),
+    })
   })
 }
 
@@ -470,6 +549,7 @@ function boot() {
   setupHero()
   setupPins(scenes)
   setupLeaves()
+  setupPipeline()
   setupSteps()
   setupRates()
   setupLive()

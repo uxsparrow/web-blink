@@ -70,6 +70,7 @@ sequences to produce or ship:
 | Laptop → tablet → phone | `js/scenes/desk.js` — the headline types into the Blink editor, the finished story lifts off the screen and flies across the desk, then lights up a tablet and a phone with the same article. One article renderer draws all four surfaces, and a dotted world map sways behind them |
 | The platform itself | `js/scenes/platform.js` — a dotted sea in perspective moving under a level ink deck that the six module cards stand on; each column’s water takes that module’s accent as its cards land, and the deck thickens into the ink strip that carries into HOW IT WORKS |
 | The edition going out | `js/scenes/press.js` — the published feed races up a dark bus, hopping through violet-lit relays, then fans out to endpoint screens |
+| Pipeline, end to end | `js/main.js` — `setupPipeline()`: inputs, six stages and audience channels on one rail; the curves are SVG drawn from the pills’ measured positions, the rest is CSS |
 | The story on every screen | same file — ~320 reader screens burst outward and clear to white |
 | Reader signal | `js/scenes/reader-signal.js` — a return trace that rises as the section scrolls, response marks lighting as it passes them; no axis, scale or number |
 | Halftone wordmark | `js/scenes/halftone-wordmark.js` — the type is rendered offscreen, sampled, and redrawn as dots sized by ink coverage |

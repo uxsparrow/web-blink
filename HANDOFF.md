@@ -599,6 +599,57 @@ Four of the five resisted extraction, and it cost real time:
 
 ---
 
+## 6e · 06 · HOW IT WORKS — the pipeline
+
+Built from a mock the user supplied: what comes in on the left, the six stages
+it passes through, where it goes out on the right.
+
+- **The labels follow the site's own spine, not the mock's.** The mock said
+  *Monetise* and *Measure*; the hero says "Monitor, gather, create, publish,
+  **monetize** and **analyze**", and the README says the same. Two words for one
+  stage on one page is worse than a small deviation from the mock, so the stages
+  are Gather · Create · Approve · Publish · Monetize · Analyze. **Approve** is
+  the mock's own addition and a real one — the feature list has Approval
+  Workflows under Blink CMS Workflow.
+- **Every node is supported.** Reporters and Stringers from the Reporter /
+  Stringer module; Wires & alerts from Agency Feed Monitoring and RSS/API
+  ingestion; Website, Mobile app, Google News, Social & push and Newsletter all
+  from the Distribution group. Nothing here is invented.
+- **The curves are the only part that cannot be CSS.** They are drawn into an
+  SVG sized in *real pixels* from the pills' measured positions, so they land
+  exactly on the pill edges and the rail ends at any width. A viewBox would mean
+  keeping the curve maths in two coordinate systems. They are redrawn on resize
+  and on `refreshInit`, because a grid column changing width moves every
+  endpoint.
+- **One scrubbed value, split three ways**: the inputs arrive, the spine draws
+  left to right lighting each stage as it reaches it, the channels light once it
+  gets to them. The edges overlap the spine slightly so it reads as one movement
+  rather than three.
+- **A stage lights at `(i + 0.5) / n`**, which is exactly where CSS puts it via
+  `left: calc((var(--i) + 0.5) / var(--n) * 100%)`. The two agree because they
+  are the same expression, not because they were tuned to match.
+- **The gradient on the rail is deliberate and unique on this page.** It warms
+  from violet to red toward the channel end because the story is going
+  somewhere. No other rule here carries one.
+- **Below lg it straightens into a list.** A 1300px-wide flow scaled to a phone
+  puts its labels at about 3px. There is no version of this that reads sideways
+  at 390px, so the rail stands up, the curves are dropped, and the stages become
+  what they are — an ordered list. Measured at 390: pills at 13.6px, no overflow.
+
+### The three module cards lost their line
+
+They had a drawn rule and a node each. **The pipeline draws the flow now, and
+two scroll-drawn lines stacked in one section say the same thing twice** — the
+trap §6 records for 05, in a smaller form. `.steps__ink`, `.steps__head`,
+`.step__node` and `.step::before` are gone; the cards keep their copy, which is
+the part carrying real module facts, and now just arrive in sequence.
+
+The section's own copy moved with it: the standfirst said "Three steps on one
+platform" and the foot strip said `FILE → EDIT → PUBLISH`. Both named three
+things where there are now six.
+
+---
+
 ## 6d · 09 · LETTERS — the read-through, and a content warning
 
 ### ⚠ The quotes here are fabricated, and nothing on screen says so

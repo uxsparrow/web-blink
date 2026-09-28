@@ -104,7 +104,7 @@ knowing before editing `scss/`:
 - **Breakpoints are Tailwind's** (sm 640 / md 768 / lg 1024).
 - **`$position-values` is extended with the spacing scale**, so `bottom-7`
   works; stock Bootstrap only ships `0/50/100`.
-- **The type scale is `.t-hero` … `.t-giant`**, deliberately not `.d-*`, which
+- **The type scale is `.t-xl` … `.t-giant`**, deliberately not `.d-*`, which
   would read as Bootstrap's display utilities.
 - **The utilities API is imported last**, so utilities override component
   classes. Put new component CSS in the partials, not below that import.

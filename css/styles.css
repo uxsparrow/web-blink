@@ -2450,10 +2450,6 @@ html.lenis body {
   font-feature-settings: "kern" 1;
 }
 
-.t-hero {
-  font-size: clamp(2.7rem, 8.4vw, 9.5rem);
-}
-
 .t-xl {
   font-size: clamp(2.4rem, 7.4vw, 8.4rem);
 }
@@ -2881,6 +2877,27 @@ html.lenis body {
   max-width: min(94vw, 980px);
 }
 
+/*
+ * The hero headline, sized to its column rather than to the viewport.
+ *
+ * It used `.t-hero`, which caps at 9.5rem — 152px — while `.hero-copy` above
+ * stops at 980px. `NEWSROOMS` is one unbreakable word and measures 1061px at
+ * that size, so past roughly 1670px of viewport it overflowed the column and
+ * `.line-mask { overflow: hidden }` cut its tail: the hero read NEWSROOM.
+ *
+ * **The fourth headline on this page to hit this** — see §4 for the front
+ * page, 07 and 09. The rule that catches it every time: a `.t-*` scales with
+ * the viewport, the column it sits in does not, and only a single unbreakable
+ * word can be clipped. Cap to the longest word, never to the line.
+ *
+ * Measured against the real element at 2000px: NEWSROOMS is 1061px at 152px,
+ * fits 980px at 140px and under. 8.5rem is 136px, which leaves 31px in hand.
+ * The 2.6rem floor is for 320px screens, where the column is 94vw = 301px.
+ */
+.hero-head {
+  font-size: clamp(2.5rem, 8.4vw, 8.5rem);
+}
+
 .hero-sub {
   max-width: 44ch;
 }
@@ -2970,9 +2987,6 @@ html.lenis body {
 }
 .leave-head {
   font-size: clamp(1.9rem, 4.6vw, 4.6rem);
-}
-.leave-head .line-inner {
-  white-space: nowrap;
 }
 
 .leave-row {

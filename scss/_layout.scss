@@ -977,8 +977,12 @@
 // the lead letter, set large the way a letters page sets its first
 .letter--lead {
   padding-left: 2.25rem;
-  margin-bottom: 3rem;
-  max-width: 46ch;
+  margin-bottom: 3.5rem;
+
+  // No `max-width` here. It used to cap at 46ch, which at this type size ran
+  // the lead eleven lines down the left third and left two thirds of the row
+  // empty. The measure is the grid column’s job now — seven of twelve, with
+  // the attribution and the case study’s figures in the five beside it.
 
   &::before {
     width: 3px;
@@ -1027,6 +1031,20 @@
 .letter--lead .letter__role {
   display: inline-block;
   margin-top: 0;
+}
+
+// The figures beside the lead. Sized below `.result__metric` on purpose: the
+// measured results further up are the section’s headline numbers, and these
+// support a quote rather than competing with them.
+.letter__figure {
+  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+  line-height: 0.95;
+  color: var(--ink);
+}
+
+.letter__figure-label {
+  margin-top: 0.4rem;
+  color: rgba(17, 17, 17, 0.45);
 }
 
 // ── 10 masthead wall ────────────────────────────────────────────

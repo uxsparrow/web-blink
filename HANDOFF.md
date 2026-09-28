@@ -633,6 +633,19 @@ of the case studies under `/case-study/`, and are quoted verbatim here:
 - **Playfair on the lead** is deliberate and within the rule `_type.scss` sets
   for it — newspaper props only, never UI. A published letter is a newspaper
   prop; a button is not.
+- **The lead is a 7/5 row, and the `max-width` is gone.** It first capped at
+  `46ch`, which at that type size ran the quote eleven lines down the left
+  third and left two thirds of the row empty. The grid column sets the measure
+  now: seven of twelve for the quote, five for the attribution and two figures,
+  bottom-aligned with its last line. Measured at 1440: 7 lines, 740px of quote
+  against 551px of aside, the full 1327px row used.
+- **Those two figures come from the same case study as the quote**, not from
+  the brief — 100× revenue growth, and 3M → 50M readers over five years. The
+  `.result` row further up carries LiveLaw’s *supplied* numbers (−30% bounce,
+  10s faster pages), which are different figures from a different source, so
+  the two do not duplicate. Keep them straight if either is edited.
+- `.letter__figure` is sized **below** `.result__metric` on purpose. The
+  measured results are the section’s headline numbers; these support a quote.
 - **`--rise` rests at 1 in the stylesheet**, not 0. `setupLetters()` drops it to
   0 on mount and only then animates it back, so a dead script leaves four
   legible letters rather than four invisible ones. Same rule as the ON AIR film.

@@ -2619,12 +2619,30 @@
   <script>
     window.addEventListener('load', function () {
       setTimeout(function () {
-        if (!window.__blinkBooted) {
-          document.documentElement.classList.add('boot-failed')
-          if (window.console && console.warn) {
-            console.warn('Blink CMS: js/main.js did not run, falling back to static markup. ' + (location.protocol === 'file:' ? 'The page is open from disk — ES modules need http. Serve the folder instead.' : 'Check the script path and any Content-Security-Policy.'))
-          }
-        }
+        if (window.__blinkBooted) return
+        document.documentElement.classList.add('boot-failed')
+
+        var onDisk = location.protocol === 'file:'
+        var why = onDisk
+          ? 'The page is open from disk. Browsers block ES modules on file://, so the scroll story and all the canvas scenes cannot run. Serve the folder over http instead.'
+          : 'js/main.js did not run. Check the script path and any Content-Security-Policy.'
+        if (window.console && console.warn) console.warn('Blink CMS: falling back to static markup. ' + why)
+
+        /*
+         * Only ever shown for file://, which cannot happen on a real host, so
+         * this can never reach a reader. It exists because the console message
+         * alone is easy to miss: the page looks merely "broken, no animation"
+         * rather than "not being served".
+         */
+        if (!onDisk) return
+        var bar = document.createElement('div')
+        bar.setAttribute('role', 'status')
+        bar.style.cssText =
+          'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:#e10600;color:#fff;' +
+          'font:500 13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px 16px;text-align:center'
+        bar.textContent =
+          'Opened from disk — animations are off. ES modules need http. Serve this folder (e.g. npx serve .) and open the localhost address.'
+        document.body.appendChild(bar)
       }, 1500)
     })
   </script>

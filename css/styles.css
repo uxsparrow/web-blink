@@ -1,3 +1,32 @@
+/* ==========================================================================
+   Blink CMS — stylesheet
+
+   THIS FILE IS THE SOURCE. Edit it directly.
+
+   It was originally compiled from Sass. The SCSS sources and the Node
+   toolchain were removed on request, so there is nothing to rebuild and no
+   build step to run — what you edit here is what the browser serves.
+
+   Layout of the file, marked by the banners below:
+
+     BOOTSTRAP · REBOOT / GRID / HELPERS   vendor, top
+     BLINK · TOKENS / BASE / TYPE / UI / LAYOUT / STATIC   hand-written
+     BOOTSTRAP · UTILITIES                 vendor, bottom, all !important
+
+   Four conventions are baked in and will look wrong without this note:
+
+     1. $spacers used Tailwind's numeric scale, so .mt-7 is 1.75rem and the
+        scale runs 1 = .25rem … 12 = 3rem. It is NOT Bootstrap's stock 1–5.
+     2. Breakpoints are Tailwind's: sm 640 · md 768 · lg 1024.
+     3. $position-values was extended with that spacing scale, so bottom-7
+        exists; stock Bootstrap only ships 0/50/100.
+     4. The type scale is .t-xl … .t-giant, deliberately not .d-*, which would
+        collide with Bootstrap's display utilities.
+
+   The utilities block at the bottom carries !important and therefore beats
+   everything above it. New component CSS goes in the BLINK blocks, never
+   below that banner.
+   ========================================================================== */
 @charset "UTF-8";
 :root,
 [data-bs-theme=light] {
@@ -112,6 +141,11 @@
   --bs-form-invalid-border-color: #dc3545;
 }
 
+
+/* ==========================================================================
+   BOOTSTRAP 5.3 · REBOOT
+   Vendor. Normalises the browser. Nothing here is Blink-specific.
+   ========================================================================== */
 *,
 *::before,
 *::after {
@@ -522,6 +556,12 @@ progress {
   display: none !important;
 }
 
+
+/* ==========================================================================
+   BOOTSTRAP 5.3 · GRID
+   Vendor. .container / .row / .col-* . Breakpoints are Tailwind's:
+   sm 640 · md 768 · lg 1024 — NOT Bootstrap's stock values.
+   ========================================================================== */
 :root {
   --bs-breakpoint-xs: 0;
   --bs-breakpoint-sm: 640px;
@@ -2153,6 +2193,11 @@ progress {
   transform: var(--bs-icon-link-transform, translate3d(0.25em, 0, 0));
 }
 
+
+/* ==========================================================================
+   BOOTSTRAP 5.3 · HELPERS
+   Vendor. .ratio, .stretched-link, .text-truncate and friends.
+   ========================================================================== */
 .ratio {
   position: relative;
   width: 100%;
@@ -2333,6 +2378,12 @@ progress {
   opacity: 0.25;
 }
 
+
+/* ==========================================================================
+   BLINK · TOKENS
+   Hand-written from here down. Custom properties: colours, the ink
+   scale, the accent (--blink) and the breaking red.
+   ========================================================================== */
 :root {
   --font-tomorrow: 'Tomorrow';
   --font-grotesk: 'Space Grotesk';
@@ -2366,6 +2417,11 @@ progress {
   padding: 0;
 }
 
+
+/* ==========================================================================
+   BLINK · BASE
+   Element defaults: html, body, selection, focus rings, canvas reset.
+   ========================================================================== */
 html {
   background: #000;
   -webkit-text-size-adjust: 100%;
@@ -2441,6 +2497,12 @@ html.lenis body {
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   BLINK · TYPE
+   The type scale is .t-xl … .t-giant — deliberately not .d-*, which
+   would collide with Bootstrap's display utilities below.
+   ========================================================================== */
 .display {
   font-family: var(--font-tomorrow), "Arial Narrow", sans-serif;
   font-weight: 700;
@@ -2552,6 +2614,11 @@ html.lenis body {
   will-change: transform;
 }
 
+
+/* ==========================================================================
+   BLINK · UI
+   Reusable pieces: hairlines, buttons, pills, the cursor, the ticker.
+   ========================================================================== */
 .hair-t {
   border-top: 1px solid var(--hairline);
 }
@@ -2763,6 +2830,12 @@ html.lenis body {
   border-color: var(--ink);
 }
 
+
+/* ==========================================================================
+   BLINK · LAYOUT
+   The sections and their scenes — hero, desk, pipeline, letters, press.
+   The biggest block in the file; most edits land here.
+   ========================================================================== */
 .inset-0 {
   inset: 0;
 }
@@ -4277,6 +4350,11 @@ html.lenis body {
   max-width: 30ch;
 }
 
+
+/* ==========================================================================
+   BLINK · STATIC
+   Markup that carries no scene: lists, tables, the footer, the modal.
+   ========================================================================== */
 .list-unstyled {
   padding-left: 0;
   list-style: none;
@@ -4735,6 +4813,13 @@ html.lenis body {
   bottom: 12px;
 }
 
+
+/* ==========================================================================
+   BOOTSTRAP 5.3 · UTILITIES (GENERATED)
+   Vendor, and LAST ON PURPOSE. Every rule below carries !important, so
+   it beats the component CSS above. Never add component CSS down here —
+   put it in the BLINK blocks above, or the next utility class will win.
+   ========================================================================== */
 .overflow-auto {
   overflow: auto !important;
 }

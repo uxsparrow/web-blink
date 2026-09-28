@@ -1,16 +1,19 @@
 /**
  * Tiny zero-dependency static server, for previewing the site locally.
- * The build itself needs nothing — any static host will serve this folder.
  *
- *   node server.js          → http://localhost:8080
- *   node server.js 3000     → a different port
+ * This is Claude Code tooling, not part of the site. It lives in .claude/ so
+ * that the project root contains only the files that ship. The site itself
+ * needs no server of its own — any static host will serve the folder.
+ *
+ *   node .claude/preview.js          -> http://localhost:8080
+ *   node .claude/preview.js 3000     -> a different port
  */
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
 
 const PORT = Number(process.argv[2] || process.env.PORT || 8080)
-const ROOT = __dirname
+const ROOT = path.join(__dirname, '..') // the site root — this file lives in .claude/
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',

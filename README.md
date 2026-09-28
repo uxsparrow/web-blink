@@ -12,25 +12,39 @@ dependencies.** Drop this folder on any static host and it works.
 
 ## Running it
 
-The page uses ES modules and `fetch`, so it needs to be *served* — opening
-`index.html` straight off the disk (`file://`) will not work. Any web server
-does. A zero-dependency one is included:
+**There is no build step and no dependencies.** The folder *is* the site — put
+it behind any web server and it works. nginx, Apache, cPanel, S3, Netlify,
+GitHub Pages and any CMS that serves static files will all take it as-is.
+
+It does have to be *served over http*, though. The page uses ES modules and
+`fetch`, and both are blocked on the `file://` origin, so **double-clicking
+`index.html` will not work** — you get the shell of the page with no scroll
+story. This is a browser security rule, not a missing dependency; serving the
+folder over http is all it needs.
+
+Anything that serves a directory will do:
 
 ```bash
-node server.js
+npx serve .
 ```
 
-Then open <http://localhost:8080>. On a real host, just upload the folder —
-nginx, Apache, cPanel, S3, Netlify, GitHub Pages all serve it as-is.
+```bash
+python3 -m http.server 8080
+```
+
+```bash
+php -S localhost:8080
+```
+
+Then open <http://localhost:8080>.
 
 ## What's in the folder
 
 ```
 index.html            the whole page — all 16 sections as static markup
 css/
-  styles.css          compiled from scss/ — edit directly if you prefer
+  styles.css          all styles — edit directly, there is nothing to compile
   fonts.css           @font-face rules for the self-hosted fonts
-scss/                 source for styles.css (optional, see "Rebuilding the CSS")
 js/
   main.js             entry point: boots the UI and the scroll story
   lib/                motion helpers, land geometry, canvas plumbing, copy
@@ -40,9 +54,17 @@ vendor/               GSAP, ScrollTrigger, Lenis, Three.js, topojson-client
 fonts/                Tomorrow, Space Grotesk, Space Mono, Playfair Display
 data/                 Natural Earth 110m land geometry
 assets/               logo, and the ON AIR background video (4.4MB, lazy-loaded)
-server.js             local preview server (not needed in production)
-.claude/              Claude Code preview config — safe to delete
+.claude/              Claude Code tooling — not part of the site, safe to delete
 ```
+
+Every one of those paths is **relative**, so the folder structure has to stay
+intact. If your CMS rewrites or flattens asset URLs, fix the references in
+`index.html` and `css/fonts.css` to match.
+
+One thing to check when mounting this inside a larger site: the footer's
+navigation links are **root-relative** (`/pricing/`, `/case-studies/livelaw/`
+and about a dozen more). They are correct if the page is the site root, and
+wrong if it is served from a subdirectory.
 
 Nothing is fetched from a CDN **except the brand video**, which is a YouTube
 embed in the "Watch video" modal. It is `youtube-nocookie.com` and carries no
@@ -90,29 +112,51 @@ JavaScript is in `js/lib/content.js` — the bureau coordinates, the preloader's
 sample wire feed, the globe's ping tags, the live-blog timestamps and the
 headline the Desk types out, because the scenes need those as data.
 
-## Rebuilding the CSS
+## Editing the CSS
 
-`css/styles.css` is committed and ready to serve — you only need this if you
-want to change the SCSS sources.
+`css/styles.css` is the source. Edit it directly — there is no Sass, no build
+and nothing to regenerate.
 
-```bash
-npm install    # pulls sass + bootstrap, dev-only
-npm run css    # or: npm run css:watch
-```
+It was compiled from SCSS once; those sources and the Node toolchain were
+removed on request, so the compiled file became the thing you maintain. It is
+~12k lines, which is only navigable because of the banner comments that divide
+it. In order:
 
-Bootstrap 5.3 provides the grid, reboot and utilities. A few decisions worth
-knowing before editing `scss/`:
+| Block | |
+|---|---|
+| `BOOTSTRAP · REBOOT` | vendor — normalises the browser |
+| `BOOTSTRAP · GRID` | vendor — `.container`, `.row`, `.col-*` |
+| `BOOTSTRAP · HELPERS` | vendor — `.ratio`, `.text-truncate`… |
+| `BLINK · TOKENS` | custom properties: colours, ink scale, accents |
+| `BLINK · BASE` | element defaults |
+| `BLINK · TYPE` | the type scale |
+| `BLINK · UI` | hairlines, buttons, pills, cursor, ticker |
+| `BLINK · LAYOUT` | the sections and their scenes — **most edits land here** |
+| `BLINK · STATIC` | lists, tables, footer, modal |
+| `BOOTSTRAP · UTILITIES` | vendor, generated, **all `!important`** |
 
-- **`$spacers` is Tailwind's numeric scale** (`1 = .25rem` … `12 = 3rem`), not
-  Bootstrap's stock 1–5.
+Search for the banner, then work inside that block. The header at the top of
+the file repeats this map.
+
+Four Bootstrap decisions are baked into the generated output and will look
+wrong without the explanation:
+
+- **`$spacers` used Tailwind's numeric scale** (`1 = .25rem` … `12 = 3rem`), not
+  Bootstrap's stock 1–5. So `.mt-7` is `1.75rem`.
 - **Breakpoints are Tailwind's** (sm 640 / md 768 / lg 1024).
-- **`$position-values` is extended with the spacing scale**, so `bottom-7`
-  works; stock Bootstrap only ships `0/50/100`.
+- **`$position-values` was extended with the spacing scale**, so `bottom-7`
+  exists; stock Bootstrap only ships `0/50/100`.
 - **The type scale is `.t-xl` … `.t-giant`**, deliberately not `.d-*`, which
   would read as Bootstrap's display utilities.
-- **The utilities API is imported last**, so utilities override component
-  classes. Put new component CSS in the partials, not below that import.
 
+**The utilities block is last and carries `!important`**, so it beats every
+component rule above it. Add component CSS in the `BLINK` blocks — anything
+written below that banner will be overridden by the next utility class someone
+puts in the markup.
+
+If you would rather have the Sass back, the partials are recoverable from git
+history; they were last present in the commit before "chore: drop the Node
+toolchain".
 ## What still needs real assets
 
 Marked in the UI so nothing reads as finished:

@@ -45,10 +45,14 @@ the `src` again, which is what stops playback rather than just hiding it.
 **Behind a firewall that blocks YouTube the modal is the only thing that
 breaks**; the rest of the page still runs with no network at all.
 
-It must be *served* (ES modules + `fetch` don't work from `file://`):
+It must be *served* — ES modules and `fetch` are both blocked on the `file://`
+origin, so opening `index.html` from disk gives you the page with no scroll
+story. **There is no server in the project any more** (see §3.5); anything that
+serves a directory works:
 
 ```bash
-node server.js      # → http://localhost:8080
+npx serve .                      # or: python3 -m http.server 8080
+node .claude/preview.js          # the zero-dependency one, kept for tooling
 ```
 
 ### Git
@@ -74,6 +78,40 @@ complete; there are no leftovers from either.
 3. **Next/React removed → plain static site** — user's client wants "normal
    html css js".
 4. **Unused files/exports/fonts pruned.**
+5. **Node toolchain removed** — see §3.5.
+
+### 3.5 · Why there is no SCSS and no `package.json`
+
+The client integrates this page into their own custom CMS and asked for HTML,
+CSS and JS only. Nothing Node-related ever ran in the browser — `server.js` was
+a local preview convenience and `package.json` existed only to run `sass` — so
+removing them changed nothing about what the page does. Deleted:
+`server.js`, `package.json`, `package-lock.json` and the whole of `scss/`.
+
+**`css/styles.css` is now the source and cannot be regenerated.** Before the
+delete it was verified byte-identical to a fresh compile of the partials, so no
+work was lost at the cut — but from here on, edits go into the compiled file by
+hand.
+
+Two things were done to make that survivable, and you should understand both
+before touching CSS:
+
+- **Sass strips `//` comments**, and the partials used those almost exclusively,
+  so only 5 of their comments made it into the output. The explanatory prose
+  that was in `scss/_layout.scss` is *gone from the CSS* — it is still in this
+  file and in git history, but not next to the rules it explains.
+- **Banner comments were added** to `styles.css` marking the ten blocks it is
+  built from (`BOOTSTRAP · REBOOT`, `BLINK · LAYOUT`, and so on), plus a header
+  repeating the map and the four Bootstrap conventions. Without them the file is
+  ~12k lines of undifferentiated output. Keep them accurate if you move things.
+
+The critical structural fact, unchanged from the SCSS: **the Bootstrap utilities
+block is last and every rule in it carries `!important`**, so it beats the
+component CSS above it. New component CSS goes in the `BLINK` blocks. Anything
+added below that banner will lose to the next utility class in the markup.
+
+The SCSS partials are recoverable from git history if the decision is reversed —
+they were last present in the commit before "chore: drop the Node toolchain".
 
 ### Decisions that will look odd without context
 
@@ -85,7 +123,7 @@ complete; there are no leftovers from either.
   stock Bootstrap only ships `0/50/100`.
 - **The type scale is `.t-xl` … `.t-giant`**, deliberately *not* `.d-*`, which
   would collide visually with Bootstrap's `d-*` display utilities.
-- **The utilities API is imported last** in `scss/main.scss`, so utilities
+- **The utilities API is last in the file** in `css/styles.css`, so utilities
   override component classes. New component CSS goes in the partials, never
   below that import.
 - **No Bootstrap JS.** Accordion, tabs, menu and video modal are hand-written
@@ -849,7 +887,7 @@ followed the cursor over the wire list no longer appears. It fails silently:
 return never fires and only the per-row loop comes up empty.
 
 Still in the tree and doing nothing: `.wire-thumb-wrap` in `index.html`, the
-`.wire-thumb*` rules in `scss/_layout.scss`, `initWireThumb` and its call in
+`.wire-thumb*` rules in `css/styles.css`, `initWireThumb` and its call in
 `main.js`. **Left alone deliberately** — the attributes came off in the user's
 own commit, so whether the feature goes or comes back is theirs to say. Either
 restore the two attributes on the four rows, or delete the handler, the markup
@@ -903,7 +941,7 @@ These cost a lot of time; they are about the tooling, not the site.
 
 - **The preview pane does not composite canvas/WebGL into screenshots.** DOM
   renders fine, canvases come out blank or black. To actually see a canvas
-  scene, temporarily add a POST endpoint to `server.js` that writes a PNG to
+  scene, temporarily add a POST endpoint to `.claude/preview.js` that writes a PNG to
   disk, capture frames into an offscreen grid canvas in the page, POST it, and
   read the file. Remove the endpoint afterwards.
 - **`requestAnimationFrame` throttles when the pane isn't painting.** In-pane
@@ -947,15 +985,16 @@ These cost a lot of time; they are about the tooling, not the site.
 - **`window.scrollTo` does not stick — Lenis owns the scroll position.** Use
   `window.__lenis.scrollTo(y, { immediate: true })`. `window.__ST` is
   ScrollTrigger. Both are dev-only handles.
-- **Rebuilding CSS:** `npm run css` (needs `npm install` for sass + bootstrap,
-  dev-only). `css/styles.css` is committed and ready to serve.
-  - A worktree has no `node_modules` of its own. Rather than installing a second
-    copy, compile with the main checkout's:
-    `node ../../../node_modules/sass/sass.js scss/main.scss css/styles.css --load-path=../../../node_modules --no-source-map`.
-    Bootstrap's own partials emit a wall of deprecation warnings; they are not
-    yours. Check `git diff --stat css/styles.css` afterwards — if the diff is
-    anything other than purely additive for what you changed, your sass version
-    disagrees with whatever built the committed file.
+- **There is no CSS build any more.** `css/styles.css` is hand-edited; see §3.5.
+  The old `npm run css` and the worktree `node ../../../node_modules/sass/...`
+  invocation are both gone along with `package.json` and `scss/`. If you find a
+  reference to either in an old note, it is stale.
+  - **Find the right block before you edit.** Grep for the banner comment
+    (`BLINK · LAYOUT` for the sections and scenes, which is where most edits go)
+    rather than scrolling ~12k lines.
+  - **Never add component CSS below the `BOOTSTRAP · UTILITIES` banner** — every
+    rule under it carries `!important` and will win. This was a property of the
+    SCSS import order and it survived into the compiled file unchanged.
 
 ---
 

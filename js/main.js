@@ -456,7 +456,28 @@ function setupLetters(scenes) {
  * The three pinned scenes. gsap.matchMedia rebuilds them when the breakpoint
  * flips and reverts the old set automatically.
  */
-function setupPins(scenes) {
+/**
+ * 04 / 05 / 08 · the three canvas scenes.
+ *
+ * These used to be pinned and scrub-driven: the section stuck to the viewport
+ * and the scene's progress was tied to scroll distance, which is exactly why
+ * each one had to be three-plus screens tall. The client asked for sections
+ * that read in a single screen, and for animation that runs with the flow
+ * rather than being dragged by the scrollbar. So each scene is one screen tall
+ * now and plays once, on its own clock, when it comes into view.
+ *
+ * The timelines keep their original relative positions - they were authored as
+ * 0..1 offsets because scrub normalised them - and are stretched to a real
+ * duration with timeScale.
+ *
+ * REST POINTS, and why they are not 1: progress 1 is an exit state in all
+ * three scenes (the platform slab turns edge-on, the press bursts into flying
+ * pages and flashes white). Under a scrub that was the handoff into the next
+ * section; played on entry it would leave the section looking blank. Each
+ * scene therefore rests at its last composed frame, a little past the single
+ * frame `reducedMotion` picks.
+ */
+function setupScenes(scenes) {
   const desk = q('#desk .pin-stage')
   const platform = q('#platform .pin-stage')
   const press = q('#press .pin-stage')
@@ -470,42 +491,60 @@ function setupPins(scenes) {
     return
   }
 
+  // the flash only ever existed to cover a pinned handoff
+  gsap.set(q('[data-press-flash]'), { opacity: 0 })
+
+  /** Stretches a timeline to `seconds` and plays it once, when `el` is seen. */
+  const playOnEnter = (el, tl, seconds) => {
+    const natural = tl.duration() || 1
+    tl.timeScale(natural / seconds)
+    let played = false
+    onInView(
+      el,
+      (inView) => {
+        if (!inView || played) return
+        played = true
+        tl.play()
+      },
+      '-12%'
+    )
+  }
+
+  /** Drives a scene from 0 to `rest` across the whole of `tl`. */
+  const driveScene = (tl, scene, rest) => {
+    if (!scene) return
+    const state = { p: 0 }
+    tl.to(
+      state,
+      {
+        p: rest,
+        duration: tl.duration() || 1,
+        ease: 'none',
+        onUpdate: () => scene.setProgress(state.p),
+      },
+      0
+    )
+  }
+
   const mm = gsap.matchMedia()
 
-  const build = (long, short) => (context) => {
+  mm.add({ isDesktop: '(min-width: 900px)', isMobile: '(max-width: 899px)' }, (context) => {
     const { isDesktop } = context.conditions
-    const len = isDesktop ? long : short
+    const beat = isDesktop ? 1 : 0.8 // phones get the same moves, a little quicker
 
     /* 04 · THE DESK */
     if (desk) {
-      ScrollTrigger.create({
-        trigger: desk,
-        start: 'top top',
-        end: `+=${len.desk}%`,
-        pin: true,
-        pinSpacing: true,
-        scrub: true,
-        anticipatePin: 1,
-        onUpdate: (self) => scenes.desk?.setProgress(self.progress),
-      })
+      const tl = gsap.timeline({ paused: true })
+      driveScene(tl, scenes.desk, 0.92)
+      playOnEnter(desk, tl, 4.2 * beat)
     }
 
     /* 05 · OUR PLATFORM */
     if (platform) {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: platform,
-          start: 'top top',
-          end: `+=${len.platform}%`,
-          pin: true,
-          scrub: true,
-          anticipatePin: 1,
-          onUpdate: (self) => scenes.platform?.setProgress(self.progress),
-        },
-      })
+      const tl = gsap.timeline({ paused: true })
       // the giant word slides against the run of the rail
-      tl.fromTo(q('[data-platform-word]'), { xPercent: 12 }, { xPercent: -46, ease: 'none' }, 0)
-      // each platform card unfolds off the rail in turn
+      tl.fromTo(q('[data-platform-word]'), { xPercent: 12 }, { xPercent: -46, ease: 'none', duration: 1.3 }, 0)
+      // each card unfolds off the rail in turn
       qq('[data-platform-card]').forEach((card, i) => {
         tl.fromTo(
           card,
@@ -514,61 +553,22 @@ function setupPins(scenes) {
           0.06 + i * 0.125
         )
       })
+      driveScene(tl, scenes.platform, 0.66)
+      playOnEnter(platform, tl, 4 * beat)
     }
 
     /* 08 · THE PRESS */
     if (press) {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: press,
-          start: 'top top',
-          end: `+=${len.press}%`,
-          pin: true,
-          scrub: true,
-          anticipatePin: 1,
-          onUpdate: (self) => scenes.press?.setProgress(self.progress),
-        },
-      })
+      const tl = gsap.timeline({ paused: true })
       const head = q('[data-press-head]')
       tl.fromTo(head, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5 }, 0.02)
-      tl.to(head, { scale: 0.82, opacity: 0.9, duration: 0.5 }, 0.5)
-      tl.to(head, { opacity: 0, duration: 0.22 }, 0.84)
-
       qq('[data-press-feature]').forEach((f, i) => {
-        tl.fromTo(
-          f,
-          { opacity: 0, y: 26 },
-          { opacity: 1, y: 0, ease: 'power2.out', duration: 0.34 },
-          0.5 + i * 0.06
-        )
-        tl.to(f, { opacity: 0, duration: 0.18 }, 0.86)
+        tl.fromTo(f, { opacity: 0, y: 26 }, { opacity: 1, y: 0, ease: 'power2.out', duration: 0.34 }, 0.5 + i * 0.06)
       })
-      // the pages flutter away and the page goes white
-      tl.fromTo(q('[data-press-flash]'), { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.12 }, 0.93)
+      driveScene(tl, scenes.press, 0.8)
+      playOnEnter(press, tl, 4 * beat)
     }
-  }
-
-  /*
-   * Pin lengths, as a percentage of viewport height.
-   *
-   * These were 500 / 650 / 650 on desktop, which put 16,128px — 53% of the
-   * whole page — into three canvas scenes, against 7,330px for all eight
-   * selling sections combined. The press scene alone took 5.7x the scroll of
-   * the pricing block. That ratio is what read as "graphics for the sake of
-   * adding": the scenes were not wrong, they were just given most of the page.
-   *
-   * Roughly 2x viewport each is enough to read a scene as a move with a
-   * beginning and an end. Shorter than ~150% and the choreography inside them
-   * genuinely does get clipped, so this is the floor, not a target to keep
-   * cutting towards.
-   */
-  mm.add(
-    { isDesktop: '(min-width: 900px)', isMobile: '(max-width: 899px)' },
-    build(
-      { desk: 200, platform: 220, press: 220 },
-      { desk: 130, platform: 150, press: 150 }
-    )
-  )
+  })
 }
 
 /**
@@ -619,7 +619,7 @@ function boot() {
 
   const scenes = mountScenes()
   setupHero()
-  setupPins(scenes)
+  setupScenes(scenes)
   setupLeaves()
   setupPipeline()
   setupSteps()

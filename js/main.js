@@ -428,12 +428,30 @@ function setupLetters(scenes) {
       groups.forEach((g) => g.words.forEach((w) => w.classList.add('is-dim')))
       const n = groups.length
       const state = { p: 0 }
-      gsap.to(state, {
+      /*
+       * Played on entry rather than scrubbed. The block used to be 3.28 screens
+       * tall, which gave the scrub room to run; now that it is one screen a
+       * scrub would finish almost the moment it started. The sequencing is
+       * unchanged - one value sliced four ways, so a letter cannot begin until
+       * the one before it has finished.
+       */
+      const tl = gsap.timeline({ paused: true })
+      tl.to(state, {
         p: 1,
+        duration: 5.6,
         ease: 'none',
         onUpdate: () => groups.forEach((g, i) => paint(g, seg(state.p, i / n, (i + 1) / n))),
-        scrollTrigger: { trigger: track, start: 'top 80%', end: 'bottom 90%', scrub: 0.4 },
       })
+      let played = false
+      onInView(
+        track,
+        (inView) => {
+          if (!inView || played) return
+          played = true
+          tl.play()
+        },
+        '-10%'
+      )
     }
   }
 

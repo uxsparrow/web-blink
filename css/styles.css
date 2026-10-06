@@ -3894,8 +3894,10 @@ html.lenis body {
   padding-inline: 1.25rem;
 }
 
+/* was clamp(2.4rem, 7vw, 7rem): three lines of that is 336px, a third of the
+   section, before a single letter had been read */
 .letters-head {
-  font-size: clamp(2.4rem, 7vw, 7rem);
+  font-size: clamp(2rem, 3.6vw, 3.6rem);
 }
 
 .result {
@@ -3925,24 +3927,71 @@ html.lenis body {
   border: 1px solid var(--edge);
 }
 
+/*
+ * The letters read as a 2x2 board, not a stack.
+ *
+ * Four full-width letters ran to 3.28 screens - the longest section on the
+ * page and the last one over a screen. The quotes were never the problem;
+ * they are about thirty words each. The height came from a 34ch measure and
+ * 5.25rem of padding per letter. Two columns, a wider measure and less
+ * padding fit all four on one screen with the sequential reveal intact.
+ */
 .letters-roll {
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
 .letter {
   position: relative;
-  padding: 2.5rem 0 2.75rem 2rem;
+  padding: 1.6rem 0 1.6rem 1.5rem;
 }
 .letter + .letter {
   border-top: 1px solid var(--hairline);
+}
+
+@media (min-width: 1024px) {
+  .letters-roll {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 3.5rem;
+  }
+
+  /* the grid separates the columns; only the second ROW wants a rule */
+  .letter + .letter {
+    border-top: 0;
+  }
+
+  /* the roll opens with a header; it spans the board rather than taking a cell */
+  .letters-roll > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* letters are children 2-5, so the second row starts at the fourth child */
+  .letters-roll .letter:nth-child(n + 4) {
+    border-top: 1px solid var(--hairline);
+  }
+
+  /* a cell is too narrow for the 3/9 split the markup asks for */
+  .letters-roll .letter .row > [class*="col-"] {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .letters-roll .letter__slug {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.75rem;
+    margin-bottom: 0.6rem;
+  }
 }
 
 .letter__rule {
   --read: 0;
   position: absolute;
   left: 0;
-  top: 2.5rem;
-  bottom: 2.75rem;
+  top: 1.6rem;
+  bottom: 1.6rem;
   width: 3px;
   background: var(--accent);
   transform: scaleY(var(--read));
@@ -3956,7 +4005,7 @@ html.lenis body {
 }
 
 .letter__num {
-  color: rgba(17, 17, 17, 0.3);
+  color: var(--ink-faint);
 }
 
 .letter__masthead {
@@ -3971,9 +4020,9 @@ html.lenis body {
 .letter__quote {
   font-family: var(--font-playfair), Georgia, serif;
   font-weight: 500;
-  font-size: clamp(1.15rem, 1.95vw, 1.8rem);
-  line-height: 1.42;
-  max-width: 34ch;
+  font-size: clamp(1rem, 1.08vw, 1.18rem);
+  line-height: 1.5;
+  max-width: 44ch;
 }
 
 @media (min-width: 1024px) {
@@ -3999,7 +4048,7 @@ html.lenis body {
 }
 
 .letter__by {
-  margin-top: 1.75rem;
+  margin-top: 0.9rem;
 }
 
 .letter__name {
@@ -4008,7 +4057,7 @@ html.lenis body {
 }
 
 .letter__role {
-  color: rgba(17, 17, 17, 0.45);
+  color: var(--ink-soft);
 }
 
 .tab-btn {
@@ -12102,4 +12151,57 @@ html.lenis body {
 .band-violet .live-dot,
 .band-violet [style*="--breaking"] {
   color: var(--blink-lift);
+}
+
+/*
+ * The case-study results, as a board of five rather than five full-width
+ * rows. They used to live inside 09 as stacked rows - 929px, which is what
+ * pushed that section to 3.28 screens. They are case studies, so they belong
+ * in 10, and at five across they cost one row instead of five.
+ */
+.results-grid .result {
+  padding: 1.1rem 1.15rem;
+}
+
+.results-grid .result__shot {
+  max-width: 42px;
+  margin-bottom: 0.7rem;
+}
+
+.results-grid .result__metric {
+  font-size: 1.45rem;
+}
+
+@media (min-width: 1024px) {
+  .results-grid {
+    display: grid;
+    /* minmax(0,1fr) not 1fr: a track defaults to min-content, so a long
+       label like "search discovery" widens its column and overflows the row */
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  /* a tile is too narrow for the 2/4/6 split the markup asks for */
+  .results-grid .result {
+    display: block;
+  }
+
+  .results-grid .result > [class*="col-"] {
+    width: 100%;
+    flex: none;
+    max-width: 100%;
+  }
+
+  /* metrics stack in a tile; side by side they wrap mid-label */
+  .results-grid .result .d-flex.flex-wrap {
+    display: block !important;
+  }
+
+  .results-grid .result .text-sm-end {
+    text-align: left !important;
+  }
+
+  .results-grid .result .text-sm-end + .text-sm-end {
+    margin-top: 0.45rem;
+  }
 }

@@ -263,8 +263,20 @@ function setupPipeline() {
   }
 
   stages.forEach((st, i) => {
+    const control = q('.pipe__pill', st)
+    control.tabIndex = 0
+    control.setAttribute('role', 'button')
+    control.setAttribute('aria-label', control.firstChild.textContent.trim())
     st.addEventListener('pointerenter', () => show(i))
     st.addEventListener('pointerleave', () => show(pinned))
+    control.addEventListener('focus', () => show(i))
+    st.addEventListener('click', () => { pinned = i; show(i) })
+    st.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return
+      event.preventDefault()
+      pinned = i
+      show(i)
+    })
   })
 
   // an edge pill lights the curve it owns
@@ -285,18 +297,8 @@ function setupPipeline() {
   window.addEventListener('resize', drawWires)
   ScrollTrigger.addEventListener('refreshInit', drawWires)
 
-  if (reducedMotion()) {
-    paint(1)
-    return
-  }
-
-  const state = { p: 0 }
-  gsap.to(state, {
-    p: 1,
-    ease: 'none',
-    onUpdate: () => paint(state.p),
-    scrollTrigger: { trigger: pipe, start: 'top 82%', end: 'bottom 72%', scrub: 0.5 },
-  })
+  paint(1)
+  show(0)
 }
 
 /**
@@ -496,107 +498,24 @@ function setupLetters(scenes) {
  * frame `reducedMotion` picks.
  */
 function setupScenes(scenes) {
-  const desk = q('#desk .pin-stage')
-  const platform = q('#platform .pin-stage')
-  const press = q('#press .pin-stage')
-
-  if (reducedMotion()) {
-    scenes.desk?.setProgress(0.74)
-    scenes.platform?.setProgress(0.5)
-    scenes.press?.setProgress(0.45)
-    gsap.set(qq('[data-platform-card]'), { opacity: 1, rotateX: 0, y: 0 })
-    gsap.set(qq('[data-press-feature]'), { opacity: 1, y: 0 })
-    return
-  }
-
-  // the flash only ever existed to cover a pinned handoff
+  // The illustrations remain, but information never waits for a scene to play.
+  scenes.platform?.setProgress(0.66)
+  scenes.press?.setProgress(0.8)
+  gsap.set(qq('[data-platform-card], [data-press-feature]'), { opacity: 1, y: 0, rotateX: 0 })
+  gsap.set(q('[data-press-head]'), { opacity: 1, y: 0 })
   gsap.set(q('[data-press-flash]'), { opacity: 0 })
-
-  /** Stretches a timeline to `seconds` and plays it once, when `el` is seen. */
-  const playOnEnter = (el, tl, seconds) => {
-    const natural = tl.duration() || 1
-    tl.timeScale(natural / seconds)
-    let played = false
-    onInView(
-      el,
-      (inView) => {
-        if (!inView || played) return
-        played = true
-        tl.play()
-      },
-      '-12%'
-    )
-  }
-
-  /** Drives a scene from 0 to `rest` across the whole of `tl`. */
-  const driveScene = (tl, scene, rest) => {
-    if (!scene) return
-    const state = { p: 0 }
-    tl.to(
-      state,
-      {
-        p: rest,
-        duration: tl.duration() || 1,
-        ease: 'none',
-        onUpdate: () => scene.setProgress(state.p),
-      },
-      0
-    )
-  }
-
-  const mm = gsap.matchMedia()
-
-  mm.add({ isDesktop: '(min-width: 900px)', isMobile: '(max-width: 899px)' }, (context) => {
-    const { isDesktop } = context.conditions
-    const beat = isDesktop ? 1 : 0.8 // phones get the same moves, a little quicker
-
-    /* 04 · THE DESK */
-    if (desk) {
-      const tl = gsap.timeline({ paused: true })
-      driveScene(tl, scenes.desk, 0.92)
-      playOnEnter(desk, tl, 4.2 * beat)
-    }
-
-    /* 05 · OUR PLATFORM */
-    if (platform) {
-      const tl = gsap.timeline({ paused: true })
-      // the giant word slides against the run of the rail
-      tl.fromTo(q('[data-platform-word]'), { xPercent: 12 }, { xPercent: -46, ease: 'none', duration: 1.3 }, 0)
-      // each card unfolds off the rail in turn
-      qq('[data-platform-card]').forEach((card, i) => {
-        tl.fromTo(
-          card,
-          { opacity: 0, y: 70, rotateX: -84 },
-          { opacity: 1, y: 0, rotateX: 0, ease: 'power3.out', duration: 0.6 },
-          0.06 + i * 0.125
-        )
-      })
-      driveScene(tl, scenes.platform, 0.66)
-      playOnEnter(platform, tl, 4 * beat)
-    }
-
-    /* 08 · THE PRESS */
-    if (press) {
-      const tl = gsap.timeline({ paused: true })
-      const head = q('[data-press-head]')
-      tl.fromTo(head, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5 }, 0.02)
-      qq('[data-press-feature]').forEach((f, i) => {
-        tl.fromTo(f, { opacity: 0, y: 26 }, { opacity: 1, y: 0, ease: 'power2.out', duration: 0.34 }, 0.5 + i * 0.06)
-      })
-      driveScene(tl, scenes.press, 0.8)
-      playOnEnter(press, tl, 4 * beat)
-    }
-  })
+  if (!scenes.desk) return
+  scenes.desk.setProgress(0.92)
+  if (reducedMotion()) return
+  let played = false
+  onInView(q('#desk'), visible => {
+    if (!visible || played) return
+    played = true
+    const state = { p: 0.35 }
+    gsap.to(state, { p: 0.92, duration: 1.6, ease: 'power2.out', onUpdate: () => scenes.desk.setProgress(state.p) })
+  }, '-10%')
 }
 
-/**
- * 14 · ON AIR — the background video.
- *
- * It is 4.4MB, so it carries no `src` until the section is close: the page's
- * whole point is that nothing heavy blocks first paint. It also never loads
- * under `prefers-reduced-motion`, and if it cannot play — no autoplay, a failed
- * fetch — the section keeps the flat #111 it has always had.
- */
 function setupOnAirVideo() {
   const video = q('[data-on-air-video]')
   if (!video || reducedMotion()) return
@@ -638,12 +557,10 @@ function boot() {
   const scenes = mountScenes()
   setupHero()
   setupScenes(scenes)
-  setupLeaves()
+  // Answers and prices are readable immediately; scrolling never gates copy.
   setupPipeline()
   setupSteps()
-  setupRates()
-  setupLive()
-  setupLetters(scenes)
+  scenes.signal?.setProgress(0.42)
 
   // pinned scenes change the document height as they initialise
   ScrollTrigger.refresh()

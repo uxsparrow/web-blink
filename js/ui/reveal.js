@@ -11,7 +11,7 @@ export function initReveals() {
     const inners = el.querySelectorAll('.line-inner')
     if (!inners.length) return
 
-    if (reduced) {
+    if (reduced || !el.closest('#hero')) {
       gsap.set(inners, { yPercent: 0, opacity: 1 })
       return
     }

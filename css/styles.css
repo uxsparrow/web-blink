@@ -2387,6 +2387,14 @@ progress {
 :root {
   /* dark surface; --ink below stays the colour of type */
   --night: #000000;
+  /*
+   * Muted type, three levels. The markup used to hardcode eleven different
+   * alphas of ink inline, which is why the sections stopped looking related.
+   * A band redefines these and every muted line on it follows.
+   */
+  --ink-muted: rgba(17, 17, 17, 0.66);
+  --ink-soft: rgba(17, 17, 17, 0.5);
+  --ink-faint: rgba(17, 17, 17, 0.34);
   --font-tomorrow: 'Tomorrow';
   --font-grotesk: 'Space Grotesk';
   --font-spacemono: 'Space Mono';
@@ -4591,6 +4599,66 @@ html.lenis body {
  */
 .band-night {
   background: var(--night);
+}
+
+.band-paper {
+  background: #fff;
+}
+
+.band-newsprint {
+  background: var(--newsprint);
+}
+
+/*
+ * The violet band. --ink names "the colour type takes on this surface", not
+ * black, so a band redefines the tokens once and every component inside it
+ * follows. Only values that were hardcoded rather than tokenised need naming
+ * individually below - that is the whole list, seven rules.
+ */
+/*
+ * Alphas here are solved, not picked: white on #6118ea reaches 4.5:1 only at
+ * alpha 0.728 and 3:1 at 0.533, so the muted levels sit above those. The
+ * hierarchy is compressed compared with the light bands - that is the real
+ * cost of a dark saturated brand colour, not something to tune away.
+ */
+.band-violet {
+  background: var(--blink);
+  --ink: #ffffff;
+  --grey-head: rgba(255, 255, 255, 0.62);
+  --hairline: rgba(255, 255, 255, 0.22);
+  --ink-muted: rgba(255, 255, 255, 0.92);
+  --ink-soft: rgba(255, 255, 255, 0.82);
+  --ink-faint: rgba(255, 255, 255, 0.74);
+  color: #fff;
+}
+
+.band-violet .leave-row__num,
+.band-violet .live-entry__num {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.band-violet .leave-row__copy,
+.band-violet .live-entry__body {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.band-violet .live-entry__plate {
+  border-color: rgba(255, 255, 255, 0.26);
+}
+
+.band-violet .live-card {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* the feed scrim has to fade to the band, not to black */
+.band-violet .live-feed__fade {
+  background: linear-gradient(180deg, rgba(97, 24, 234, 0) 0%, rgba(97, 24, 234, 0.65) 45%, #6118ea 100%);
+}
+
+/* halftone dots are ink on light surfaces; on violet they read as grime */
+.band-violet.tex-halftone::before {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.9) 0.5px, transparent 0.6px);
+  opacity: 0.07;
 }
 
 .hero {
@@ -12007,4 +12075,15 @@ html.lenis body {
   .d-print-none {
     display: none !important;
   }
+}
+
+/* the accent and the breaking red both disappear against violet */
+.band-violet .leave-row__tag {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+.band-violet .live-dot,
+.band-violet [style*="--breaking"] {
+  color: var(--blink-lift);
 }

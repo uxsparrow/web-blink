@@ -2385,6 +2385,8 @@ progress {
    scale, the accent (--blink) and the breaking red.
    ========================================================================== */
 :root {
+  /* dark surface; --ink below stays the colour of type */
+  --night: #000000;
   --font-tomorrow: 'Tomorrow';
   --font-grotesk: 'Space Grotesk';
   --font-spacemono: 'Space Mono';
@@ -2423,7 +2425,7 @@ progress {
    Element defaults: html, body, selection, focus rings, canvas reset.
    ========================================================================== */
 html {
-  background: #000;
+  background: var(--night);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -4444,7 +4446,7 @@ html.lenis body {
 }
 
 .preloader {
-  background: #000;
+  background: var(--night);
 }
 .preloader.is-leaving {
   animation: loader-out 1.5s 0.55s forwards;
@@ -4581,9 +4583,19 @@ html.lenis body {
   opacity: 0.6;
 }
 
+/*
+ * The dark band. Three sections used to hand-write three different darks -
+ * #000, #0a0810 and #111111 - which read as sloppiness rather than a system.
+ * They are one surface now. --night is deliberately separate from --ink, which
+ * stays the colour of type: a surface and an ink are different jobs.
+ */
+.band-night {
+  background: var(--night);
+}
+
 .hero {
   height: 240svh;
-  background: #000;
+  background: var(--night);
 }
 @media (prefers-reduced-motion: reduce) {
   .hero {

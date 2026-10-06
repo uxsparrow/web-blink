@@ -548,11 +548,25 @@ function setupPins(scenes) {
     }
   }
 
+  /*
+   * Pin lengths, as a percentage of viewport height.
+   *
+   * These were 500 / 650 / 650 on desktop, which put 16,128px — 53% of the
+   * whole page — into three canvas scenes, against 7,330px for all eight
+   * selling sections combined. The press scene alone took 5.7x the scroll of
+   * the pricing block. That ratio is what read as "graphics for the sake of
+   * adding": the scenes were not wrong, they were just given most of the page.
+   *
+   * Roughly 2x viewport each is enough to read a scene as a move with a
+   * beginning and an end. Shorter than ~150% and the choreography inside them
+   * genuinely does get clipped, so this is the floor, not a target to keep
+   * cutting towards.
+   */
   mm.add(
     { isDesktop: '(min-width: 900px)', isMobile: '(max-width: 899px)' },
     build(
-      { desk: 500, platform: 650, press: 650 },
-      { desk: 250, platform: 320, press: 320 }
+      { desk: 200, platform: 220, press: 220 },
+      { desk: 130, platform: 150, press: 150 }
     )
   )
 }

@@ -6445,7 +6445,24 @@ button:disabled,
   display: block;
   width: 100%;
   padding-inline: var(--ed-pad);
-  margin-top: clamp(10px, 2svh, 28px);
+  margin-top: clamp(16px, 3svh, 40px);
+}
+
+/*
+ * The hairline and the two end labels. Every section on this page is bracketed
+ * this way, and the sign-off was the one place a graphic sat on its own with
+ * nothing to hold it — which is most of why it read as a slab rather than as
+ * the end of an edition.
+ */
+.wordmark__rule {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 0 0 clamp(8px, 1.4svh, 18px);
+  padding-top: clamp(14px, 2.4svh, 28px);
+  border-top: 1px solid var(--glass-line);
+  color: var(--txt-3);
 }
 
 .wordmark svg {
@@ -6463,23 +6480,18 @@ button:disabled,
   fill: url(#wmGrad);
 }
 
-.wordmark__sweep {
+/*
+ * `.wordmark text` is one class and one type — it out-specifies a bare class,
+ * so this rule had no effect at all and the shine copy was painted in the
+ * solid brand gradient. A full second BLINKCMS then slid across the first at
+ * up to 100% opacity for most of every six-second cycle, which is the double
+ * wordmark in the footer. Matching the element as well settles it.
+ *
+ * The travel is gone with it: the band now moves along the gradient's own
+ * stops (see the SVG), so this copy never leaves the glyphs it belongs to.
+ */
+.wordmark text.wordmark__sweep {
   fill: url(#wmSweep);
-  animation: wm-sweep 6s ease-in-out infinite;
-}
-
-@keyframes wm-sweep {
-  0%, 100% {
-    transform: translateX(-60%);
-    opacity: 0;
-  }
-  45% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(60%);
-    opacity: 0;
-  }
 }
 
 .ed-footer__addr {
@@ -6841,6 +6853,16 @@ button:disabled,
   .rate--best,
   .chat__dots i {
     animation: none !important;
+  }
+
+  /*
+   * The wordmark's shine is SMIL on the gradient's stops, not a CSS
+   * animation, so the blanket reset above cannot reach it. Removing the copy
+   * that carries it is what stops the movement — the wordmark underneath is
+   * unaffected, because the shine was only ever laid over it.
+   */
+  .wordmark__sweep {
+    display: none;
   }
 
   .backvid {

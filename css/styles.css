@@ -2500,14 +2500,6 @@ html.lenis body {
   overflow: hidden;
 }
 
-@media (pointer: fine) {
-  [data-custom-cursor] body,
-  [data-custom-cursor] a,
-  [data-custom-cursor] button,
-  [data-custom-cursor] [data-cursor] {
-    cursor: none;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2598,10 +2590,16 @@ html.lenis body {
   color: transparent;
 }
 
+/*
+ * No `overflow: hidden` here any more. It clipped the hero headline — the
+ * display face has descenders and the lavender gradient is painted through
+ * `background-clip: text`, which trims a glyph tight to its outline, so a
+ * mask sized to the line box cut the bottom off. The line box is just a
+ * block now, with enough padding under it for the gradient to finish.
+ */
 .line-mask {
   display: block;
-  overflow: hidden;
-  padding-bottom: 0.06em;
+  padding-bottom: 0.08em;
 }
 
 .line-inner {
@@ -2964,36 +2962,6 @@ html.lenis body {
   margin-bottom: 2px;
 }
 
-/*
- * The cursor ring. It was red, and red is now reserved for the LIVE dot in
- * 06 and nothing else, so it reads in the brand lavender. Its second mode —
- * a halftone "finder" frame over the grayscale photos — went with the
- * photos; there is no image on the page for it to frame.
- */
-.cursor-root {
-  color: var(--blink-lift);
-}
-
-.cursor-ring {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 46px;
-  height: 46px;
-  max-width: none;
-  transform: translate(-50%, -50%);
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
-}
-
-.cursor-root[data-mode=hover] .cursor-ring {
-  transform: translate(-50%, -50%) scale(1.45);
-}
-
-.cursor-arc {
-  transform-origin: 23px 23px;
-  animation: spin-arc 2.6s linear infinite;
-}
-
 .preloader {
   background: #000;
 }
@@ -3033,11 +3001,34 @@ html.lenis body {
  * near-black there is nothing to invert against, so the switch, the second
  * logo and the ticker slot that rode along with them are all gone.
  */
+/*
+ * The bar has a background at every scroll position, not only once you have
+ * moved — at the top it was transparent and the hero's globe read straight
+ * through the logo. It darkens after 24px (`.is-scrolled`, set by
+ * initHeader) so content passing under it never shows through sharply.
+ */
 .site-header__bar {
-  background: rgba(10, 8, 18, 0.72);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--card-line);
+  background: rgba(6, 4, 14, 0.55);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--txt);
+  transition: background 0.2s linear;
+}
+
+.site-header.is-scrolled .site-header__bar {
+  background: rgba(6, 4, 14, 0.85);
+}
+
+/*
+ * A browser with no `backdrop-filter` gets a solid bar rather than a
+ * see-through one. Blur is the whole reason 55% is readable.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header__bar,
+  .site-header.is-scrolled .site-header__bar {
+    background: rgba(6, 4, 14, 0.94);
+  }
 }
 
 .site-header__menu {
@@ -3045,8 +3036,9 @@ html.lenis body {
   align-items: center;
 }
 
+/* solid, not translucent: the overlay has to stop the page behind it */
 .site-menu {
-  background: var(--edition-bg);
+  background: var(--bg);
   clip-path: inset(0% 0 100% 0);
   transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1);
   pointer-events: none;
@@ -3690,6 +3682,109 @@ body {
   display: block;
 }
 
+/* ── the media system ─────────────────────────────────────────── */
+/*
+ * One treatment for every picture on the page, real or dummy, so a client
+ * screenshot and a stand-in sit in the same world: desaturate, lift the
+ * contrast, drop the brightness, then lay brand purple over it in `color`
+ * blend mode. The duotone is on a wrapper rather than the image so the
+ * overlay can be a pseudo-element and the image underneath stays replaceable.
+ */
+.duo {
+  position: relative;
+  overflow: hidden;
+}
+
+.duo > img,
+.duo > video,
+.duo > .pxm {
+  filter: grayscale(1) contrast(1.1) brightness(0.8);
+}
+
+.duo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--blink);
+  mix-blend-mode: color;
+  opacity: 0.6;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/*
+ * The parallax mask. `overflow: hidden` IS allowed here — this is the one
+ * place it is, because the thing being clipped is a picture deliberately
+ * oversized to have somewhere to travel, not content that would otherwise be
+ * read. `--pxy` is scrubbed between -8% and 8% by initMediaParallax().
+ */
+.pxm {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.pxm img,
+.pxm video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.15) translateY(var(--pxy, 0%));
+  will-change: transform;
+}
+
+/*
+ * The poster under a video slot. It is not a fallback that appears on error —
+ * it is simply always there, and the video fades in over it if and when a
+ * file exists. A missing video is a still, not a broken state.
+ */
+/*
+ * A back-layer still sits at the same 30% the video does. At full strength a
+ * photograph behind a glass card wins every time — the card stops being
+ * readable and the section stops being about what it says.
+ */
+.layer-back .vidslot {
+  opacity: 0.25;
+}
+
+.layer-back .vidslot img {
+  filter: grayscale(1) contrast(1.05) brightness(0.55);
+}
+
+/* a scrim under the text column, so a headline never lands on a highlight.
+   A gradient, so it has no edge of its own. */
+.layer-back .vidslot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(6, 4, 14, 0.92) 0%, rgba(6, 4, 14, 0.4) 52%, rgba(6, 4, 14, 0.75) 100%);
+}
+
+.vidslot {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.vidslot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: slow-zoom 24s ease-in-out infinite alternate;
+}
+
+@keyframes slow-zoom {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.16);
+  }
+}
+
 /* a back-layer video: purple duotone, masked into the page, never a block */
 .backvid {
   position: absolute;
@@ -3712,17 +3807,23 @@ body {
 }
 
 /*
- * The fallback that makes a missing asset a non-event. It is always there,
- * under the video; the video fades in over it only once it can actually
- * play, so the placeholder paths in the brief can 404 all day and the
- * section still reads as designed.
+ * The purple light behind 05 and 12.
+ *
+ * It is a radial glow, and the whole element is masked away at its top and
+ * bottom quarters. Before, the gradients ran to the edge of the layer and the
+ * layer stopped at the section boundary, which drew a straight purple line
+ * across the page at each end — the hard-edged band the client flagged. The
+ * glow now fades into #06040E before it reaches either edge, so there is no
+ * line to see.
  */
-.backvid-fallback {
+.glow-layer {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 70% 30%, rgba(97, 24, 234, 0.3), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 108, 241, 0.16), transparent 70%);
+    radial-gradient(ellipse 62% 54% at 68% 34%, rgba(97, 24, 234, 0.34), transparent 72%),
+    radial-gradient(ellipse 54% 44% at 22% 78%, rgba(154, 108, 241, 0.2), transparent 72%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
 }
 
 /* ── the one entry reveal ─────────────────────────────────────── */
@@ -3742,20 +3843,41 @@ body {
   transition-delay: calc(var(--i, 0) * 80ms);
 }
 
-/* the hero's roll-up is the one exception, because the hero is unchanged */
+/*
+ * The hero headline. Its roll-up is the one entry animation that is not the
+ * shared one, because the hero's motion was never up for redesign.
+ *
+ * It runs ONCE, ON LOAD, and is keyed to `html.is-loaded` rather than to the
+ * section's `.is-in`. That is the fix for the headline coming back cut after
+ * a scroll down and up: `.is-in` is owned by an IntersectionObserver, so
+ * anything that re-evaluated it — a resize, a reload at mid-page, an observer
+ * firing late — could catch the title mid-transition or leave it at its
+ * start value, which is 112% down and behind the header. Nothing scroll-
+ * linked touches hero text now, and `initHeroIntro()` strips the inline
+ * styles once the transition has finished, so there is no state left to
+ * get back into.
+ */
 .js .hero-head .line-inner {
+  display: block;
   transform: translateY(112%);
   opacity: 0.25;
 }
 
-.js #hero.is-in .hero-head .line-inner {
+.js.is-loaded .hero-head .line-inner {
   transform: none;
   opacity: 1;
   transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.js #hero.is-in .hero-head .line-mask:nth-child(2) .line-inner {
+.js.is-loaded .hero-head .line-mask:nth-child(2) .line-inner {
   transition-delay: 0.085s;
+}
+
+/* once `initHeroIntro()` has cleared up, the headline is plain text again */
+.js.hero-done .hero-head .line-inner {
+  transform: none;
+  opacity: 1;
+  transition: none;
 }
 
 /* ══ 01 · THE NETWORK ═════════════════════════════════════════ */
@@ -3953,22 +4075,6 @@ body {
   opacity: 0;
 }
 
-/* the progress hairline that shows the 6s auto-advance */
-.monitor__time {
-  flex: none;
-  height: 1px;
-  background: var(--glass-line);
-  overflow: hidden;
-}
-
-.monitor__time i {
-  display: block;
-  height: 100%;
-  width: 100%;
-  background: var(--lavender);
-  transform-origin: left center;
-  transform: scaleX(var(--t, 0));
-}
 
 /* ══ 03 · THE PLATFORM — the bento grid ═══════════════════════ */
 .bento {
@@ -4043,305 +4149,6 @@ body {
   color: var(--txt-2);
   font-size: clamp(12px, 1.6svh, 15px);
   line-height: 1.3;
-}
-
-/* ══ 04 · THE FLOW ════════════════════════════════════════════ */
-.flow {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 2svh, 24px);
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.flow__stage {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.flow__stage svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.flow__ends {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(4px, 1svh, 12px);
-  pointer-events: none;
-}
-
-.flow__ends--in {
-  left: 0;
-  align-items: flex-start;
-}
-
-.flow__ends--out {
-  right: 0;
-  align-items: flex-end;
-}
-
-.flow__end {
-  display: flex;
-  align-items: center;
-  gap: 0.55em;
-  white-space: nowrap;
-  transition: color 0.4s;
-}
-
-.flow__end::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--lavender);
-  opacity: 0.4;
-  flex: none;
-  transition: opacity 0.4s, box-shadow 0.4s;
-}
-
-.flow__end.is-on {
-  color: var(--txt);
-}
-
-.flow__end.is-on::before {
-  opacity: 1;
-  box-shadow: 0 0 10px var(--blink-light);
-}
-
-.flow__steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(8px, 1.4svh, 16px);
-  flex: none;
-}
-
-.flow__step {
-  transition: border-color 0.4s, background 0.4s;
-}
-
-.flow__step.is-on {
-  border-color: var(--glass-line-hi);
-  background: rgba(97, 24, 234, 0.14);
-}
-
-.flow__step p {
-  color: var(--txt-2);
-  font-size: clamp(12px, 1.6svh, 15px);
-  line-height: 1.3;
-  margin-top: clamp(4px, 0.8svh, 8px);
-}
-
-/* ══ 05 · LIVE ════════════════════════════════════════════════ */
-.live {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  gap: clamp(8px, 1.6svh, 18px);
-  padding: clamp(14px, 2.4svh, 28px);
-  overflow: hidden;
-}
-
-.live__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1em;
-  flex: none;
-}
-
-.live__flag {
-  display: flex;
-  align-items: center;
-  gap: 0.7em;
-  color: var(--txt);
-}
-
-.live__readout {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5em;
-  flex: none;
-}
-
-.live__nodes {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.live__nodes canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.live__spark {
-  flex: none;
-  height: clamp(28px, 5svh, 56px);
-}
-
-.live__spark svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.live__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1em;
-  flex: none;
-}
-
-/* ══ 06 · HEAD TO HEAD ════════════════════════════════════════ */
-.vs {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  border-radius: var(--glass-radius);
-  border: 1px solid var(--glass-line);
-  --split: 50%;
-}
-
-.vs__side {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(6px, 1.2svh, 14px);
-  padding: clamp(12px, 2.2svh, 26px);
-}
-
-/* the left side is clipped to the divider; the right one sits under it */
-.vs__side--wp {
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.02);
-  clip-path: inset(0 calc(100% - var(--split)) 0 0);
-}
-
-.vs__side--blink {
-  z-index: 1;
-  background: radial-gradient(ellipse 80% 70% at 70% 50%, rgba(97, 24, 234, 0.22), transparent 70%);
-  align-items: flex-end;
-  text-align: right;
-}
-
-.vs__plugins {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  width: min(100%, 320px);
-  filter: grayscale(1);
-  opacity: 0.75;
-}
-
-.vs__plugin {
-  padding: 8px 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  text-align: center;
-  font-size: 11px;
-  color: rgba(245, 243, 255, 0.55);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.vs__core {
-  width: min(100%, 300px);
-  padding: clamp(10px, 1.8svh, 20px);
-  border-radius: 14px;
-  border: 1px solid var(--glass-line-hi);
-  background: rgba(97, 24, 234, 0.18);
-  text-align: center;
-  box-shadow: 0 0 46px rgba(97, 24, 234, 0.4);
-}
-
-.vs__handle {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--split);
-  width: 1px;
-  background: var(--lavender);
-  z-index: 3;
-  box-shadow: 0 0 16px var(--blink-light);
-}
-
-.vs__grip {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid var(--lavender);
-  background: rgba(10, 6, 24, 0.86);
-  display: grid;
-  place-items: center;
-  cursor: ew-resize;
-  color: var(--lavender);
-  font-size: 11px;
-}
-
-.vstable {
-  flex: none;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 clamp(8px, 1.6vw, 24px);
-}
-
-.vstable > * {
-  display: contents;
-}
-
-.vstable span {
-  padding-block: clamp(4px, 0.9svh, 9px);
-  border-top: 1px solid var(--glass-line);
-  font-size: clamp(12px, 1.6svh, 15px);
-  line-height: 1.25;
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  min-width: 0;
-}
-
-.vstable .vs-h {
-  border-top: 0;
-  color: var(--txt-3);
-}
-
-.vstable .vs-k {
-  color: var(--txt-2);
-}
-
-.vstable .vs-wp {
-  color: var(--txt-3);
-}
-
-.vstable .vs-bl {
-  color: var(--txt);
-}
-
-/* an unsourced cell is marked on screen, never quietly filled */
-.todo {
-  color: var(--live);
-  font-family: var(--font-spacemono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
 }
 
 /* ══ 07 · THE BEATS ═══════════════════════════════════════════ */
@@ -4441,7 +4248,9 @@ body {
   border-radius: 14px;
   border: 1px solid var(--glass-line);
   background: #0a0718;
-  overflow: hidden;
+  /* visible, so the metric chips can hang off the corners — the picture
+     inside is clipped by its own `.pxm` mask, not by this */
+  overflow: visible;
   transition: opacity 0.4s;
 }
 
@@ -4461,44 +4270,11 @@ body {
  * <img> if its file 404s, which is what lets the brief's placeholder asset
  * paths ship without a broken-image icon on the page.
  */
-/*
- * The drawn stand-in behind every <img> on the page.
- *
- * It is built from the same DNA as the real graphics — dot matrix, two purple
- * light sources, hairline rules — rather than being a grey box, because every
- * image here is a placeholder path the client has not filled yet and a flat
- * rectangle in a 70%-of-the-window graphic slot is exactly the emptiness this
- * pass exists to remove. When the files arrive the <img> covers it and none of
- * this is ever seen.
- */
-.shot__stub {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 55% 45% at 24% 26%, rgba(97, 24, 234, 0.42), transparent 70%),
-    radial-gradient(ellipse 45% 55% at 82% 76%, rgba(154, 108, 241, 0.26), transparent 70%),
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 9px),
-    radial-gradient(rgba(185, 166, 255, 0.4) 1px, transparent 1.2px) 0 0 / 14px 14px,
-    linear-gradient(180deg, #0b0718 0%, #080513 100%);
-}
-
-.shot__stub::after {
-  content: attr(data-stub);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--font-spacemono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: rgba(245, 243, 255, 0.35);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
 
 .shot__chip {
   position: absolute;
-  z-index: 2;
+  /* above the duotone overlay, which is z-index 1 on the frame */
+  z-index: 3;
 }
 
 /* the giant language glyph on the back layer */
@@ -5073,35 +4849,6 @@ body {
   background: var(--glass-bg);
 }
 
-/*
- * The wordmark, scaled to exactly the container width. `vw` cannot do it —
- * the container is capped at 1440px and padded, so a vw-sized wordmark either
- * overflows or leaves a gap at the sides. initWordmark() measures the element
- * and writes `--wm`, and this falls back to a sane vw if that never runs.
- */
-.wordmark {
-  display: block;
-  width: 100%;
-  font-size: var(--wm, 13vw);
-  line-height: 0.76;
-  letter-spacing: -0.03em;
-  white-space: nowrap;
-  background: linear-gradient(100deg, var(--lavender) 0%, var(--blink) 45%, var(--blink-light) 70%, var(--blink) 100%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: sweep 9s ease-in-out infinite;
-}
-
-@keyframes sweep {
-  0%, 100% {
-    background-position: 0% 0;
-  }
-  50% {
-    background-position: 100% 0;
-  }
-}
 
 /* ── the micro-UI animations ──────────────────────────────────── */
 /*
@@ -5553,6 +5300,857 @@ body {
   }
 }
 
+/* ── top-aligned sections ─────────────────────────────────────── */
+/*
+ * 02, 06 and 11 put a panel beside a list, and the panel used to run the full
+ * height of the section while the list stopped halfway — so the card was
+ * mostly empty and the two sides were visibly out of register. These three
+ * align both columns to the top and cap the panel at the height of the
+ * column beside it (and at 56svh), so the panel is only ever as tall as it
+ * has something to say.
+ */
+/*
+ * `flex: 0 1 auto` on the grid is the whole trick. Everywhere else the grid
+ * fills the section, so a panel beside a short list stretched to the full
+ * window and sat mostly empty. Here the grid is only as tall as its tallest
+ * child — the headline-and-list column — and the panel stretches to match it,
+ * capped at 56svh. Both columns start at the same top edge.
+ */
+.ed--top .ed__grid {
+  flex: 0 1 auto;
+  align-items: stretch;
+}
+
+.ed__col--top {
+  justify-content: flex-start;
+}
+
+.ed__gfx--top {
+  justify-content: flex-start;
+  max-height: 56svh;
+}
+
+.ed__gfx--top > * {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* 11's panel is auto-height — it is a conversation, not a chart */
+#faq .ed__gfx--top {
+  max-height: 48svh;
+}
+
+#faq .ed__gfx--top > * {
+  height: auto;
+  flex: 0 1 auto;
+}
+
+/*
+ * The 48svh cap comes off where it would do the opposite of its job. It
+ * exists to stop a short conversation stretching down a tall window; below
+ * lg the panel sits under the list and there is nothing to stretch into, and
+ * under 760px of window the exchange is simply taller than 48% of it — so
+ * capping there pushes the content out of the panel instead of containing it.
+ */
+@media (max-width: 1023.98px), (max-height: 760px) {
+  #faq .ed__gfx--top {
+    max-height: none;
+  }
+}
+
+/*
+ * Same reasoning for all three top-aligned sections once the layout stacks:
+ * the cap exists to stop a panel stretching down a tall column beside it, and
+ * below lg there is no column beside it. Keeping it there only squeezes the
+ * content out of the panel.
+ */
+@media (max-width: 1023.98px) {
+  .ed__gfx--top {
+    max-height: none;
+  }
+
+  .ed--top .ed__grid {
+    flex: 1 1 auto;
+  }
+
+  /*
+   * The chat's footer link goes once the layout stacks: the longest answer
+   * wraps to six lines on a 360px screen and the exchange runs past the
+   * window. The two quick-action chips directly above it carry the same two
+   * destinations, so nothing is actually lost.
+   */
+  .chat__more {
+    display: none;
+  }
+}
+
+/* ── the system cursor ────────────────────────────────────────── */
+/*
+ * The custom ring is gone. What is left is the thing it replaced: an arrow
+ * everywhere, a hand on anything that does something, a caret in inputs.
+ * Spelt out because several of the clickable things here are <span> and <g>
+ * elements, which get no pointer from the browser.
+ */
+a,
+button,
+summary,
+[role="tab"],
+.post,
+.rail__dot,
+.flow__node,
+.addons__chip,
+[data-cursor="hover"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: default;
+}
+
+/* ── 02 · the monitor, rebuilt ────────────────────────────────── */
+.monitor__legend {
+  display: flex;
+  gap: clamp(10px, 2vw, 22px);
+  flex: none;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--txt-2);
+}
+
+.legend__key {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.legend__key--bl {
+  background: var(--lavender);
+}
+
+.legend__key--wp {
+  background: var(--live);
+}
+
+/* the axes, drawn once and shared by every scene that has them */
+.axis path {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
+  fill: none;
+}
+
+.axis path.axis__grid {
+  stroke: rgba(255, 255, 255, 0.07);
+}
+
+.axis__t,
+.sv-label {
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  fill: var(--txt-3);
+  text-transform: uppercase;
+}
+
+.sv-label--on {
+  fill: var(--txt);
+}
+
+.sv-big {
+  font-family: var(--font-tomorrow), sans-serif;
+  font-size: 30px;
+  fill: #fff;
+}
+
+.sv-big--xl {
+  font-size: 56px;
+}
+
+.mon-tag--wp {
+  left: 60%;
+  top: 74%;
+  color: var(--live);
+}
+
+.mon-tag--bl {
+  right: 2%;
+  top: 4%;
+  color: var(--lavender);
+}
+
+/*
+ * One segment per question, filling over its six seconds. It replaces the
+ * single hairline, which said "something is advancing" without saying how far
+ * through the six it was or how many there were.
+ */
+.monitor__steps {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+
+.monitor__steps i {
+  flex: 1 1 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--glass-line);
+  overflow: hidden;
+}
+
+.monitor__steps i::after {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--lavender);
+  transform: scaleX(var(--t, 0));
+  transform-origin: left center;
+}
+
+.monitor__steps i.is-done::after {
+  transform: scaleX(1);
+  background: rgba(185, 166, 255, 0.45);
+}
+
+/* ── 04 · the flow, rebuilt as one SVG ────────────────────────── */
+/*
+ * Every chip, label, curve, node and the packet live in ONE viewBox. That is
+ * the whole fix for curves that started in empty space: before, the chips
+ * were HTML beside an SVG and the two drifted apart at any width the layout
+ * was not tuned for. Inside one coordinate system a curve cannot come unstuck
+ * from the node it is drawn to, at any screen size.
+ */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2svh, 24px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.flow__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.flow__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* one diagram or the other, never both — an SVG cannot reflow, so the
+   vertical version is a second viewBox rather than a CSS rearrangement */
+.flow__svg--v {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .flow__svg--h {
+    display: none;
+  }
+
+  .flow__svg--v {
+    display: block;
+  }
+}
+
+/* near-opaque, so a connector can never read through a label */
+.flow__chip rect {
+  fill: rgba(11, 9, 22, 0.94);
+  stroke: var(--glass-line);
+  stroke-width: 1;
+}
+
+.flow__chip text {
+  font-family: var(--font-grotesk), sans-serif;
+  font-size: 17px;
+  fill: var(--txt-2);
+  dominant-baseline: middle;
+}
+
+.flow__chip.is-on rect {
+  stroke: var(--glass-line-hi);
+  fill: rgba(97, 24, 234, 0.18);
+}
+
+.flow__chip.is-on text {
+  fill: var(--txt);
+}
+
+.flow__track {
+  stroke: rgba(185, 166, 255, 0.18);
+  stroke-width: 3;
+  fill: none;
+}
+
+.flow__lit {
+  stroke: var(--blink-light);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 7px rgba(154, 108, 241, 0.75));
+}
+
+.flow__node circle {
+  fill: #0b0916;
+  stroke: var(--glass-line);
+  stroke-width: 1.5;
+  transition: fill 0.3s, stroke 0.3s;
+}
+
+.flow__node .flow__num {
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 15px;
+  fill: var(--txt-3);
+  transition: fill 0.3s;
+}
+
+.flow__node .flow__cap {
+  font-family: var(--font-grotesk), sans-serif;
+  font-size: 18px;
+  fill: var(--txt-2);
+  transition: fill 0.3s;
+}
+
+.flow__node.is-on circle {
+  fill: rgba(97, 24, 234, 0.3);
+  stroke: var(--blink-light);
+}
+
+.flow__node.is-on .flow__num,
+.flow__node.is-on .flow__cap {
+  fill: var(--txt);
+}
+
+.flow__node:focus-visible circle {
+  stroke: var(--lavender);
+  outline: none;
+}
+
+.flow__packet {
+  fill: var(--blink);
+  stroke: var(--lavender);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 10px rgba(154, 108, 241, 0.9));
+}
+
+/* one panel, under whichever stage is lit */
+.flow__read {
+  flex: none;
+  min-height: clamp(52px, 8svh, 86px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+
+.flow__read.is-swapping {
+  opacity: 0;
+}
+
+.flow__read .meta {
+  color: var(--lavender);
+}
+
+.flow__read p {
+  font-size: clamp(14px, 2svh, 18px);
+  line-height: 1.3;
+  color: var(--txt-2);
+  max-width: 48ch;
+}
+
+/* ── 05 · the live card, rebuilt ──────────────────────────────── */
+.live__chart {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: clamp(70px, 14svh, 150px);
+}
+
+.live__chart svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.live__capname {
+  position: absolute;
+  right: 0;
+  top: 4px;
+}
+
+.live__servers {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  flex: none;
+}
+
+.live__rack {
+  display: flex;
+  gap: 4px;
+  flex: 1 1 auto;
+}
+
+.live__rack i {
+  flex: 1 1 0;
+  height: clamp(10px, 1.8svh, 18px);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  transition: background 0.4s, box-shadow 0.4s;
+}
+
+.live__rack i.is-on {
+  background: var(--blink-light);
+  box-shadow: 0 0 10px rgba(154, 108, 241, 0.7);
+}
+
+.live__mini {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1.6vw, 20px);
+  padding-top: clamp(8px, 1.6svh, 16px);
+  border-top: 1px solid var(--glass-line);
+  flex: none;
+}
+
+.live__mini b {
+  display: block;
+  font-size: clamp(16px, 2.6svh, 26px);
+  line-height: 1;
+}
+
+.live__mini .meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* ── 06 · the comparison, rebuilt ─────────────────────────────── */
+.vtabs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.vtabs button {
+  width: 100%;
+  text-align: left;
+  padding: clamp(7px, 1.4svh, 13px) clamp(10px, 1.6svh, 16px);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--txt-2);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.25s, background 0.25s, border-color 0.25s;
+}
+
+.vtabs button:hover {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+}
+
+.vtabs button[aria-selected="true"] {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+  background: rgba(97, 24, 234, 0.2);
+}
+
+.vs2 {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(12px, 2.2svh, 24px);
+  min-height: 0;
+}
+
+.vs2__head,
+.vs2__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(6px, 1.4vw, 20px);
+  align-items: center;
+}
+
+.vs2__head {
+  padding-bottom: clamp(6px, 1.2svh, 12px);
+  border-bottom: 1px solid var(--glass-line);
+  flex: none;
+}
+
+.vs2__head span:nth-child(2),
+.vs2__head span:nth-child(3),
+.vs2__row span:nth-child(2),
+.vs2__row span:nth-child(3) {
+  text-align: center;
+}
+
+.vs2__sub {
+  display: block;
+  opacity: 0.6;
+  letter-spacing: 0.08em;
+}
+
+/* the Blink column is lit; the WordPress one is simply not */
+.vs2__lit {
+  color: var(--txt);
+}
+
+.vs2__rows {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition: opacity 0.3s;
+}
+
+.vs2__rows.is-swapping {
+  opacity: 0;
+}
+
+.vs2__row {
+  padding-block: clamp(5px, 1.1svh, 11px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: clamp(12px, 1.7svh, 15px);
+  line-height: 1.25;
+}
+
+.vs2__row:last-child {
+  border-bottom: 0;
+}
+
+.vs2__row > span:first-child {
+  color: var(--txt-2);
+}
+
+/*
+ * The Blink cell carries the glow. The WordPress cross is muted grey, never
+ * red — red on this page means a live or alert state, and "this product does
+ * not ship that feature" is neither.
+ */
+.vs2__yes {
+  color: var(--blink-light);
+  font-size: 1.1em;
+  background: radial-gradient(ellipse 70% 120% at 50% 50%, rgba(97, 24, 234, 0.3), transparent 72%);
+  border-radius: 8px;
+}
+
+.vs2__no {
+  color: rgba(245, 243, 255, 0.3);
+}
+
+.vs2__note {
+  flex: none;
+  margin-top: clamp(8px, 1.6svh, 16px);
+  padding-top: clamp(8px, 1.6svh, 16px);
+  border-top: 1px solid var(--glass-line);
+  color: var(--txt-3);
+  font-size: clamp(12px, 1.6svh, 14px);
+  line-height: 1.35;
+}
+
+.vs2__src {
+  flex: none;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ── 09 · the rate card, rebuilt ──────────────────────────────── */
+/*
+ * `.rate__list` no longer has `margin-top: auto`. That is what put the big
+ * gap between the price and the features: the list was pushed to the bottom
+ * of whichever card was tallest. The features start under the price and the
+ * CTA takes the slack instead.
+ */
+.rate__name {
+  color: var(--txt-3);
+}
+
+.rate__limits {
+  color: var(--lavender);
+  padding-bottom: clamp(5px, 1svh, 10px);
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.rate__cta {
+  margin-top: auto;
+  justify-content: center;
+}
+
+.rate__all {
+  color: var(--txt-3);
+  text-align: center;
+  transition: color 0.25s;
+}
+
+.rate__all:hover {
+  color: var(--lavender);
+}
+
+.rates__note {
+  flex: none;
+  text-align: center;
+  color: var(--txt-3);
+  line-height: 1.5;
+}
+
+.addons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  flex: none;
+}
+
+.addons__chip {
+  position: relative;
+}
+
+.addons__pop {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: min(340px, 78vw);
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(10, 6, 24, 0.97);
+  border: 1px solid var(--glass-line-hi);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  color: var(--txt-2);
+  font-family: var(--font-grotesk), sans-serif;
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-transform: none;
+  white-space: normal;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 5;
+}
+
+.addons__pop b {
+  color: var(--txt);
+  font-weight: inherit;
+}
+
+.addons__chip:hover .addons__pop,
+.addons__chip:focus-visible .addons__pop {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── 11 · the chat, rebuilt ───────────────────────────────────── */
+.chat__ask {
+  align-self: flex-end;
+  max-width: 34ch;
+  padding: clamp(8px, 1.5svh, 14px) clamp(11px, 1.8svh, 17px);
+  border-radius: 16px 16px 4px 16px;
+  background: rgba(185, 166, 255, 0.16);
+  border: 1px solid rgba(185, 166, 255, 0.28);
+  color: var(--txt);
+  font-size: clamp(13px, 1.75svh, 16px);
+  line-height: 1.35;
+  text-align: right;
+  transition: opacity 0.2s;
+}
+
+.chat__reply {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  transition: opacity 0.3s;
+}
+
+/* the answer is smaller than the questions, not bigger — in the last build
+   it was the other way round and the list read as a caption for the panel */
+.chat__bubble {
+  max-width: 40ch;
+  padding: clamp(10px, 1.8svh, 18px) clamp(12px, 2svh, 20px);
+  border-radius: 16px 16px 16px 4px;
+  background: rgba(97, 24, 234, 0.16);
+  border: 1px solid var(--glass-line);
+  font-size: clamp(13px, 1.7svh, 16px);
+  line-height: 1.4;
+  color: var(--txt);
+}
+
+.chat__avatar--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 9px;
+}
+
+.chat__dots {
+  display: flex;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line);
+}
+
+.chat__dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lavender);
+  animation: typing 1.2s ease-in-out infinite;
+}
+
+.chat__dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat__dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* the typing indicator and the answer are never both on screen */
+.chat.is-typing .chat__reply,
+.chat.is-typing .chat__actions {
+  display: none;
+}
+
+.chat:not(.is-typing) .chat__dots {
+  display: none;
+}
+
+.chat__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 32px;
+}
+
+.chat__more {
+  margin-top: auto;
+  padding-top: clamp(8px, 1.6svh, 16px);
+  border-top: 1px solid var(--glass-line);
+  width: 100%;
+}
+
+/* ── 12 · the closing page ────────────────────────────────────── */
+.cta-contact {
+  color: var(--txt-3);
+}
+
+.cta-contact a:hover {
+  color: var(--lavender);
+}
+
+/*
+ * The publisher chips orbiting the globe — and only where there IS a globe.
+ * It is not mounted below 900px (one WebGL context is not worth it on a
+ * phone), and eight chips circling nothing collided with each other at that
+ * width anyway.
+ */
+.cta-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 899px) {
+  .cta-orbit {
+    display: none;
+  }
+}
+
+.cta-orbit span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: rgba(10, 6, 24, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--txt-2);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── 13 · the wordmark ────────────────────────────────────────── */
+/*
+ * SVG, not text scaled by JavaScript.
+ *
+ * An <svg> with a viewBox fills the width it is given exactly, at every size,
+ * before the webfont has loaded and without measuring anything — which is
+ * what "scale it to exactly the container width" actually needs. The previous
+ * version measured the rendered text and set a font-size from it, which was
+ * right only until the font swapped or the window moved. initWordmark() now
+ * does one thing: set the viewBox to the glyphs' own bounding box, once, so
+ * the type touches both edges with no side bearing left over.
+ */
+.wordmark {
+  display: block;
+  width: 100%;
+  padding-inline: var(--ed-pad);
+  margin-top: clamp(10px, 2svh, 28px);
+}
+
+.wordmark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wordmark text {
+  font-family: var(--font-tomorrow), "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 128px;
+  letter-spacing: -0.03em;
+  fill: url(#wmGrad);
+}
+
+.wordmark__sweep {
+  fill: url(#wmSweep);
+  animation: wm-sweep 6s ease-in-out infinite;
+}
+
+@keyframes wm-sweep {
+  0%, 100% {
+    transform: translateX(-60%);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(60%);
+    opacity: 0;
+  }
+}
+
+.ed-footer__addr {
+  color: var(--txt-2);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.45;
+  padding-block: 3px;
+  max-width: 28ch;
+}
+
 /* ── height breakpoints ───────────────────────────────────────── */
 /*
  * Progressive, not responsive. Each step removes the least important thing
@@ -5567,6 +6165,29 @@ body {
   .ed--cta .ed__sup {
     display: block;
   }
+
+  /*
+   * The wordmark is the full container width by design, so on a 1366×657
+   * window it is 287px of the footer on its own and everything else has to
+   * give way around it. Nothing is removed — the paddings just take their
+   * tightest setting.
+   */
+  .ed-footer {
+    padding-top: clamp(20px, 3svh, 72px);
+    padding-bottom: clamp(12px, 2svh, 32px);
+  }
+
+  .news {
+    padding-bottom: clamp(12px, 2svh, 40px);
+  }
+
+  .ed-footer__cols {
+    padding-block: clamp(12px, 2svh, 44px);
+  }
+
+  .ed-footer__base {
+    padding-block: clamp(8px, 1.6svh, 24px);
+  }
 }
 
 @media (max-height: 680px) {
@@ -5575,10 +6196,6 @@ body {
   }
 
   .ed__sup {
-    display: none;
-  }
-
-  .vstable span:nth-child(n + 7) {
     display: none;
   }
 }
@@ -5620,84 +6237,6 @@ body {
 
   .tile--lg {
     grid-column: span 2;
-  }
-
-  /*
-   * Stacked, not split. A draggable divider needs two readable halves and a
-   * 390px window has room for one — at 1023px and below the two stacks sit
-   * one above the other, WordPress first so the section still builds to the
-   * better answer, and the handle goes away with the thing it dragged.
-   */
-  .vs {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    --split: 100%;
-  }
-
-  .vs__side {
-    position: relative;
-    inset: auto;
-    clip-path: none;
-    align-items: flex-start;
-    text-align: left;
-    justify-content: center;
-  }
-
-  .vs__side--wp {
-    order: 1;
-    border-bottom: 1px solid var(--glass-line);
-  }
-
-  .vs__side--blink {
-    order: 2;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .vs__plugins,
-  .vs__core {
-    width: 100%;
-  }
-
-  .vs__core {
-    text-align: left;
-  }
-
-  .vs__handle {
-    display: none;
-  }
-
-  .vstable {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-
-  /*
-   * The header row's first cell is the empty one above the key column. On two
-   * columns it would take the WordPress slot and push both labels one cell
-   * along — which is exactly what it did — so it goes.
-   */
-  .vstable .vs-h:first-child {
-    display: none;
-  }
-
-  /* the key column is the row header on narrow screens */
-  .vstable .vs-k {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--glass-line);
-    padding-bottom: 0;
-    color: var(--txt-3);
-    font-size: 12px;
-  }
-
-  .vstable .vs-wp,
-  .vstable .vs-bl {
-    border-top: 0;
-    padding-top: 0;
-    align-items: flex-start;
-  }
-
-  .flow__ends {
-    display: none;
   }
 
   .wire {
@@ -5824,7 +6363,7 @@ body {
   }
 
   .js .is-in [data-in],
-  .js #hero.is-in .hero-head .line-inner {
+  .js.is-loaded .hero-head .line-inner {
     transition: opacity 0.4s;
   }
 

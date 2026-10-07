@@ -1,131 +1,107 @@
 /**
  * 05 · LIVE — the desk monitor.
  *
- * Three things on one panel: the concurrent-reader counter racing to 43,000,
- * auto-scaling nodes spawning as dots, and a latency sparkline. The first two
- * follow the scroll — scrub them and the reader is the one making the desk
- * scale, which is the point of the section — and the sparkline loops on its
- * own because latency does not care where anybody has scrolled to.
+ * Four things on one panel, all driven by the same scroll progress so they
+ * cannot drift apart: the counter climbing to 43,000, an area chart of
+ * readers over time, a dashed capacity line that steps up under it as the
+ * load rises, and twelve servers lighting in turn.
+ *
+ * Reading the section IS the load coming in. That is why these are scrubbed
+ * rather than looped — the reader scrolls and the desk fills up; they scroll
+ * back and it empties.
  */
 
-import { onScrub, clamp, reducedMotion } from '../lib/motion.js'
-import { fitCanvas, loop, token } from './dots.js'
+import { onScrub, clamp } from '../lib/motion.js'
 
 const PEAK = 43000
+const W = 420
+const H = 150
+const N = 48
+const RACKS = 12
+
+/** The load curve: a slow start, a steep results-night climb, then a plateau. */
+const load = (t) => {
+  if (t < 0.45) return 0.16 + 0.5 * t
+  if (t < 0.78) return 0.385 + 1.55 * (t - 0.45)
+  return 0.9 + 0.08 * (t - 0.78)
+}
 
 export function mountLive(root) {
   const countEl = root.querySelector('[data-live-count]')
-  const canvas = root.querySelector('[data-live-nodes]')
-  const spark = root.querySelector('[data-live-spark]')
+  const area = root.querySelector('[data-live-area]')
+  const line = root.querySelector('[data-live-line]')
+  const cap = root.querySelector('[data-live-cap]')
+  const rack = root.querySelector('[data-live-rack]')
 
-  /* ── the counter ───────────────────────────────────────────── */
-  /*
-   * This deliberately overrides the shared `[data-count-to]` plumbing for
-   * this one figure: everywhere else a count-up fires once on entry, but here
-   * the number IS the scroll position — the desk fills up as you arrive and
-   * empties as you leave.
-   */
-  if (countEl) {
-    const write = (n) => {
-      countEl.textContent = Math.round(n).toLocaleString('en-IN')
+  /* twelve server blocks, built here so the markup stays a single element */
+  const blocks = []
+  if (rack) {
+    for (let i = 0; i < RACKS; i++) {
+      const b = document.createElement('i')
+      rack.appendChild(b)
+      blocks.push(b)
     }
-    write(PEAK)
-    onScrub(
-      root.closest('.ed') || root,
-      (p) => write(PEAK * clamp(p * 1.6)),
-      { start: 'top 85%', end: 'center center', scrub: 0.4 }
-    )
   }
 
-  /* ── the auto-scaling nodes ────────────────────────────────── */
-  if (canvas) {
-    const colour = token('--dot', 'rgba(185,166,255,.45)')
-    const c = fitCanvas(canvas)
-    let fill = 1
+  const px = (i) => (i / (N - 1)) * W
+  const py = (v) => H - 6 - v * (H - 22)
 
-    // a fixed lattice, so nodes appear in a readable order rather than at random
-    const nodes = []
-    for (let i = 0; i < 72; i++) {
-      nodes.push({
-        gx: i % 12,
-        gy: Math.floor(i / 12),
-        // the order they spawn in: left to right, with a little scatter
-        at: (i % 12) / 12 + Math.random() * 0.18,
-        ph: Math.random() * Math.PI * 2,
-      })
+  const draw = (p) => {
+    // how much of the series has arrived
+    const shown = clamp(p * 1.25)
+    const peak = load(shown)
+
+    if (countEl) countEl.textContent = Math.round(PEAK * peak).toLocaleString('en-IN')
+
+    /* the readers curve, drawn only as far as the scroll has brought it */
+    const pts = []
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1)
+      if (t > shown) break
+      // a little jitter so it reads as measured rather than plotted
+      const v = load(t) * (0.97 + 0.03 * Math.sin(i * 1.7))
+      pts.push([px(i), py(v)])
     }
-
-    loop(canvas, (t) => {
-      const { ctx, w, h } = c
-      if (!w) return
-      ctx.clearRect(0, 0, w, h)
-      const cw = w / 12
-      const ch = h / 6
-
-      for (const n of nodes) {
-        const on = fill > n.at
-        const x = cw * (n.gx + 0.5)
-        const y = ch * (n.gy + 0.5)
-        if (!on) {
-          ctx.fillStyle = 'rgba(255,255,255,.07)'
-          ctx.beginPath()
-          ctx.arc(x, y, 1.6, 0, Math.PI * 2)
-          ctx.fill()
-          continue
-        }
-        const pulse = 0.65 + 0.35 * Math.sin(t * 2 + n.ph)
-        ctx.fillStyle = colour
-        ctx.globalAlpha = 0.35 + 0.5 * pulse
-        ctx.beginPath()
-        ctx.arc(x, y, 2 + pulse * 1.1, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      ctx.globalAlpha = 1
-    })
-
-    onScrub(
-      root.closest('.ed') || root,
-      (p) => {
-        fill = clamp(p * 1.6)
-      },
-      { start: 'top 85%', end: 'center center', scrub: 0.4 }
-    )
-  }
-
-  /* ── the latency sparkline ─────────────────────────────────── */
-  if (spark) {
-    const W = 400
-    const H = 60
-    const N = 56
-    const series = Array.from({ length: N }, () => 0.5)
-
-    const paint = () => {
-      const d = series
-        .map((v, i) => {
-          const x = (i / (N - 1)) * W
-          const y = H - 6 - v * (H - 14)
-          return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`
-        })
-        .join(' ')
-      spark.setAttribute('d', d)
-    }
-
-    if (reducedMotion()) {
-      series.forEach((_, i) => (series[i] = 0.42 + 0.08 * Math.sin(i / 4)))
-      paint()
+    if (pts.length > 1) {
+      const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
+      line?.setAttribute('d', d)
+      area?.setAttribute('d', `${d} L${pts[pts.length - 1][0].toFixed(1)} ${H} L0 ${H} Z`)
     } else {
-      let last = 0
-      loop(spark, (t) => {
-        // one sample every ~90ms, not one per frame: a sparkline that
-        // redraws at 60Hz reads as noise rather than as a trace
-        if (t - last < 0.09) return
-        last = t
-        series.shift()
-        series.push(0.38 + Math.random() * 0.2 + (Math.random() < 0.06 ? 0.22 : 0))
-        paint()
-      })
+      line?.setAttribute('d', '')
+      area?.setAttribute('d', '')
     }
+
+    /*
+     * Capacity, as a staircase above the load. This is the auto-scaling: it
+     * does not rise smoothly with demand, it jumps a step ahead of it and
+     * waits there, which is what the section is claiming.
+     */
+    if (cap) {
+      const steps = []
+      let last = -1
+      for (let i = 0; i < N; i++) {
+        const t = i / (N - 1)
+        const want = Math.min(1, Math.ceil((load(Math.min(t, shown)) + 0.1) * 4) / 4)
+        if (want !== last) {
+          if (last >= 0) steps.push(`L${px(i).toFixed(1)} ${py(last).toFixed(1)}`)
+          steps.push(`${steps.length ? 'L' : 'M'}${px(i).toFixed(1)} ${py(want).toFixed(1)}`)
+          last = want
+        }
+      }
+      steps.push(`L${W} ${py(last).toFixed(1)}`)
+      cap.setAttribute('d', steps.join(' '))
+    }
+
+    // one server per 1/12 of the load
+    blocks.forEach((b, i) => b.classList.toggle('is-on', peak > (i + 0.5) / RACKS))
   }
 
-  return null
+  draw(1)
+  onScrub(root.closest('.ed') || root, draw, {
+    start: 'top 90%',
+    end: 'center center',
+    scrub: 0.4,
+  })
+
+  return { draw }
 }

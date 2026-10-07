@@ -276,21 +276,6 @@
     </symbol>
   </svg>
 
-  <!-- ═══ custom cursor ═══════════════════════════════════════════ -->
-  <!-- Lavender, not red: red is the LIVE dot in 06 and nothing else. The
-       second "finder" frame it used to swap to belonged to the grayscale
-       halftone photos, which this page no longer has. -->
-  <div class="cursor-root pe-none position-fixed start-0 top-0 z-cursor" data-cursor-root aria-hidden="true" hidden>
-    <svg class="cursor-ring" width="46" height="46" viewBox="0 0 46 46">
-      <circle cx="23" cy="23" r="16" fill="none" stroke="currentColor" stroke-opacity=".28" stroke-width="1" />
-      <g class="cursor-arc">
-        <path d="M23 5.5 A17.5 17.5 0 0 1 40.5 23" fill="none" stroke="currentColor" stroke-width="1.3"
-          stroke-linecap="round" />
-      </g>
-      <circle cx="23" cy="23" r="2.6" fill="currentColor" />
-    </svg>
-  </div>
-
   <!-- ═══ header ══════════════════════════════════════════════════ -->
   <header class="site-header position-fixed start-0 top-0 w-100 z-header" data-header>
     <div class="site-header__bar">
@@ -452,21 +437,25 @@
     -->
 
     <!-- ═══ 01 · THE NETWORK ════════════════════════════════════════ -->
+    <!--
+      The map is the official boundary of India per the Survey of India —
+      Jammu & Kashmir, Ladakh and the island territories included — from
+      data/india-boundary.json, not from the Natural Earth file the globe
+      uses, which draws India without them. A map published in India has to
+      show the official boundary. See tools/build-india-map.js for where the
+      data came from and what was done to it.
+    -->
     <section id="network" class="ed ed--a" data-label="THE NETWORK">
       <div class="ed__shell">
         <div class="ed__grid">
           <div class="ed__col">
             <div class="ed__head">
               <span class="mono ed__label" data-in style="--i:0">01 — THE NETWORK</span>
-              <h2 class="display ed__h2" data-in style="--i:1">Powering <span class="head-lilac">66+
+              <h2 class="display ed__h2" data-in style="--i:1">Powering <span class="head-lilac">150+
                   newsrooms.</span></h2>
             </div>
 
             <div class="stats" data-in style="--i:2">
-              <div class="glass glass--pad glass--hover">
-                <span class="figure figure--sm" data-count-to="66" data-suffix="+">66+</span>
-                <span class="meta stat__label">newsrooms powered</span>
-              </div>
               <div class="glass glass--pad glass--hover">
                 <span class="figure figure--sm" data-count-to="43" data-suffix="K">43K</span>
                 <span class="meta stat__label">concurrent readers</span>
@@ -476,19 +465,16 @@
                 <span class="meta stat__label">fact-checking sites</span>
               </div>
               <div class="glass glass--pad glass--hover">
-                <span class="figure figure--sm" data-count-to="396" data-suffix="%">396%</span>
-                <span class="meta stat__label">faster page loads</span>
+                <span class="figure figure--sm" data-count-to="200" data-suffix="%">200%</span>
+                <span class="meta stat__label">increase in SEO reach</span>
+              </div>
+              <div class="glass glass--pad glass--hover">
+                <span class="figure figure--sm" data-count-to="30" data-suffix="%">30%</span>
+                <span class="meta stat__label">lower newsroom costs</span>
               </div>
             </div>
           </div>
 
-          <!--
-            The map. Same dot style as the hero globe — this is the first and
-            loudest statement of the shared DNA, which is why it is section 01.
-            Canvas 2D rather than a second WebGL context: it is a flat map, the
-            globe already owns the one renderer, and a 2D canvas costs nothing
-            on the phones most of this traffic is on.
-          -->
           <div class="ed__gfx ed__gfx--bleed ed__fade">
             <div class="net" data-net data-in style="--i:1">
               <canvas data-net-canvas></canvas>
@@ -497,47 +483,25 @@
           </div>
         </div>
 
+        <!-- two rows, opposite directions, 80px fade at both edges -->
         <div class="logos" data-in style="--i:3" aria-label="Publishers using Blink CMS">
-          <div class="marquee" data-marquee>
-            <div class="marquee-track">
-              <span class="display">Daily Thanthi</span>
-              <span class="display">The Hans India</span>
-              <span class="display">LiveLaw</span>
-              <span class="display">The Federal</span>
-              <span class="display">Madhyamam</span>
-              <span class="display">TV5 Telugu</span>
-              <span class="display">Deccan Chronicle</span>
-              <span class="display">The Asian Age</span>
-            </div>
-          </div>
-          <div class="marquee logos--rev" data-marquee>
-            <div class="marquee-track">
-              <span class="display">MediaOne</span>
-              <span class="display">Maalaimalar</span>
-              <span class="display">Bhaskar Hindi</span>
-              <span class="display">The Assam Tribune</span>
-              <span class="display">Millennium Post</span>
-              <span class="display">Medical Dialogues</span>
-              <span class="display">Tupaki</span>
-              <span class="display">BOOM</span>
-            </div>
-          </div>
+          <div class="marquee" data-marquee data-logos="0"></div>
+          <div class="marquee logos--rev" data-marquee data-logos="1"></div>
         </div>
       </div>
     </section>
 
     <!-- ═══ 02 · THE PROBLEM ════════════════════════════════════════ -->
     <!--
-      Two columns, not three. Each question plays its own scene on the
-      monitor; the monitor auto-advances every 6s while it is on screen and
-      stops the moment anyone points at it or picks a question. The scenes are
-      inline SVG so they animate with CSS and GSAP rather than a canvas loop
-      per scene.
+      The monitor is capped at the height of the column beside it and at
+      56svh, and both columns are top-aligned — it used to run the full height
+      of the section while the question list stopped halfway, which left the
+      card mostly empty and the two sides visibly out of register.
     -->
-    <section id="problem" class="ed ed--a" data-label="THE PROBLEM">
+    <section id="problem" class="ed ed--a ed--top" data-label="THE PROBLEM">
       <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__col">
+          <div class="ed__col ed__col--top">
             <div class="ed__head">
               <span class="mono ed__label" data-in style="--i:0">02 — THE PROBLEM</span>
               <h2 class="display ed__h2" data-in style="--i:1">Why newsrooms <span class="head-lilac">leave
@@ -546,30 +510,28 @@
 
             <div class="qlist" role="tablist" aria-label="Why newsrooms leave WordPress" data-in style="--i:2">
               <button class="qlist__q" type="button" role="tab" aria-selected="true" aria-controls="monitor"
-                data-scene="spike" data-cap="Auto-scales on AWS. Zero downtime at 43K concurrent readers."><i>01</i>Will
-                it hold on results night?</button>
+                data-cap="Auto-scales on AWS. 43K concurrent readers, zero downtime."><i>01</i>Will it hold on results
+                night?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
-                data-scene="vendors" data-cap="One platform. CMS, apps, paywall, ads and analytics together."><i>02</i>How
-                many vendors is that?</button>
+                data-cap="One. CMS, apps, paywall, ads and analytics together."><i>02</i>How many vendors is
+                that?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
-                data-scene="rank" data-cap="Google News setup and AI-SEO scoring on every story."><i>03</i>What happens
-                to our rankings?</button>
+                data-cap="Advanced SEO module, Google News setup and webmaster support."><i>03</i>What happens to our
+                rankings?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
-                data-scene="bill" data-cap="No. You pay for features, not traffic."><i>04</i>Does the bill grow with
-                traffic?</button>
+                data-cap="No. We bill by features, not traffic."><i>04</i>Does the bill grow with traffic?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
-                data-scene="night" data-cap="The extended tech team behind 66+ newsrooms. No ticket queues."><i>05</i>Who
-                fixes it at 2 a.m.?</button>
+                data-cap="Your extended tech team. Webmaster monitoring and resolution."><i>05</i>Who fixes it at 2
+                a.m.?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
-                data-scene="speed" data-cap="396% faster. 1.5s on a Tamil daily at 20× traffic."><i>06</i>How fast do
-                pages have to be?</button>
+                data-cap="Daily Thanthi loads in 1.5s."><i>06</i>How fast do pages have to be?</button>
             </div>
 
             <a class="mono ed__link ed__link--overflow" href="#faq">All six, in the F.A.Q <span
                 aria-hidden="true">→</span></a>
           </div>
 
-          <div class="ed__gfx">
+          <div class="ed__gfx ed__gfx--top">
             <div class="glass monitor" id="monitor" role="tabpanel" data-monitor data-in style="--i:1">
               <div class="monitor__bar">
                 <span class="meta" style="color:var(--txt)"><span class="sig"
@@ -577,119 +539,128 @@
                 <span class="meta">NOIDA · 14:32 IST</span>
               </div>
 
+              <div class="monitor__legend">
+                <span class="meta legend"><i class="legend__key legend__key--bl"></i>Blink CMS</span>
+                <span class="meta legend"><i class="legend__key legend__key--wp"></i>WordPress</span>
+              </div>
+
               <div class="monitor__stage" data-monitor-stage>
-                <!-- 1 · the traffic graph: WordPress breaks, Blink holds -->
+                <!-- 1 · results night: WordPress breaks, Blink holds at 43K -->
                 <div class="monitor__scene is-on" data-scene="spike">
-                  <svg viewBox="0 0 400 200" fill="none" preserveAspectRatio="none">
-                    <g stroke="rgba(255,255,255,.07)">
-                      <path d="M0 50h400M0 100h400M0 150h400" />
+                  <svg viewBox="0 0 420 220" fill="none">
+                    <g class="axis">
+                      <path d="M46 20V186M46 186H404" />
+                      <path class="axis__grid" d="M46 20H404M46 103H404" />
                     </g>
+                    <text class="axis__t" x="40" y="24" text-anchor="end">40K</text>
+                    <text class="axis__t" x="40" y="107" text-anchor="end">20K</text>
+                    <text class="axis__t" x="40" y="190" text-anchor="end">0</text>
+                    <text class="axis__t axis__t--rot" x="14" y="103" text-anchor="middle"
+                      transform="rotate(-90 14 103)">Concurrent readers</text>
+                    <text class="axis__t" x="46" y="204">20:00</text>
+                    <text class="axis__t" x="225" y="204" text-anchor="middle">21:30</text>
+                    <text class="axis__t" x="404" y="204" text-anchor="end">23:00</text>
+
                     <path class="mon-line mon-line--wp"
-                      d="M0 170 L60 164 L110 150 L150 120 L175 70 L190 40 L196 96 L200 30 L204 120 L208 44 L214 150 L220 60 L226 160" />
+                      d="M46 182 L110 172 L160 150 L200 104 L228 62 L244 96 L252 44 L262 120 L272 150 L286 178" />
                     <path class="mon-line mon-line--bl"
-                      d="M0 172 L60 166 L110 152 L150 122 L185 70 L220 44 L260 34 L320 30 L400 28" />
-                    <circle class="mon-break" cx="226" cy="160" r="4" fill="var(--live)" />
-                    <circle class="mon-hold" cx="400" cy="28" r="4" fill="var(--lavender)" />
+                      d="M46 183 L110 174 L160 152 L210 100 L260 52 L310 30 L360 24 L404 22" />
+                    <circle class="mon-break" cx="286" cy="178" r="4" fill="var(--live)" />
+                    <circle class="mon-hold" cx="404" cy="22" r="4" fill="var(--lavender)" />
                   </svg>
-                  <span class="meta mon-tag mon-tag--wp">WORDPRESS</span>
-                  <span class="meta mon-tag mon-tag--bl">BLINK · 43K HELD</span>
+                  <span class="meta mon-tag mon-tag--wp">DOWN</span>
+                  <span class="meta mon-tag mon-tag--bl">43K · ZERO DOWNTIME</span>
                 </div>
 
                 <!-- 2 · five vendors pull into one core -->
                 <div class="monitor__scene" data-scene="vendors">
-                  <svg viewBox="0 0 400 200" fill="none">
+                  <svg viewBox="0 0 420 220" fill="none">
                     <g class="mon-wires" stroke="var(--wire)">
-                      <path d="M70 40 C140 70 160 90 200 100" />
-                      <path d="M330 40 C260 70 240 90 200 100" />
-                      <path d="M50 160 C130 140 160 115 200 100" />
-                      <path d="M350 160 C270 140 240 115 200 100" />
-                      <path d="M200 18 C200 50 200 70 200 100" />
+                      <path d="M74 46 C150 78 170 96 210 110" />
+                      <path d="M346 46 C270 78 250 96 210 110" />
+                      <path d="M54 176 C140 154 170 126 210 110" />
+                      <path d="M366 176 C280 154 250 126 210 110" />
+                      <path d="M210 24 C210 56 210 78 210 110" />
                     </g>
-                    <g class="mon-nodes" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="rgba(245,243,255,.55)" text-anchor="middle">
-                      <text x="70" y="36">CMS</text>
-                      <text x="330" y="36">APPS</text>
-                      <text x="50" y="172">PAYWALL</text>
-                      <text x="350" y="172">ADS</text>
-                      <text x="200" y="14">ANALYTICS</text>
+                    <g class="mon-nodes sv-label" text-anchor="middle">
+                      <text x="74" y="40">CMS</text>
+                      <text x="346" y="40">APPS</text>
+                      <text x="54" y="190">PAYWALL</text>
+                      <text x="366" y="190">ADS</text>
+                      <text x="210" y="18">ANALYTICS</text>
                     </g>
-                    <circle class="mon-core" cx="200" cy="100" r="26" fill="rgba(97,24,234,.3)"
+                    <circle class="mon-core" cx="210" cy="110" r="30" fill="rgba(97,24,234,.32)"
                       stroke="var(--blink-light)" />
-                    <text class="mon-core-t" x="200" y="104" font-family="var(--font-spacemono), monospace"
-                      font-size="9" fill="#fff" text-anchor="middle">BLINK</text>
+                    <text class="mon-core-t sv-label sv-label--on" x="210" y="114"
+                      text-anchor="middle">BLINK</text>
                   </svg>
                 </div>
 
-                <!-- 3 · a story climbs to #1, the AI-SEO ring fills -->
+                <!-- 3 · a story climbs to #1, the SEO ring fills -->
                 <div class="monitor__scene" data-scene="rank">
-                  <svg viewBox="0 0 400 200" fill="none">
-                    <g class="mon-rows">
-                      <rect x="10" y="22" width="230" height="10" rx="5" fill="rgba(255,255,255,.1)" />
-                      <rect x="10" y="52" width="200" height="10" rx="5" fill="rgba(255,255,255,.1)" />
-                      <rect x="10" y="82" width="215" height="10" rx="5" fill="rgba(255,255,255,.1)" />
-                      <rect x="10" y="112" width="190" height="10" rx="5" fill="rgba(255,255,255,.1)" />
+                  <svg viewBox="0 0 420 220" fill="none">
+                    <g>
+                      <rect x="20" y="30" width="230" height="11" rx="5.5" fill="rgba(255,255,255,.1)" />
+                      <rect x="20" y="64" width="200" height="11" rx="5.5" fill="rgba(255,255,255,.1)" />
+                      <rect x="20" y="98" width="215" height="11" rx="5.5" fill="rgba(255,255,255,.1)" />
+                      <rect x="20" y="132" width="190" height="11" rx="5.5" fill="rgba(255,255,255,.1)" />
                     </g>
-                    <rect class="mon-climb" x="10" y="112" width="230" height="12" rx="6" fill="var(--blink)" />
-                    <circle cx="330" cy="100" r="42" stroke="rgba(255,255,255,.1)" stroke-width="6" />
-                    <circle class="mon-ring" cx="330" cy="100" r="42" stroke="var(--lavender)" stroke-width="6"
-                      stroke-linecap="round" transform="rotate(-90 330 100)" />
-                    <text class="mon-score" x="330" y="106" font-family="var(--font-tomorrow), sans-serif"
-                      font-size="26" fill="#fff" text-anchor="middle">92</text>
-                    <text x="330" y="160" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="rgba(245,243,255,.5)" text-anchor="middle">AI-SEO SCORE</text>
+                    <rect class="mon-climb" x="20" y="132" width="230" height="13" rx="6.5" fill="var(--blink)" />
+                    <circle cx="340" cy="104" r="44" stroke="rgba(255,255,255,.1)" stroke-width="7" />
+                    <circle class="mon-ring" cx="340" cy="104" r="44" stroke="var(--lavender)" stroke-width="7"
+                      stroke-linecap="round" transform="rotate(-90 340 104)" />
+                    <text class="mon-score sv-big" x="340" y="112" text-anchor="middle">92</text>
+                    <text class="sv-label" x="340" y="170" text-anchor="middle">SEO SCORE</text>
+                    <text class="sv-label" x="20" y="190">GOOGLE NEWS · INDEXED</text>
                   </svg>
                 </div>
 
                 <!-- 4 · traffic rises, the bill stays flat -->
                 <div class="monitor__scene" data-scene="bill">
-                  <svg viewBox="0 0 400 200" fill="none" preserveAspectRatio="none">
-                    <g stroke="rgba(255,255,255,.07)">
-                      <path d="M0 60h400M0 110h400M0 160h400" />
+                  <svg viewBox="0 0 420 220" fill="none">
+                    <g class="axis">
+                      <path d="M46 20V186M46 186H404" />
+                      <path class="axis__grid" d="M46 70H404M46 128H404" />
                     </g>
-                    <path class="mon-line mon-line--traffic" d="M0 180 C90 176 150 150 210 110 S330 42 400 26" />
-                    <path class="mon-line mon-line--bill" d="M0 150 L400 150" />
-                    <circle class="mon-hold" cx="400" cy="150" r="4" fill="var(--lavender)" />
-                    <text x="8" y="24" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="rgba(245,243,255,.5)">TRAFFIC</text>
-                    <text x="8" y="142" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="var(--lavender)">YOUR BILL</text>
+                    <path class="mon-line mon-line--traffic" d="M46 178 C130 172 180 140 240 100 S350 40 404 28" />
+                    <path class="mon-line mon-line--bill" d="M46 148 L404 148" />
+                    <circle class="mon-hold" cx="404" cy="148" r="4" fill="var(--lavender)" />
+                    <text class="sv-label" x="52" y="40">TRAFFIC</text>
+                    <text class="sv-label sv-label--on" x="52" y="142">YOUR BILL</text>
                   </svg>
                 </div>
 
                 <!-- 5 · 02:00 IST, the alert is answered -->
                 <div class="monitor__scene" data-scene="night">
-                  <svg viewBox="0 0 400 200" fill="none">
-                    <text class="mon-clock" x="200" y="86" font-family="var(--font-tomorrow), sans-serif"
-                      font-size="54" fill="#fff" text-anchor="middle">02:00</text>
-                    <text x="200" y="106" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="rgba(245,243,255,.5)" text-anchor="middle">IST</text>
-                    <rect class="mon-alert" x="60" y="124" width="130" height="30" rx="8"
+                  <svg viewBox="0 0 420 220" fill="none">
+                    <text class="mon-clock sv-big sv-big--xl" x="210" y="92" text-anchor="middle">02:00</text>
+                    <text class="sv-label" x="210" y="112" text-anchor="middle">IST</text>
+                    <rect class="mon-alert" x="54" y="134" width="150" height="34" rx="9"
                       fill="rgba(229,36,59,.16)" stroke="var(--live)" />
-                    <text x="125" y="143" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="var(--live)" text-anchor="middle">ALERT</text>
-                    <rect class="mon-reply" x="210" y="124" width="140" height="30" rx="8"
-                      fill="rgba(97,24,234,.22)" stroke="var(--blink-light)" />
-                    <text x="280" y="143" font-family="var(--font-spacemono), monospace" font-size="9" fill="#fff"
-                      text-anchor="middle">BLINK TEAM · ON IT</text>
+                    <text class="sv-label" x="129" y="155" text-anchor="middle" fill="var(--live)">ALERT</text>
+                    <rect class="mon-reply" x="218" y="134" width="150" height="34" rx="9"
+                      fill="rgba(97,24,234,.24)" stroke="var(--blink-light)" />
+                    <text class="sv-label sv-label--on" x="293" y="155" text-anchor="middle">RESOLVED</text>
                   </svg>
                 </div>
 
                 <!-- 6 · the page-load race -->
                 <div class="monitor__scene" data-scene="speed">
-                  <svg viewBox="0 0 400 200" fill="none">
-                    <rect x="10" y="70" width="380" height="16" rx="8" fill="rgba(255,255,255,.07)" />
-                    <rect class="mon-race" x="10" y="70" width="380" height="16" rx="8" fill="var(--blink)" />
-                    <text class="mon-time" x="200" y="140" font-family="var(--font-tomorrow), sans-serif"
-                      font-size="48" fill="#fff" text-anchor="middle">1.5s</text>
-                    <text x="200" y="164" font-family="var(--font-spacemono), monospace" font-size="9"
-                      fill="rgba(245,243,255,.5)" text-anchor="middle">DAILY THANTHI · PAGE LOAD</text>
+                  <svg viewBox="0 0 420 220" fill="none">
+                    <rect x="20" y="78" width="380" height="18" rx="9" fill="rgba(255,255,255,.07)" />
+                    <rect class="mon-race" x="20" y="78" width="380" height="18" rx="9" fill="var(--blink)" />
+                    <text class="mon-time sv-big sv-big--xl" x="210" y="152" text-anchor="middle">1.5s</text>
+                    <text class="sv-label" x="210" y="176" text-anchor="middle">DAILY THANTHI · PAGE LOAD</text>
                   </svg>
                 </div>
               </div>
 
-              <p class="monitor__cap" data-monitor-cap>Auto-scales on AWS. Zero downtime at 43K concurrent readers.
-              </p>
-              <span class="monitor__time"><i data-monitor-time></i></span>
+              <p class="monitor__cap" data-monitor-cap>Auto-scales on AWS. 43K concurrent readers, zero downtime.</p>
+
+              <!-- one segment per question; the active one fills over its 6s -->
+              <div class="monitor__steps" data-monitor-steps aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
             </div>
           </div>
         </div>
@@ -870,10 +841,18 @@
 
     <!-- ═══ 04 · THE FLOW ═══════════════════════════════════════════ -->
     <!--
-      The fibre path. One story card travels it as the section scrolls —
-      scrubbed, so it runs backwards when you scroll back up — and the three
-      step cards below light in sync with it. Scrubbed, never pinned: the
-      reader keeps the scroll.
+      One connected diagram, not three loose pieces.
+
+      EVERYTHING is inside a single fixed-viewBox SVG — the chips, their
+      labels, the curves, the track and the stage nodes. That is the fix for
+      curves starting in empty space: before, the chips were HTML positioned
+      beside an SVG, so the two drifted apart at every width the layout was
+      not tuned for. In one coordinate system a curve cannot come unstuck from
+      the node it is drawn to, at any screen size, because they are the same
+      numbers.
+
+      Labels are set at 13px in viewBox units and the curves are routed around
+      them rather than under them.
     -->
     <section id="flow" class="ed ed--b" data-label="THE FLOW">
       <div class="ed__shell">
@@ -884,78 +863,195 @@
         </div>
 
         <div class="flow" data-flow data-in style="--i:2">
-          <div class="flow__stage" data-flow-stage>
-            <svg data-flow-svg viewBox="0 0 1200 360" preserveAspectRatio="none" fill="none" aria-hidden="true">
-              <!-- the four source streams converging -->
-              <g stroke="var(--wire)" stroke-width="1">
-                <path d="M150 60 C280 60 320 150 400 180" />
-                <path d="M150 140 C280 140 330 165 400 180" />
-                <path d="M150 220 C280 220 330 195 400 180" />
-                <path d="M150 300 C280 300 320 210 400 180" />
+          <div class="flow__stage">
+            <svg class="flow__svg flow__svg--h" data-flow-svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid meet"
+              role="img" aria-label="Sources feed the Blink CMS core, which publishes to five channels">
+              <!-- the curves, behind everything -->
+              <g class="flow__wires" fill="none" stroke="var(--wire)" stroke-width="1.5">
+                <path d="M250 70 C330 70 350 210 420 210" />
+                <path d="M250 163 C330 163 360 200 420 210" />
+                <path d="M250 257 C330 257 360 220 420 210" />
+                <path d="M250 350 C330 350 350 210 420 210" />
+                <path d="M780 210 C850 210 870 70 950 70" />
+                <path d="M780 210 C850 210 870 140 950 140" />
+                <path d="M780 210 H950" />
+                <path d="M780 210 C850 210 870 280 950 280" />
+                <path d="M780 210 C850 210 870 350 950 350" />
               </g>
-              <!-- the trunk -->
-              <path class="flow__trunk" d="M400 180 H800" stroke="rgba(185,166,255,.22)" stroke-width="2" />
-              <path class="flow__lit" data-flow-lit d="M400 180 H800" stroke="var(--blink-light)" stroke-width="2"
-                stroke-linecap="round" />
-              <!-- the five endpoints -->
-              <g stroke="var(--wire)" stroke-width="1">
-                <path d="M800 180 C880 180 920 60 1050 60" />
-                <path d="M800 180 C880 180 920 120 1050 120" />
-                <path d="M800 180 H1050" />
-                <path d="M800 180 C880 180 920 240 1050 240" />
-                <path d="M800 180 C880 180 920 300 1050 300" />
+
+              <!-- the track the packet runs along -->
+              <path class="flow__track" d="M420 210 H780" />
+              <path class="flow__lit" data-flow-lit d="M420 210 H780" />
+
+              <!-- sources -->
+              <g class="flow__chip" data-flow-in>
+                <rect x="40" y="48" width="210" height="44" rx="12" />
+                <text x="66" y="75">Reporters</text>
               </g>
-              <circle class="flow__card" data-flow-card cx="400" cy="180" r="9" fill="var(--blink)"
-                stroke="var(--lavender)" stroke-width="2" />
+              <g class="flow__chip" data-flow-in>
+                <rect x="40" y="141" width="210" height="44" rx="12" />
+                <text x="66" y="168">Stringers</text>
+              </g>
+              <g class="flow__chip" data-flow-in>
+                <rect x="40" y="235" width="210" height="44" rx="12" />
+                <text x="66" y="262">Agency feeds</text>
+              </g>
+              <g class="flow__chip" data-flow-in>
+                <rect x="40" y="328" width="210" height="44" rx="12" />
+                <text x="66" y="355">RSS &amp; APIs</text>
+              </g>
+
+              <!-- the three stages -->
+              <g class="flow__node is-on" data-flow-node tabindex="0" role="button"
+                aria-label="Stage 01, Gather">
+                <circle cx="420" cy="210" r="34" />
+                <text class="flow__num" x="420" y="216" text-anchor="middle">01</text>
+                <text class="flow__cap" x="420" y="272" text-anchor="middle">Gather</text>
+              </g>
+              <g class="flow__node" data-flow-node tabindex="0" role="button" aria-label="Stage 02, Create">
+                <circle cx="600" cy="210" r="34" />
+                <text class="flow__num" x="600" y="216" text-anchor="middle">02</text>
+                <text class="flow__cap" x="600" y="272" text-anchor="middle">Create</text>
+              </g>
+              <g class="flow__node" data-flow-node tabindex="0" role="button"
+                aria-label="Stage 03, Publish and grow">
+                <circle cx="780" cy="210" r="34" />
+                <text class="flow__num" x="780" y="216" text-anchor="middle">03</text>
+                <text class="flow__cap" x="780" y="272" text-anchor="middle">Publish &amp; grow</text>
+              </g>
+
+              <!-- outputs -->
+              <g class="flow__chip" data-flow-out>
+                <rect x="950" y="48" width="210" height="44" rx="12" />
+                <text x="976" y="75">Website</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="950" y="118" width="210" height="44" rx="12" />
+                <text x="976" y="145">Apps</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="950" y="188" width="210" height="44" rx="12" />
+                <text x="976" y="215">Google News</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="950" y="258" width="210" height="44" rx="12" />
+                <text x="976" y="285">Social</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="950" y="328" width="210" height="44" rx="12" />
+                <text x="976" y="355">Newsletter</text>
+              </g>
+
+              <!-- the story packet -->
+              <circle class="flow__packet" data-flow-packet cx="420" cy="210" r="8" />
             </svg>
 
-            <div class="flow__ends flow__ends--in">
-              <span class="meta flow__end">Reporters</span>
-              <span class="meta flow__end">Stringers</span>
-              <span class="meta flow__end">Wires</span>
-              <span class="meta flow__end">RSS</span>
-            </div>
+            <!--
+              The same diagram, stood up. Not a CSS reflow of the one above —
+              an SVG cannot reflow, and scaling the 1200-wide version into a
+              390px column put its 17px labels at 4.7px. This is a second
+              viewBox at a ratio that fits a phone, with the type sized so it
+              lands at about 13px once scaled. Both carry the same data
+              attributes, so one driver runs whichever is on screen.
+            -->
+            <svg class="flow__svg flow__svg--v" data-flow-svg viewBox="0 0 420 980"
+              preserveAspectRatio="xMidYMid meet" fill="none" role="img"
+              aria-label="Sources feed the Blink CMS core, which publishes to five channels">
+              <!-- routed around the chips, never under them: each curve leaves
+                   the stack and lands on a chip's outer edge -->
+              <g class="flow__wires" fill="none" stroke="var(--wire)" stroke-width="1.5">
+                <path d="M10 31 C2 110 110 160 210 198" />
+                <path d="M410 31 C418 110 310 160 210 198" />
+                <path d="M105 106 C105 150 150 176 210 198" />
+                <path d="M315 106 C315 150 270 176 210 198" />
+                <path d="M210 662 C210 712 86 744 20 780" />
+                <path d="M210 662 C210 718 108 792 65 826" />
+                <path d="M210 662 C210 726 146 838 115 872" />
+                <path d="M210 662 C210 740 184 884 165 918" />
+                <path d="M210 662 C210 760 212 930 210 964" />
+              </g>
 
-            <div class="flow__ends flow__ends--out">
-              <span class="meta flow__end" data-flow-out>Web</span>
-              <span class="meta flow__end" data-flow-out>App</span>
-              <span class="meta flow__end" data-flow-out>Google News</span>
-              <span class="meta flow__end" data-flow-out>Social</span>
-              <span class="meta flow__end" data-flow-out>Newsletter</span>
-            </div>
+              <path class="flow__track" d="M210 230 V630" />
+              <path class="flow__lit" data-flow-lit d="M210 230 V630" />
+
+              <g class="flow__chip" data-flow-in>
+                <rect x="10" y="10" width="190" height="42" rx="12" />
+                <text x="32" y="36">Reporters</text>
+              </g>
+              <g class="flow__chip" data-flow-in>
+                <rect x="220" y="10" width="190" height="42" rx="12" />
+                <text x="242" y="36">Stringers</text>
+              </g>
+              <g class="flow__chip" data-flow-in>
+                <rect x="10" y="64" width="190" height="42" rx="12" />
+                <text x="32" y="90">Agency feeds</text>
+              </g>
+              <g class="flow__chip" data-flow-in>
+                <rect x="220" y="64" width="190" height="42" rx="12" />
+                <text x="242" y="90">RSS &amp; APIs</text>
+              </g>
+
+              <g class="flow__node is-on" data-flow-node tabindex="0" role="button"
+                aria-label="Stage 01, Gather">
+                <circle cx="210" cy="230" r="32" />
+                <text class="flow__num" x="210" y="236" text-anchor="middle">01</text>
+                <text class="flow__cap" x="210" y="296" text-anchor="middle">Gather</text>
+              </g>
+              <g class="flow__node" data-flow-node tabindex="0" role="button" aria-label="Stage 02, Create">
+                <circle cx="210" cy="430" r="32" />
+                <text class="flow__num" x="210" y="436" text-anchor="middle">02</text>
+                <text class="flow__cap" x="210" y="496" text-anchor="middle">Create</text>
+              </g>
+              <g class="flow__node" data-flow-node tabindex="0" role="button"
+                aria-label="Stage 03, Publish and grow">
+                <circle cx="210" cy="630" r="32" />
+                <text class="flow__num" x="210" y="636" text-anchor="middle">03</text>
+                <text class="flow__cap" x="210" y="696" text-anchor="middle">Publish &amp; grow</text>
+              </g>
+
+              <g class="flow__chip" data-flow-out>
+                <rect x="20" y="760" width="190" height="40" rx="12" />
+                <text x="42" y="785">Website</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="65" y="806" width="190" height="40" rx="12" />
+                <text x="87" y="831">Apps</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="115" y="852" width="190" height="40" rx="12" />
+                <text x="137" y="877">Google News</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="165" y="898" width="190" height="40" rx="12" />
+                <text x="187" y="923">Social</text>
+              </g>
+              <g class="flow__chip" data-flow-out>
+                <rect x="210" y="944" width="190" height="40" rx="12" />
+                <text x="232" y="969">Newsletter</text>
+              </g>
+
+              <circle class="flow__packet" data-flow-packet cx="210" cy="230" r="8" />
+            </svg>
           </div>
 
-          <div class="flow__steps">
-            <article class="glass glass--pad flow__step is-on" data-flow-step>
-              <span class="meta" style="color:var(--lavender)">01 — GATHER</span>
-              <p>Monitor and gather from every source.</p>
-            </article>
-            <article class="glass glass--pad flow__step" data-flow-step>
-              <span class="meta" style="color:var(--lavender)">02 — CREATE</span>
-              <p>Write, tag and approve in one editor.</p>
-            </article>
-            <article class="glass glass--pad flow__step" data-flow-step>
-              <span class="meta" style="color:var(--lavender)">03 — PUBLISH &amp; GROW</span>
-              <p>Publish everywhere, monetize, then measure it.</p>
-            </article>
+          <!-- one panel, under whichever stage is lit -->
+          <div class="flow__read" data-flow-read>
+            <span class="meta" data-flow-name>01 — GATHER</span>
+            <p data-flow-copy>Trends, agency feeds, reporters and stringers in one queue.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ═══ 05 · LIVE ═══════════════════════════════════════════════ -->
-    <!--
-      The back layer is a video the client has not supplied yet. It carries
-      `data-src`, never `src`, loads only in view, and fades in only once it
-      can actually play — so a 404 on the placeholder path is invisible and
-      the drawn fallback behind it carries the section.
-    -->
     <section id="live" class="ed ed--a" data-label="LIVE">
       <div class="layer-back ed__fade" aria-hidden="true">
-        <span class="backvid-fallback" data-depth="0.3"></span>
-        <video class="backvid" data-backvid data-src="./assets/video/live-newsroom.mp4" muted loop playsinline
-          preload="none" tabindex="-1"></video>
-        <span class="backvid-tint"></span>
+        <span class="vidslot duo" data-depth="0.3">
+          <img data-poster="live_video" alt="" loading="lazy">
+        </span>
+        <video class="backvid" data-backvid="live_video" muted loop playsinline preload="none"
+          tabindex="-1"></video>
+        <span class="glow-layer"></span>
       </div>
 
       <div class="ed__shell">
@@ -976,31 +1072,43 @@
           <div class="ed__gfx">
             <div class="glass live" data-live data-in style="--i:1">
               <div class="live__top">
-                <span class="meta live__flag"><span class="sig"></span>LIVE</span>
+                <span class="meta live__flag"><span class="sig"></span>LIVE · DESK HOLDS AT FULL LOAD</span>
                 <span class="meta">NOIDA · 14:32 IST</span>
               </div>
 
-              <span class="display ed__h3">Desk holds at full load</span>
-
               <div class="live__readout">
-                <span class="figure" data-count-to="43000" data-live-count>43,000</span>
+                <span class="figure" data-live-count>43,000</span>
                 <span class="meta">concurrent readers</span>
               </div>
 
-              <div class="live__nodes">
-                <canvas data-live-nodes></canvas>
-              </div>
-
-              <div class="live__spark">
-                <svg viewBox="0 0 400 60" preserveAspectRatio="none" fill="none" aria-hidden="true">
-                  <path data-live-spark stroke="var(--lavender)" stroke-width="1.5" fill="none"
+              <!-- readers over time, with the capacity line stepping up under it -->
+              <div class="live__chart">
+                <svg viewBox="0 0 420 150" preserveAspectRatio="none" fill="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="liveFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(97,24,234,.55)" />
+                      <stop offset="100%" stop-color="rgba(97,24,234,0)" />
+                    </linearGradient>
+                  </defs>
+                  <path data-live-area fill="url(#liveFill)" />
+                  <path data-live-line stroke="var(--lavender)" stroke-width="2" fill="none"
                     stroke-linejoin="round" />
+                  <path data-live-cap stroke="rgba(245,243,255,.45)" stroke-width="1.5" stroke-dasharray="5 5"
+                    fill="none" />
                 </svg>
+                <span class="meta live__capname">CAPACITY</span>
               </div>
 
-              <div class="live__foot">
-                <span class="meta">LATENCY · STEADY</span>
-                <span class="meta" style="color:var(--txt)">0 DOWNTIME</span>
+              <!-- twelve servers, lighting as the load climbs -->
+              <div class="live__servers">
+                <span class="live__rack" data-live-rack aria-hidden="true"></span>
+                <span class="meta">AWS AUTO-SCALING</span>
+              </div>
+
+              <div class="live__mini">
+                <span><b class="display">Zero</b><span class="meta">downtime</span></span>
+                <span><b class="display">10s</b><span class="meta">faster page loads</span></span>
+                <span><b class="display">Live</b><span class="meta">real-time desk view</span></span>
               </div>
             </div>
           </div>
@@ -1010,81 +1118,57 @@
 
     <!-- ═══ 06 · HEAD TO HEAD ═══════════════════════════════════════ -->
     <!--
-      The WordPress column is NOT filled in. Every value in it is a visible
-      [FROM CLIENT] marker, because there is no source for it in the brief or
-      on the site and this build does not invent claims about another
-      product — least of all unflattering ones. The client is sending PDFs;
-      drop the values into `data-wp` on each row and delete `.todo`.
+      Source: Blink CMS feature comparison. Every row is "WordPress out of the
+      box does not, Blink CMS does", which is a statement about what ships in
+      each product rather than a judgement of either — and the muted line
+      under the table says plainly what WordPress does offer, so the
+      comparison cannot be read as the whole story.
     -->
-    <section id="versus" class="ed ed--b" data-label="HEAD TO HEAD">
+    <section id="versus" class="ed ed--a ed--top" data-label="HEAD TO HEAD">
       <div class="ed__shell">
-        <div class="ed__head">
-          <span class="mono ed__label" data-in style="--i:0">06 — HEAD TO HEAD</span>
-          <h2 class="display ed__h2" data-in style="--i:1">Blink CMS <span class="head-lilac">vs WordPress.</span></h2>
-        </div>
+        <div class="ed__grid">
+          <div class="ed__col ed__col--top">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">06 — HEAD TO HEAD</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Blink CMS <span class="head-lilac">vs
+                  WordPress.</span></h2>
+            </div>
 
-        <div class="vs" data-vs data-in style="--i:2">
-          <div class="vs__side vs__side--blink">
-            <span class="meta" style="color:var(--lavender)">BLINK CMS</span>
-            <div class="vs__core">
-              <span class="display ed__h3">One platform</span>
-              <span class="meta d-block mt-2">CMS · APPS · PAYWALL · ADS · ANALYTICS</span>
+            <div class="vtabs" role="tablist" aria-label="Comparison categories" data-vs-tabs data-in style="--i:2">
+              <button type="button" role="tab" aria-selected="true" aria-controls="vs-table"
+                data-vs-tab="newsroom">Newsroom</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="vs-table"
+                data-vs-tab="ai">AI</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="vs-table"
+                data-vs-tab="dist">Distribution</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="vs-table"
+                data-vs-tab="revenue">Revenue</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="vs-table"
+                data-vs-tab="modules">Modules</button>
             </div>
           </div>
 
-          <div class="vs__side vs__side--wp">
-            <span class="meta">A PLUGIN STACK</span>
-            <div class="vs__plugins">
-              <span class="vs__plugin">CMS</span>
-              <span class="vs__plugin">Cache</span>
-              <span class="vs__plugin">SEO</span>
-              <span class="vs__plugin">Paywall</span>
-              <span class="vs__plugin">Ads</span>
-              <span class="vs__plugin">Analytics</span>
-              <span class="vs__plugin">AMP</span>
-              <span class="vs__plugin">Apps</span>
-              <span class="vs__plugin">Backups</span>
+          <div class="ed__gfx ed__gfx--top">
+            <div class="glass vs2" id="vs-table" role="tabpanel" data-in style="--i:1">
+              <div class="vs2__head">
+                <span class="meta">Feature</span>
+                <span class="meta">WordPress <span class="vs2__sub">out of the box</span></span>
+                <span class="meta vs2__lit">Blink CMS</span>
+              </div>
+              <div class="vs2__rows" data-vs-rows></div>
+              <p class="vs2__note">Both offer SEO tools, AMP, PWA, API integrations and analytics. WordPress is
+                open-source with a free plan.</p>
+              <p class="meta vs2__src">SOURCE: BLINK CMS FEATURE COMPARISON</p>
             </div>
           </div>
-
-          <span class="vs__handle" data-vs-handle><span class="vs__grip" role="separator"
-              aria-label="Drag to compare">⇆</span></span>
-        </div>
-
-        <div class="vstable" data-in style="--i:3">
-          <span class="meta vs-h">&nbsp;</span><span class="meta vs-h">WORDPRESS</span><span
-            class="meta vs-h">BLINK CMS</span>
-          <span class="vs-k">Traffic spikes</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">Auto-scales, zero downtime</span>
-          <span class="vs-k">Vendors to manage</span><span class="vs-wp"><em
-              class="todo">[FROM CLIENT]</em></span><span class="vs-bl">One</span>
-          <span class="vs-k">Google News &amp; SEO</span><span class="vs-wp"><em
-              class="todo">[FROM CLIENT]</em></span><span class="vs-bl">Built in, set up for you</span>
-          <span class="vs-k">Billing</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">By features, not traffic</span>
-          <span class="vs-k">Support</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">Your extended tech team</span>
-          <span class="vs-k">Page speed</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">1.5s on Daily Thanthi</span>
-          <span class="vs-k">Reporter app</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">Included</span>
-          <span class="vs-k">E-paper</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
-            class="vs-bl">Included</span>
         </div>
       </div>
     </section>
 
     <!-- ═══ 07 · THE BEATS ══════════════════════════════════════════ -->
-    <!--
-      Five segments, three of which have published numbers. Broadcasters and
-      fact-checking do not, so their metric cells are visible [FROM CLIENT]
-      markers rather than plausible-looking figures. The screenshots are the
-      brief's placeholder paths; `initShots()` hides an <img> whose file 404s
-      so the drawn stand-in behind it shows instead.
-    -->
     <section id="beats" class="ed ed--a" data-label="THE BEATS">
       <div class="layer-back" aria-hidden="true">
-        <span class="glyph" data-glyph data-depth="0.3">தமிழ்</span>
+        <span class="glyph" data-glyph data-depth="0.3">த</span>
       </div>
 
       <div class="ed__shell">
@@ -1098,27 +1182,28 @@
 
             <div class="tabs" role="tablist" aria-label="Segments" data-beats data-in style="--i:2">
               <button type="button" role="tab" aria-selected="true" aria-controls="beat-panel" data-beat
-                data-name="Daily Thanthi" data-glyph="தமிழ்" data-shot="./assets/img/case-dailythanthi.webp"
-                data-metrics='[["20×","growth"],["1.5s","load time"],["83%","search discovery"]]'>Regional
-                dailies</button>
+                data-name="Daily Thanthi" data-tag="TAMIL" data-glyph="த" data-shot="beats_thanthi"
+                data-metrics='[["20×","growth"],["1.5s","load time"],["83%","search discovery"]]'>Tamil</button>
               <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
-                data-name="The Hans India" data-glyph="తెలుగు" data-shot="./assets/img/case-hansindia.webp"
-                data-metrics='[["2 MO","to record traffic"],["43K","concurrent users"],["ZERO","downtime"]]'>National
-                dailies</button>
+                data-name="Madhyamam" data-tag="MALAYALAM" data-glyph="മ" data-shot="beats_madhyamam"
+                data-metrics='[["+50%","engagement"],["77%","site performance"],["72%","search discovery"]]'>Malayalam</button>
               <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
-                data-name="LiveLaw" data-glyph="English" data-shot="./assets/img/case-livelaw.webp"
-                data-metrics='[["−30%","bounce rate"],["10s","faster pages"]]'>Digital &amp; niche</button>
+                data-name="Bhaskar Hindi" data-tag="HINDI" data-glyph="हि" data-shot="beats_bhaskar"
+                data-metrics='[["+46%","faster indexing"],["+32%","engaged sessions"],["77%","performance"]]'>Hindi</button>
               <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
-                data-name="MediaOne" data-glyph="മലയാളം" data-shot="./assets/img/case-mediaone.webp"
-                data-metrics='[]'>Broadcasters</button>
+                data-name="The Hans India" data-tag="ENGLISH" data-glyph="A" data-shot="beats_hansindia"
+                data-metrics='[["43K","concurrent users"],["Zero","downtime"],["10s","faster loads"]]'>English</button>
               <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
-                data-name="20+ fact-checking sites" data-glyph="हिन्दी"
-                data-shot="./assets/img/case-factcheck.webp"
-                data-metrics='[["20+","sites"]]'>Fact-checking</button>
+                data-name="LiveLaw" data-tag="LEGAL" data-glyph="A" data-shot="beats_livelaw"
+                data-metrics='[["2 MO","to record traffic"],["−30%","bounce rate"],["10s","faster loads"]]'>Legal</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
+                data-name="The Federal" data-tag="DIGITAL" data-glyph="A" data-shot="beats_federal"
+                data-metrics='[["2×","traffic in 8 months"],["93ms","INP"],["68%","performance"]]'>Digital</button>
             </div>
 
             <div id="beat-panel" role="tabpanel">
-              <span class="display ed__h3 d-block mb-3" data-beat-name>Daily Thanthi</span>
+              <span class="meta d-block" data-beat-tag>TAMIL</span>
+              <span class="display ed__h3 d-block mt-1 mb-3" data-beat-name>Daily Thanthi</span>
               <div class="metrics" data-beat-metrics>
                 <span class="metric"><b>20×</b><span class="meta">growth</span></span>
                 <span class="metric"><b>1.5s</b><span class="meta">load time</span></span>
@@ -1129,15 +1214,18 @@
 
           <div class="ed__gfx">
             <div class="shot" data-shot data-in style="--i:1">
-              <div class="shot__frame">
-                <span class="shot__stub" data-stub="screenshot — from client"></span>
-                <img data-beat-shot src="./assets/img/case-dailythanthi.webp" alt="" loading="lazy" width="1600"
-                  height="1000">
+              <div class="shot__frame duo">
+                <span class="pxm" data-pxm>
+                  <img data-beat-shot data-img="beats_thanthi" alt="" loading="lazy">
+                </span>
+                <!-- the chips hang off the frame, not off the column: the
+                     column is as tall as the section and they drifted a long
+                     way from the device on a phone -->
+                <span class="chip mono shot__chip" data-depth="1.15" style="left:-6%;top:12%"
+                  data-beat-chip>20× growth</span>
+                <span class="chip mono shot__chip" data-depth="1.15" style="right:-4%;bottom:12%"
+                  data-beat-chip>1.5s load time</span>
               </div>
-              <span class="chip mono shot__chip" data-depth="1.15" style="left:-4%;top:14%"
-                data-beat-chip>20× growth</span>
-              <span class="chip mono shot__chip" data-depth="1.15" style="right:-2%;bottom:18%"
-                data-beat-chip>1.5s load time</span>
             </div>
           </div>
         </div>
@@ -1145,6 +1233,12 @@
     </section>
 
     <!-- ═══ 08 · LETTERS ════════════════════════════════════════════ -->
+    <!--
+      The image beside the quote is a newsroom frame, never a face. A stock
+      photograph of a plausible-looking person next to a named quote reads as
+      that person, and these names are placeholders until real approved
+      testimonials arrive — see HANDOFF §7.
+    -->
     <section id="letters" class="ed ed--a" data-label="LETTERS">
       <div class="layer-back" aria-hidden="true">
         <span class="bigquote" data-depth="0.3">&ldquo;</span>
@@ -1182,19 +1276,16 @@
 
           <div class="ed__gfx">
             <div class="deck" data-deck data-in style="--i:1">
-              <div class="deck__card deck__card--2">
-                <span class="shot__stub" data-stub=""></span>
+              <div class="deck__card deck__card--2 duo">
+                <img data-deck-img="2" alt="" loading="lazy">
               </div>
-              <div class="deck__card deck__card--1">
-                <span class="shot__stub" data-stub=""></span>
+              <div class="deck__card deck__card--1 duo">
+                <img data-deck-img="1" alt="" loading="lazy">
               </div>
-              <div class="deck__card deck__card--0">
-                <span class="deck__media">
-                  <span class="shot__stub" data-stub="portrait — from client"></span>
-                  <img data-quote-shot src="./assets/img/testimonial-kavitha-iyer.webp" alt="" loading="lazy"
-                    width="900" height="1200">
+              <div class="deck__card deck__card--0 duo">
+                <span class="pxm deck__media" data-pxm>
+                  <img data-quote-shot data-img="letters_1" alt="" loading="lazy">
                 </span>
-                <span class="backvid-tint"></span>
               </div>
             </div>
           </div>
@@ -1204,73 +1295,111 @@
 
     <!-- ═══ 09 · THE RATE CARD ══════════════════════════════════════ -->
     <!--
-      Prices read from blinkcms.ai/pricing-page on 27 Sep 2026 and carried
-      over from the earlier build. NOTHING HERE CHECKS THAT AGAINST THE LIVE
-      PAGE, so if the rate card moves this section goes stale silently. Re-read
-      it before a release.
+      Plans, prices, limits, features, add-ons and the footnote are the
+      client's published pricing page. NOTHING HERE CHECKS THAT AGAINST THE
+      LIVE PAGE, so if the rate card moves this section goes stale silently.
+      Re-read it before a release.
     -->
     <section id="rates" class="ed ed--b" data-label="THE RATE CARD">
       <div class="layer-back ed__fade" aria-hidden="true">
         <svg data-rates-bg viewBox="0 0 1200 400" preserveAspectRatio="none" fill="none">
-          <path data-rates-traffic d="M0 390 C260 380 440 300 620 220 S960 70 1200 30" stroke="rgba(185,166,255,.2)"
+          <path data-rates-traffic d="M0 330 C260 322 440 262 620 196 S960 74 1200 38" stroke="rgba(185,166,255,.18)"
             stroke-width="2" />
-          <path data-rates-flat d="M0 300 H1200" stroke="var(--blink-light)" stroke-width="2" opacity=".55" />
+          <path data-rates-flat d="M0 262 H1200" stroke="var(--blink-light)" stroke-width="2" opacity=".4" />
         </svg>
       </div>
 
       <div class="ed__shell">
         <div class="ed__head">
           <span class="mono ed__label" data-in style="--i:0">09 — THE RATE CARD</span>
-          <h2 class="display ed__h2" data-in style="--i:1">Pay for features, <span class="head-lilac">not
+          <h2 class="display ed__h2 ed__h2--sm" data-in style="--i:1">Pay for features, <span class="head-lilac">not
               traffic.</span></h2>
         </div>
 
         <div class="rates" data-in style="--i:2">
           <article class="glass rate">
-            <span class="meta">BASIC</span>
-            <span class="rate__price"><span class="figure figure--sm">$500</span><span class="meta">/ month</span></span>
+            <span class="meta rate__name">DEMO</span>
+            <span class="rate__price"><span class="figure figure--sm">Talk to us</span></span>
+            <span class="meta rate__limits">20 GB · 1 TB · 10 USERS</span>
             <div class="rate__list">
-              <span>100 GB storage</span>
-              <span>5 TB bandwidth</span>
-              <span>20 users</span>
-              <span>CDN and auto-scaling</span>
-              <span>Google News and AMP</span>
+              <span>Direct publishing workflow</span>
+              <span>Standard SEO package</span>
+              <span>Social channel automation</span>
+              <span>Self-serve ads management</span>
+              <span>Standard CDN</span>
             </div>
-            <a class="pill pill-white mt-4" href="/contact/">Get started</a>
+            <a class="pill pill-outline-inv rate__cta" href="/contact/">Talk to us</a>
+            <a class="mono rate__all" href="/pricing/">See all features <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="glass rate">
+            <span class="meta rate__name">BASIC</span>
+            <span class="rate__price"><span class="figure figure--sm">$500</span><span class="meta">/ month</span></span>
+            <span class="meta rate__limits">100 GB · 5 TB · 20 USERS</span>
+            <div class="rate__list">
+              <span>Custom workflows</span>
+              <span>PWA &amp; basic AMP stories</span>
+              <span>Agency feeds ingestion</span>
+              <span>H-Analytics</span>
+              <span>Access to add-ons &amp; apps</span>
+            </div>
+            <a class="pill pill-white rate__cta" href="/contact/">Get started</a>
+            <a class="mono rate__all" href="/pricing/">See all features <span aria-hidden="true">→</span></a>
           </article>
 
           <article class="glass rate rate--best">
             <span class="meta rate__flag">RECOMMENDED</span>
-            <span class="meta">BUSINESS</span>
-            <span class="rate__price"><span class="figure figure--sm">$1,500</span><span class="meta">/
-                month</span></span>
+            <span class="meta rate__name">BUSINESS</span>
+            <span class="rate__price"><span class="figure figure--sm">$1,500</span><span
+                class="meta">/ month</span></span>
+            <span class="meta rate__limits">400 GB · 15 TB · 50 USERS</span>
             <div class="rate__list">
-              <span>400 GB storage</span>
-              <span>15 TB bandwidth</span>
-              <span>50 users</span>
-              <span>Advanced features and reporting</span>
-              <span>Reporter, paywall and e-paper add-ons</span>
+              <span>Advanced workflows &amp; SEO</span>
+              <span>Newsroom monitoring system</span>
+              <span>Web reporting / UGC module</span>
+              <span>Teams / bureau structures</span>
+              <span>Advanced API access</span>
             </div>
-            <a class="pill pill-white mt-4" href="/contact/">Get started</a>
+            <a class="pill pill-white rate__cta" href="/contact/">Get started</a>
+            <a class="mono rate__all" href="/pricing/">See all features <span aria-hidden="true">→</span></a>
           </article>
 
           <article class="glass rate">
-            <span class="meta">CUSTOM SUITE</span>
-            <span class="rate__price"><span class="figure figure--sm">$2,000</span><span class="meta">/ month
-                up</span></span>
+            <span class="meta rate__name">CUSTOM SUITE</span>
+            <span class="rate__price"><span class="figure figure--sm">From $2,000</span><span
+                class="meta">/ month</span></span>
+            <span class="meta rate__limits">SCALED TO THE NEWSROOM</span>
             <div class="rate__list">
-              <span>Scaled to the newsroom</span>
+              <span>Enterprise CMS and website</span>
+              <span>Android &amp; iOS apps</span>
+              <span>Digital channel management</span>
               <span>Custom modules</span>
               <span>Custom hosting</span>
-              <span>Apps, e-paper and subscriptions</span>
-              <span>Onboarding quoted separately</span>
             </div>
-            <a class="pill pill-outline-inv mt-4" href="/contact/">Contact sales</a>
+            <a class="pill pill-outline-inv rate__cta" href="/contact/">Contact sales</a>
+            <a class="mono rate__all" href="/pricing/">See all features <span aria-hidden="true">→</span></a>
           </article>
         </div>
 
-        <span class="meta" data-in style="--i:3" style="text-align:center">PRICES AS PUBLISHED 27 SEP 2026 · TAXES
-          EXTRA</span>
+        <div class="addons" data-in style="--i:3">
+          <span class="chip mono addons__chip" data-addon tabindex="0">
+            Subscription from $100/mo
+            <span class="addons__pop">
+              <b>Basic</b> $100/mo — 1,000 active subscribers free, then $0.10/user/mo<br>
+              <b>Advanced</b> $250/mo — 2,500 free, then $0.20/user/mo<br>
+              <b>Revenue share</b> from $100/mo — min 1,000 subscribers
+            </span>
+          </span>
+          <span class="chip mono">Reporter module</span>
+          <span class="chip mono">E-paper</span>
+          <span class="chip mono">Android &amp; iOS apps</span>
+          <span class="chip mono">AMP web stories</span>
+          <span class="chip mono">RSS ingestion</span>
+        </div>
+
+        <p class="meta rates__note" data-in style="--i:4">PRICES PER MONTH · TAXES EXTRA · ONE-TIME ONBOARDING BASED
+          ON DATA IMPORT &amp; WEBSITE DESIGN · ADS MANAGEMENT &amp; REVENUE OPTIMIZATION OFFERED AS A SEPARATE
+          SERVICE</p>
       </div>
     </section>
 
@@ -1287,28 +1416,25 @@
         </div>
 
         <div class="wire" data-in style="--i:2">
-          <a class="glass post post--lg glass--hover" href="/blog/">
-            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub="image — from client"></span>
-              <img src="./assets/img/post-tamil-daily.webp" alt="" loading="lazy" width="1200" height="800"
-                data-opt-img></span>
+          <a class="post post--lg" href="/blog/">
+            <span class="post__art duo"><span class="pxm" data-pxm><img data-img="wire_1" alt=""
+                  loading="lazy"></span></span>
             <span class="post__scrim"></span>
             <span class="meta post__meta">26 SEP 2026 · CASE STUDY</span>
             <span class="display post__title">How a Tamil daily grew 20×</span>
           </a>
 
-          <a class="glass post glass--hover" href="/blog/">
-            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub=""></span>
-              <img src="./assets/img/post-ai-editor.webp" alt="" loading="lazy" width="900" height="600"
-                data-opt-img></span>
+          <a class="post" href="/blog/">
+            <span class="post__art duo"><span class="pxm" data-pxm><img data-img="wire_2" alt=""
+                  loading="lazy"></span></span>
             <span class="post__scrim"></span>
             <span class="meta post__meta">19 SEP 2026 · PRODUCT</span>
             <span class="display post__title">AI story creation in the editor</span>
           </a>
 
-          <a class="glass post glass--hover" href="/blog/">
-            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub=""></span>
-              <img src="./assets/img/post-wordpress-seo.webp" alt="" loading="lazy" width="900" height="600"
-                data-opt-img></span>
+          <a class="post" href="/blog/">
+            <span class="post__art duo"><span class="pxm" data-pxm><img data-img="wire_3" alt=""
+                  loading="lazy"></span></span>
             <span class="post__scrim"></span>
             <span class="meta post__meta">11 SEP 2026 · MIGRATION</span>
             <span class="display post__title">Leaving WordPress without losing SEO</span>
@@ -1321,20 +1447,19 @@
 
     <!-- ═══ 11 · QUESTIONS ══════════════════════════════════════════ -->
     <!--
-      A chat with the desk. The answer is set SMALLER than the questions on
-      purpose — in the previous build it was larger, and the eye went to the
-      panel first, which made the list read as a caption rather than as the
-      thing you choose from. Tops are aligned: the panel's first line sits on
-      the first question's.
+      A real exchange, not a panel that swaps its text: the question you pick
+      appears as your own bubble, the desk types for 600ms, then answers. The
+      panel is auto-height and top-aligned with the headline — it used to run
+      the full height of the section and sit mostly empty.
     -->
-    <section id="faq" class="ed ed--a" data-label="QUESTIONS">
+    <section id="faq" class="ed ed--a ed--top" data-label="QUESTIONS">
       <div class="layer-back ed__fade" aria-hidden="true">
         <canvas data-wave></canvas>
       </div>
 
       <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__col">
+          <div class="ed__col ed__col--top">
             <div class="ed__head">
               <span class="mono ed__label" data-in style="--i:0">11 — QUESTIONS</span>
               <h2 class="display ed__h2" data-in style="--i:1">Questions, <span class="head-lilac">answered.</span>
@@ -1344,41 +1469,55 @@
             <div class="qlist" role="tablist" aria-label="Frequently asked questions" data-chat-list data-in
               style="--i:2">
               <button class="qlist__q" type="button" role="tab" aria-selected="true" aria-controls="chat"
-                data-a="The whole newsroom: gather, create, publish, monetize, analyze. One platform, one accountable team."><i>01</i>What
+                data-a="The whole newsroom: monitor, gather, create, publish, monetize, analyze. One platform, one accountable team."><i>01</i>What
                 does Blink CMS do?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="Yes. Technical SEO, schema, Google News feeds and AMP are built in, and our webmasters set it up."><i>02</i>Can
+                data-a="Yes. Redirection manager, canonical tags and our webmaster team protect your rankings."><i>02</i>Can
                 we migrate without losing SEO?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="Yes. Traffic auto-scales on AWS with a CDN. Measured at 43K concurrent readers, zero downtime."><i>03</i>Will
+                data-a="Yes. AWS auto-scaling; The Hans India served 43K concurrent users with zero downtime."><i>03</i>Will
                 the site survive a spike?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="No. Billing is by features — storage, bandwidth and seats, never by how many people read you."><i>04</i>Do
-                you charge more as traffic grows?</button>
+                data-a="No. We bill by features, not traffic."><i>04</i>Do you charge more as traffic
+                grows?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="Yes. Reporters and stringers file from the app, with assignments, workflows and a payments module."><i>05</i>Do
+                data-a="Yes. Stringer app with assignments, offline filing, payments and bureau structures."><i>05</i>Do
                 you have a reporter app?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="Yes. Election and cricket modules already ship, and there is a headless API to build on."><i>06</i>Can
+                data-a="Yes. Elections, cricket, Olympics, classifieds and more, built for your newsroom."><i>06</i>Can
                 you build custom modules?</button>
               <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
-                data-a="Write to sales@blinkcms.ai or call +91 88858 58900. Most newsrooms start on the Demo plan."><i>07</i>How
-                do we get a demo?</button>
+                data-a="Book a 1-hour demo for your management team."><i>07</i>How do we get a demo?</button>
             </div>
 
             <a class="mono ed__link ed__link--overflow" href="/faq/">View all FAQs <span
                 aria-hidden="true">→</span></a>
           </div>
 
-          <div class="ed__gfx">
-            <div class="glass chat" id="chat" role="tabpanel" data-chat data-in style="--i:1">
+          <div class="ed__gfx ed__gfx--top">
+            <div class="glass chat" id="chat" role="tabpanel" aria-live="polite" data-chat data-in style="--i:1">
               <div class="chat__head">
                 <span class="chat__avatar">BD</span>
                 <span class="meta">THE BLINK DESK · USUALLY REPLIES IN MINUTES</span>
               </div>
-              <span class="chat__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <p class="chat__bubble" data-chat-answer>The whole newsroom: gather, create, publish, monetize, analyze.
-                One platform, one accountable team.</p>
+
+              <p class="chat__ask" data-chat-ask>What does Blink CMS do?</p>
+
+              <span class="chat__dots" data-chat-dots aria-hidden="true"><i></i><i></i><i></i></span>
+
+              <div class="chat__reply" data-chat-reply>
+                <span class="chat__avatar chat__avatar--sm">BD</span>
+                <p class="chat__bubble" data-chat-answer>The whole newsroom: monitor, gather, create, publish,
+                  monetize, analyze. One platform, one accountable team.</p>
+              </div>
+
+              <div class="chat__actions" data-chat-actions>
+                <a class="chip mono" href="/contact/">Book a demo</a>
+                <a class="chip mono" href="#rates">See pricing</a>
+              </div>
+
+              <a class="mono ed__link chat__more" href="/contact/">Ask your own question <span
+                  aria-hidden="true">→</span></a>
             </div>
           </div>
         </div>
@@ -1387,44 +1526,44 @@
 
     <!-- ═══ 12 · FRONT PAGE ═════════════════════════════════════════ -->
     <!--
-      The globe comes back at the bottom, rising, so the page closes on the
-      thing it opened with. It is the same scene module as the hero's, mounted
-      a second time on its own canvas — and both pause when they scroll away,
-      so there is never more than one WebGL loop actually running.
+      The globe comes back at the bottom, rising. It is masked into the
+      background at every edge rather than stopping at one — before, the glow
+      layer ended square at the section boundary and drew a straight purple
+      line across the page.
     -->
     <section id="cta" class="ed ed--b ed--cta" data-label="FRONT PAGE">
       <div class="layer-back ed__fade" aria-hidden="true">
-        <span class="backvid-fallback" data-depth="0.3"></span>
-        <video class="backvid" data-backvid data-src="./assets/video/cta-press.mp4" muted loop playsinline
-          preload="none" tabindex="-1"></video>
-        <span class="backvid-tint"></span>
+        <span class="vidslot duo" data-depth="0.3">
+          <img data-poster="cta_video" alt="" loading="lazy">
+        </span>
+        <video class="backvid" data-backvid="cta_video" muted loop playsinline preload="none" tabindex="-1"></video>
+        <span class="glow-layer"></span>
 
-        <!-- Inside the back layer, not beside it. The globe is twice the
-             section's width and rises off the bottom edge; `.layer-back` is
-             the only thing on the page that clips, and clipping a decorative
-             back layer is not the same as using overflow to fake a fit. -->
         <div class="cta-globe">
           <canvas data-scene="globe-cta"></canvas>
+          <div class="cta-orbit" data-cta-orbit></div>
         </div>
       </div>
 
       <div class="ed__shell" style="position:relative;z-index:2">
         <div class="ed__head">
           <span class="mono ed__label" data-in style="--i:0">12 — FRONT PAGE</span>
-          <h2 class="display ed__h2" data-in style="--i:1">A newsroom that works <span class="head-lilac">as hard as
-              you do.</span></h2>
-          <p class="ed__sup" data-in style="--i:2">Ready to transform your newsroom?</p>
+          <h2 class="display ed__h2" data-in style="--i:1">You focus on the news. <span class="head-lilac">We cover
+              the tech.</span></h2>
+          <p class="ed__sup" data-in style="--i:2">Book a 1-hour demo for your management team.</p>
           <div class="cta-buttons" data-in style="--i:3">
             <a href="/contact/" class="pill pill-white">Book a demo</a>
             <button class="pill pill-outline-inv" data-open-video><span class="play-tri"></span>Watch video</button>
           </div>
+          <p class="meta cta-contact" data-in style="--i:4"><a href="mailto:sales@blinkcms.ai">sales@blinkcms.ai</a>
+            · <a href="tel:+918885858900">+91 88858 58900</a></p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ═══ footer ══════════════════════════════════════════════════ -->
+  <!-- ═══ 13 · FOOTER ═════════════════════════════════════════════ -->
   <footer class="ed-footer" id="contact" data-label="BACK PAGE">
     <div class="ed-footer__shell">
       <div class="news">
@@ -1462,16 +1601,33 @@
           <a href="/case-studies/">All case studies</a>
         </div>
         <div class="ed-footer__col">
-          <h3 class="meta">COMPANY</h3>
-          <a href="/about/">About Us</a>
-          <a href="/blog/">Blog</a>
-          <a href="/contact/">Book a demo</a>
+          <h3 class="meta">CONTACT</h3>
+          <a href="mailto:sales@blinkcms.ai">sales@blinkcms.ai</a>
+          <a href="tel:+918885858900">+91 88858 58900</a>
+          <address class="ed-footer__addr">H 157, Office no. 103, First Floor, Rally Infra, Sector 63, Noida,
+            Uttar Pradesh 201301</address>
         </div>
       </div>
 
       <div class="meta ed-footer__base">
-        <span><a href="mailto:sales@blinkcms.ai">sales@blinkcms.ai</a> · Noida, India</span>
         <span class="social">
+          <a href="/contact/" aria-label="Facebook">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.52-.14-2.71-.14-2.72 0-4.79 1.66-4.79 4.93V9.5H7v4h3V22h4v-8.5z" />
+            </svg>
+          </a>
+          <a href="/contact/" aria-label="Instagram">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 5.68a4.16 4.16 0 1 0 0 8.32 4.16 4.16 0 0 0 0-8.32zm0 6.86a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4zm5.3-7.02a.97.97 0 1 1-1.94 0 .97.97 0 0 1 1.94 0z" />
+            </svg>
+          </a>
+          <a href="/contact/" aria-label="YouTube">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
           <a href="/contact/" aria-label="X">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path
@@ -1484,17 +1640,6 @@
                 d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
             </svg>
           </a>
-          <a href="/contact/" aria-label="Facebook">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.52-.14-2.71-.14-2.72 0-4.79 1.66-4.79 4.93V9.5H7v4h3V22h4v-8.5z" />
-            </svg>
-          </a>
-          <a href="/contact/" aria-label="YouTube">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-            </svg>
-          </a>
         </span>
         <span class="d-flex flex-wrap gap-4">
           <span>© 2026 Blink CMS</span>
@@ -1503,8 +1648,44 @@
           <a href="/cookies/">Cookies</a>
         </span>
       </div>
+    </div>
 
-      <span class="display wordmark" data-wordmark aria-hidden="true">BLINKCMS</span>
+    <!--
+      The wordmark is SVG, not text scaled by JavaScript. An <svg> with a
+      viewBox set to the glyphs' own bounding box fills whatever width you give
+      it, exactly, at every size and before the font has even loaded — which is
+      what "scale it to exactly the container width" actually needs. The text
+      element is still live text, so it is selectable and readable.
+    -->
+    <div class="wordmark" aria-hidden="true">
+      <svg viewBox="0 0 1000 150" preserveAspectRatio="xMidYMax meet" data-wordmark-svg>
+        <defs>
+          <linearGradient id="wmGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9A6CF1" />
+            <stop offset="100%" stop-color="#6118EA" />
+          </linearGradient>
+          <linearGradient id="wmSweep" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="45%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="50%" stop-color="#fff" stop-opacity=".55" />
+            <stop offset="55%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="wmFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+            <stop offset="80%" stop-color="#fff" stop-opacity="1" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <mask id="wmMask">
+            <rect x="0" y="0" width="1000" height="150" fill="url(#wmFade)" />
+          </mask>
+        </defs>
+        <g mask="url(#wmMask)">
+          <text x="500" y="128" text-anchor="middle" data-wordmark-text>BLINKCMS</text>
+          <text x="500" y="128" text-anchor="middle" class="wordmark__sweep"
+            data-wordmark-text>BLINKCMS</text>
+        </g>
+      </svg>
     </div>
   </footer>
 

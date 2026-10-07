@@ -11,6 +11,7 @@
  */
 
 import { gsap, hasGsap, onInView, onScroll, reducedMotion, clamp } from '../lib/motion.js'
+import { imageSrc, imageSize, logos, posterSrc, videoSrc } from '../../assets/media.js'
 
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 
@@ -199,24 +200,43 @@ export function initMarquee() {
  * Measure the rendered width at a known size, then scale by the ratio.
  */
 export function initWordmark() {
-  const el = document.querySelector('[data-wordmark]')
-  if (!el) return
+  const svg = document.querySelector('[data-wordmark-svg]')
+  if (!svg) return
 
+  const texts = qq('[data-wordmark-text]', svg)
+  const mask = svg.querySelector('#wmMask rect')
+  if (!texts.length) return
+
+  /*
+   * The SVG already fills its container at every width — that is what a
+   * viewBox does, and it is why this is SVG and not text with a font-size
+   * measured by script. The one thing left to do is make the viewBox the
+   * glyphs' OWN bounding box, so the type touches both edges with no side
+   * bearing left over. Measured once, and again after the webfont lands,
+   * because the bearings change with the face.
+   */
   const fit = () => {
-    // the element's OWN content box, not the parent's clientWidth — the
-    // parent's includes its 24–48px side padding, and scaling to that put
-    // the last letter outside the container
-    el.style.setProperty('--wm', '100px')
-    const box = el.clientWidth
-    const natural = el.scrollWidth
-    if (!box || !natural) return
-    el.style.setProperty('--wm', Math.floor((box / natural) * 100) + 'px')
+    let box
+    try {
+      box = texts[0].getBBox()
+    } catch {
+      return // not rendered yet (display:none, detached); try again later
+    }
+    if (!box.width || !box.height) return
+
+    svg.setAttribute('viewBox', `${box.x} ${box.y} ${box.width} ${box.height}`)
+    if (mask) {
+      mask.setAttribute('x', box.x)
+      mask.setAttribute('y', box.y)
+      mask.setAttribute('width', box.width)
+      mask.setAttribute('height', box.height)
+    }
   }
 
   fit()
-  window.addEventListener('resize', fit)
-  // webfonts land after first layout and change the measurement
   if (document.fonts?.ready) document.fonts.ready.then(fit)
+  // the box is in viewBox units, so a resize cannot change it — but a font
+  // swapping in late can, and that is what `fonts.ready` is for
 }
 
 /* ── background video and placeholder images ──────────────────── */
@@ -234,9 +254,15 @@ export function initWordmark() {
  */
 export function initBackVideos() {
   const small = window.matchMedia('(max-width: 767px)').matches
+  // below md the brief asks for the still with its slow zoom instead, and
+  // under reduced motion there is no video at all
   if (reducedMotion() || small) return
 
   qq('[data-backvid]').forEach((video) => {
+    const file = videoSrc(video.dataset.backvid)
+    // no file yet: the poster behind it is the slot, and nothing is requested
+    if (!file) return
+
     onInView(
       video,
       (inView) => {
@@ -246,10 +272,10 @@ export function initBackVideos() {
         }
         if (!video.getAttribute('src')) {
           video.addEventListener('canplay', () => video.classList.add('is-playing'), { once: true })
-          video.setAttribute('src', video.dataset.src)
+          video.setAttribute('src', file)
         }
         video.play().catch(() => {
-          /* autoplay refused, or the file is not there yet; the fallback stands */
+          /* autoplay refused; the poster carries the slot */
         })
       },
       '25%'
@@ -257,11 +283,50 @@ export function initBackVideos() {
   })
 }
 
+/* ── the hero intro ───────────────────────────────────────────── */
 /**
- * Hides an <img> whose file is missing so the drawn stand-in behind it shows
- * through. Every image path on this page is a placeholder from the brief, so
- * without this the page is a grid of broken-image icons until the client
- * sends the assets.
+ * The hero headline rolls up ONCE, on load, and then stops existing as
+ * animation state.
+ *
+ * This is the fix for the title coming back cut after scrolling down and up
+ * again. It used to be keyed to the section's `.is-in`, which an
+ * IntersectionObserver owns — so a late callback, a resize or a reload at
+ * mid-page could catch it mid-transition or leave it at its start value,
+ * which is 112% down and behind the header. Now: one class on <html> at
+ * load, and once the transition has run, `.hero-done` takes the transform
+ * and the transition off the lines entirely. There is no state left for
+ * anything to put back.
+ */
+export function initHeroIntro() {
+  const root = document.documentElement
+  const head = document.querySelector('.hero-head')
+  if (!head) return
+
+  const settle = () => root.classList.add('hero-done')
+
+  // two frames, so the start value is painted before the end value is set
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      root.classList.add('is-loaded')
+      const lines = qq('.line-inner', head)
+      if (!lines.length || reducedMotion()) {
+        settle()
+        return
+      }
+      // whichever comes first: the transition ending, or a timeout well past
+      // its 1.05s + 0.085s stagger, so a dropped event cannot strand it
+      lines[lines.length - 1].addEventListener('transitionend', settle, { once: true })
+      setTimeout(settle, 1800)
+    })
+  )
+}
+
+/* ── media ────────────────────────────────────────────────────── */
+/**
+ * Every <img> and <video> on the page gets its source from assets/media.js,
+ * never from the markup. `data-img="wire_1"` and `data-poster="live_video"`
+ * are all the HTML says; this resolves them. When the client supplies a real
+ * file, one `src` in media.js changes and nothing here or in index.html does.
  */
 const missing = new Set()
 
@@ -270,9 +335,28 @@ function hide(img) {
   img.style.display = 'none'
 }
 
+/** The URL for a media key, so panels can swap images without importing. */
+export function mediaSrc(key) {
+  return imageSrc(key)
+}
+
 export function initImages() {
-  qq('.shot__frame img, .post__art img, .deck__card img').forEach((img) => {
-    if (img.complete && img.naturalWidth === 0) hide(img)
+  // images, with their box reserved so a late picture cannot shift the layout
+  qq('[data-img]').forEach((img) => {
+    const key = img.dataset.img
+    const { w, h } = imageSize(key)
+    img.width = w
+    img.height = h
+    img.setAttribute('src', imageSrc(key))
+  })
+
+  // the still behind every video slot
+  qq('[data-poster]').forEach((img) => {
+    img.setAttribute('src', posterSrc(img.dataset.poster))
+  })
+
+  qq('img').forEach((img) => {
+    if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) hide(img)
     img.addEventListener('error', () => hide(img))
   })
 }
@@ -280,18 +364,121 @@ export function initImages() {
 /**
  * Points an <img> at a new file, remembering the ones that are not there.
  * The segment tabs and the letters both swap images, and without the memo
- * every tab click re-requested a file the browser already 404'd — the console
- * filled up and the network panel was unreadable during review.
+ * every tab click re-requested a file the browser already failed on.
  */
 export function setImage(img, src) {
   if (!img || !src) return
-  if (missing.has(src)) {
-    img.style.display = 'none'
-    img.setAttribute('src', src)
+  img.style.display = missing.has(src) ? 'none' : ''
+  img.setAttribute('src', src)
+}
+
+/**
+ * 01's two marquees, built from the logo list. A logo with an SVG shows the
+ * image; one without shows the publisher's name as type, which is what the
+ * page does today. The rows are split in half and run in opposite directions.
+ */
+export function initLogos() {
+  qq('[data-logos]').forEach((row) => {
+    const half = Math.ceil(logos.length / 2)
+    const slice = Number(row.dataset.logos) === 0 ? logos.slice(0, half) : logos.slice(half)
+    const track = document.createElement('div')
+    track.className = 'marquee-track'
+    slice.forEach((logo) => {
+      if (logo.src) {
+        const img = document.createElement('img')
+        img.src = logo.src
+        img.alt = logo.name
+        img.loading = 'lazy'
+        track.appendChild(img)
+      } else {
+        const span = document.createElement('span')
+        span.className = 'display'
+        span.textContent = logo.name
+        track.appendChild(span)
+      }
+    })
+    row.replaceChildren(track)
+  })
+}
+
+/**
+ * 12's orbiting publisher chips. Eight of them on a slow circle around the
+ * globe, each offset so they do not all cross the horizon together.
+ */
+export function initOrbit() {
+  const orbit = document.querySelector('[data-cta-orbit]')
+  if (!orbit) return
+
+  const picked = logos.slice(0, 8)
+  orbit.replaceChildren(
+    ...picked.map((logo, i) => {
+      const el = document.createElement('span')
+      el.textContent = logo.name
+      el.style.setProperty('--a', String(i / picked.length))
+      return el
+    })
+  )
+
+  if (reducedMotion()) {
+    // parked, evenly spaced, rather than orbiting
+    place(0)
     return
   }
-  img.style.display = ''
-  img.setAttribute('src', src)
+
+  let live = false
+  let raf = 0
+  const t0 = performance.now()
+
+  function place(t) {
+    ;[...orbit.children].forEach((el, i) => {
+      const a = (i / picked.length) * Math.PI * 2 + t * 0.12
+      // an ellipse, wider than tall, so the chips read as going round a globe
+      const x = Math.cos(a) * 46
+      const y = Math.sin(a) * 19 - 4
+      el.style.transform = `translate(-50%, -50%) translate(${x}%, ${y}vh)`
+      // behind the globe on the far half
+      el.style.opacity = String(0.25 + 0.75 * ((Math.sin(a) + 1) / 2))
+    })
+  }
+
+  const tick = (now) => {
+    if (!live) {
+      raf = 0
+      return
+    }
+    place((now - t0) / 1000)
+    raf = requestAnimationFrame(tick)
+  }
+
+  onInView(
+    orbit,
+    (v) => {
+      live = v
+      if (v && !raf) raf = requestAnimationFrame(tick)
+    },
+    '5%'
+  )
+}
+
+/**
+ * The parallax inside a picture: the image is scaled 1.15 and slides between
+ * -8% and 8% as its section crosses the window. `overflow: hidden` on the
+ * mask is fine here and nowhere else — what it clips is a picture that was
+ * deliberately made oversized to have somewhere to travel, not content.
+ */
+export function initMediaParallax() {
+  if (!hasGsap || reducedMotion()) return
+
+  qq('[data-pxm]').forEach((mask) => {
+    const section = mask.closest('.ed') || mask
+    const state = { p: 0 }
+    gsap.to(state, {
+      p: 1,
+      ease: 'none',
+      onUpdate: () => mask.style.setProperty('--pxy', ((state.p * 2 - 1) * 8).toFixed(2) + '%'),
+      scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 0.6 },
+    })
+  })
 }
 
 /* ── the "Watch video" modal ──────────────────────────────────── */

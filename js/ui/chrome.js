@@ -1,16 +1,13 @@
 /**
- * The persistent UI: the header, the overlay menu, the fixed section label and
- * the cursor ring.
+ * The persistent UI: the header, the overlay menu and the fixed section label.
  *
- * All of it used to invert as `[data-nav]` blocks passed under a reading line —
- * the bar swapped between a white and a dark skin, the logo was swapped for a
- * second file, the demo pill swapped classes, the label and the cursor flipped
- * colour. The page is one background now, so there is nothing to invert
- * against and none of that machinery is left. What remains is the menu, the
- * label's text, and the ring following the pointer.
+ * The custom cursor is gone. It was a ring that followed the pointer with
+ * `cursor: none` on everything underneath it, which meant the page had no
+ * system cursor at all — no hand over a link, no caret in the newsletter
+ * field, and nothing at all if the script failed. The browser's own cursor
+ * says more, in the places it matters, than a ring ever did.
  */
 
-/** One rAF-throttled scroll listener, run once so the first frame is right. */
 import { onScroll } from '../lib/motion.js'
 
 /* ── header ───────────────────────────────────────────────────── */
@@ -21,10 +18,11 @@ export function initHeader() {
   const menu = document.querySelector('[data-menu]')
   const toggles = [...document.querySelectorAll('[data-menu-toggle]')]
 
-  // Present from the first frame and at the very top of the page, not revealed
-  // on scroll. It slides in behind the preloader, so it is already in place by
-  // the time the intro lifts.
+  // Present from the first frame and at the very top of the page. The bar has
+  // its glass background at every scroll position; this only deepens it once
+  // there is something scrolling underneath.
   header.classList.add('is-shown')
+  onScroll(() => header.classList.toggle('is-scrolled', window.scrollY > 24))
 
   let open = false
   const setMenu = (next) => {
@@ -71,44 +69,4 @@ export function initSectionLabel() {
       text.style.animation = ''
     }
   })
-}
-
-/* ── custom cursor ────────────────────────────────────────────── */
-export function initCursor() {
-  if (!window.matchMedia('(pointer: fine)').matches) return
-  const wrap = document.querySelector('[data-cursor-root]')
-  if (!wrap) return
-
-  // The native cursor is only hidden once this is actually up, so a failure
-  // here leaves a normal pointer rather than no pointer at all.
-  document.documentElement.setAttribute('data-custom-cursor', '')
-  wrap.hidden = false
-
-  const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-  const pos = { ...target }
-  let mode = 'default'
-
-  window.addEventListener(
-    'pointermove',
-    (e) => {
-      target.x = e.clientX
-      target.y = e.clientY
-
-      const hit = document.elementFromPoint(e.clientX, e.clientY)
-      const next = hit?.closest('a, button, [data-cursor="hover"]') ? 'hover' : 'default'
-      if (next !== mode) {
-        mode = next
-        wrap.dataset.mode = mode
-      }
-    },
-    { passive: true }
-  )
-
-  const loop = () => {
-    pos.x += (target.x - pos.x) * 0.22
-    pos.y += (target.y - pos.y) * 0.22
-    wrap.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`
-    requestAnimationFrame(loop)
-  }
-  requestAnimationFrame(loop)
 }

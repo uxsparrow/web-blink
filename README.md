@@ -36,6 +36,10 @@ Then open <http://localhost:8080> (or whichever port it prints).
 
 ```
 index.html            the whole page — hero, twelve sections, footer
+assets/media.js       EVERY image, video and logo path, in one place
+data/
+  india-boundary.json the official Survey of India boundary, for 01
+  countries-110m.json Natural Earth land, for the globe
 css/
   styles.css          all styles — edit directly, nothing to compile
   fonts.css           @font-face rules for the self-hosted fonts
@@ -43,17 +47,19 @@ js/
   main.js             entry point
   lib/motion.js       gsap/ScrollTrigger, onScrub, onInView, easings
   lib/content.js      the copy the scripts need as data
-  lib/world.js        Natural Earth land geometry
-  ui/edition.js       page-wide: reveal, ambient, parallax, counters, media
-  ui/panels.js        the four swapping panels (02, 07, 08, 11)
-  ui/chrome.js        header, overlay menu, section label, cursor ring
+  lib/compare.js      06's comparison rows
+  lib/world.js        Natural Earth land geometry, for the globe
+  ui/edition.js       page-wide: reveal, ambient, parallax, media, wordmark
+  ui/panels.js        the five swapping panels (02, 06, 07, 08, 11)
+  ui/chrome.js        header, overlay menu, section label
   scenes/dots.js      the canvas toolkit + the two ambient dot fields
   scenes/network.js   01 · the dot-matrix map of India
   scenes/bento.js     03 · tile tilt and the micro-UI gate
-  scenes/flow.js      04 · the fibre path, and 09's rate-card lines
-  scenes/live.js      05 · counter, auto-scaling nodes, sparkline
-  scenes/versus.js    06 · the draggable split
+  scenes/flow.js      04 · the node diagram, and 09's rate-card lines
+  scenes/live.js      05 · counter, area chart, server rack
   scenes/globe.js     the hero globe (Three.js, lazy), used twice
+tools/
+  build-india-map.js  one-off generator for india-boundary.json — NOT a build step
 vendor/               GSAP, ScrollTrigger, topojson-client, Three.js
 fonts/                Tomorrow, Space Grotesk, Space Mono
 ```
@@ -131,29 +137,47 @@ assembled rather than never arriving.
   reveal becomes an opacity fade and every scrubbed graphic draws its finished
   state.
 
-## Assets — the client still owes these
+## Assets — all dummies, all from one file
 
-Every image and video path in the page is a placeholder from the brief. **The
-page is built so their absence is invisible**, and so that dropping the files
-in is the only step needed:
+**Every image and video on the page comes from `assets/media.js`.** Nothing in
+the markup carries a path: the HTML says `data-img="wire_1"` and the script
+resolves it. To ship real assets, set `src` on the entry — that is the whole
+change, in one file.
 
-| Path | Used by |
+```js
+images.wire_1   = { src: 'assets/img/wire-tamil-daily.webp', seed: '…', w: 1400, h: 900 }
+videos.live_video = { src: 'assets/video/live-newsroom.mp4', poster: { … } }
+logos[0]        = { name: 'Daily Thanthi', src: 'assets/logos/daily-thanthi.svg' }
+```
+
+| Key | Used by |
 |---|---|
-| `assets/video/live-newsroom.mp4` | 05's back layer |
-| `assets/video/cta-press.mp4` | 12's back layer |
-| `assets/img/case-dailythanthi.webp` + `-hansindia` `-livelaw` `-mediaone` `-factcheck` | 07's device frame |
-| `assets/img/testimonial-kavitha-iyer.webp`, `-sanjay-bhat` | 08's portrait |
-| `assets/img/post-tamil-daily.webp`, `-ai-editor`, `-wordpress-seo` | 10's cards |
-| `assets/logos/<publisher>.svg` | 01's two marquees, which currently set the names as type |
+| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | 07, one per segment |
+| `letters_1` · `letters_2` | 08's portrait card and the deck behind it |
+| `wire_1` · `wire_2` · `wire_3` | 10's three post cards |
+| `live_video` · `cta_video` (and their posters) | the 05 and 12 back layers |
+| `logos[]` | 01's two marquees and 12's orbiting chips |
 
-**Videos** carry `data-src`, load only in view and fade in only on `canplay`,
-over a drawn fallback that is always there. **Images** sit on top of a drawn
-stand-in built from the same DNA; `initImages()` hides any whose file 404s, and
-`setImage()` remembers the failures so a tab switch does not re-request them.
-A 404 on these paths costs one console line and changes nothing on screen.
+**⚠ Until those are filled in the page loads dummy pictures from
+picsum.photos** — an external service, and the only one it calls apart from
+the YouTube embed behind "Watch video". It is there so the layout can be
+reviewed with pictures in it. **It is not a state to ship in**; filling in
+every `src` removes the third-party request entirely.
 
-Videos should be MP4 + WebM, 1920×1080, 8–12s seamless loop, ≤3MB, with a
-poster. Images AVIF/WebP with width/height set. Logos white monochrome SVG.
+**08 is never a face.** Its quotes carry real publisher names and placeholder
+people, so a stock photograph of a plausible-looking person beside one reads
+as that person. Those two seeds are abstract newsroom frames on purpose, and
+when real portraits arrive the names have to be real too.
+
+A missing file is never an error. An image that 404s hides itself and the
+drawn stand-in behind it shows through; a video with no `src` is never
+requested at all and its poster carries the slot with a slow zoom. The same
+purple duotone — `grayscale(1) contrast(1.1) brightness(0.8)` plus `#6118EA`
+at 60% in `color` blend mode — is applied to every picture, dummy or real, so
+a client screenshot and a stand-in sit in the same world.
+
+Supply videos as MP4 + WebM, 1920×1080, 8–12s seamless loop, ≤3MB, with a
+poster. Images AVIF or WebP. Logos white monochrome SVG.
 
 ## Editing content
 
@@ -179,6 +203,22 @@ words per section, numbers and logos excluded. No paragraphs.
   Layout A is text 5 + graphic 7 (graphic may bleed right); layout B is a
   centred headline over a full-width graphic.
 
+## The map in 01
+
+Section 01 does **not** use `data/countries-110m.json`, which the globe draws
+from. Natural Earth renders India without Jammu & Kashmir and Ladakh, and a
+map published in India has to show the official boundary.
+
+`data/india-boundary.json` is the **official boundary of India as per the
+Survey of India** — J&K, Ladakh, Aksai Chin and the island territories
+included — simplified from `datameet/maps` `Country/india-composite.geojson`,
+which is CC-0. 252,604 points became 5,616 and 10.7 MB became 86 kB; at a dot
+grid about 420px across the two are indistinguishable.
+
+`tools/build-india-map.js` is the generator. **It is not a build step** — the
+site still has no toolchain — and the file it writes is committed. Run it only
+if the source changes.
+
 ## Verification status
 
 Verified with no runtime errors at **1920×960, 1440×900, 1366×657, 1280×720,
@@ -187,12 +227,14 @@ Verified with no runtime errors at **1920×960, 1440×900, 1366×657, 1280×720,
 - no section taller than the window, no section with vertical or horizontal
   overflow, no horizontal page scroll;
 - every section reaches `.is-in` and no revealed element is left hidden;
-- the footer at 52–88% of the window (budget: 100svh);
-- the content block at 86% of each section at 1440×900 (budget: 75%).
+- the hero title fully visible, clearing the header, after scroll down → up
+  **and** after a reload at mid-page → up;
+- no element anywhere with `cursor: none`; no `[FROM CLIENT]` markers left;
+- the footer at 63–97% of the window (budget: 100svh).
 
-The interactive sweep ran at each size: all six monitor scenes in 02, all five
-segments in 07, all seven questions in 11, and the letters in 08, with every
-section re-measured afterwards.
+The interactive sweep ran at each size before re-measuring: all six monitor
+scenes in 02, all five comparison tabs in 06, all six segments in 07, both
+letters in 08, all seven questions in 11, and all three flow nodes in 04.
 
 Paste this into the console after any edit:
 
@@ -203,7 +245,7 @@ document.querySelectorAll('main > section').forEach((s, i) => {
 });
 ```
 
-**Not verified in this pass:** Lighthouse (no headless Chrome in the
-environment) and `prefers-reduced-motion` (checked by reading the rules, not by
-emulating the media query). Both are worth half an hour on a real machine
-before release — see HANDOFF §7.
+**Not verified in this pass:** Lighthouse and `prefers-reduced-motion` (read
+in the rules, not emulated). Measure Lighthouse **after** the real assets are
+in — the dummies are full-size third-party JPEGs and will dominate any number
+taken now. See HANDOFF §7.

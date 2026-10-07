@@ -14,6 +14,85 @@ is still open.
 
 ---
 
+## 0 · Fix and polish round (7 Oct 2026)
+
+A fix round on top of §0a, not a redesign. The design system, section order
+and everything not listed below are unchanged.
+
+### The global fixes
+
+**The hero title came back cut after scrolling down and up.** It was keyed to
+the section's `.is-in`, which an IntersectionObserver owns — a late callback,
+a resize or a reload at mid-page could catch it mid-transition or leave it at
+its start value, 112% down and behind the header. The intro now runs **once,
+on load**, from `html.is-loaded`, and `initHeroIntro()` adds `.hero-done`
+when it finishes, which takes the transform and the transition off entirely.
+Nothing scroll-linked touches hero text. The `overflow: hidden` line masks are
+gone and the lines carry `padding-bottom: 0.08em` so the lavender gradient,
+painted through `background-clip: text`, has room to finish. Verified both
+ways the brief asks for: down→up, and reload at mid-page→up.
+
+**The custom cursor is gone** — element, listeners and the `cursor: none` it
+put on everything. The page had no system cursor at all: no hand over a link,
+no caret in the newsletter field, nothing if the script failed. `cursor:
+pointer` is now spelt out for the clickable things the browser cannot infer
+(`<span>` and `<g>` elements acting as controls).
+
+**The header has a glass background at every scroll position** —
+`rgba(6,4,14,.55)` at the top, `.85` past 24px, blur 16px with 140%
+saturation, 1px white 6% border. There is a `@supports` fallback to a near
+solid bar where `backdrop-filter` is missing, because blur is the only reason
+55% is readable. The overlay menu is solid `#06040E`.
+
+**All media now comes from `assets/media.js`** — one file, one key per slot.
+Nothing in the markup hard-codes a path; `data-img="wire_1"` is all the HTML
+says. Until the client supplies files, images fall back to deterministic
+`picsum.photos` seeds and videos show their poster with a slow zoom and never
+request a file. Every picture, real or dummy, gets the same duotone.
+
+⚠ **picsum.photos is an external service** and the only one the page calls
+apart from the YouTube embed. It exists so the layout can be reviewed with
+pictures in it. Filling in every `src` in media.js removes it.
+
+**The hard purple bands in 05 and 12** are a `.glow-layer` masked to nothing
+at its top and bottom quarters. Before, the gradients ran to the edge of a
+layer that stopped at the section boundary, which drew a straight line across
+the page.
+
+**The logo marquees** have their 80px edge fades, and are built from the logo
+list in media.js — an SVG when there is one, the publisher's name as type
+until there is.
+
+### The section fixes
+
+| | |
+|---|---|
+| **01** | The map is now the **official boundary of India per the Survey of India**, J&K, Ladakh and the island territories included, from `data/india-boundary.json`. Natural Earth — which the globe uses and the map used to — draws India without them. Headline 150+; four new stat cards. |
+| **02** | Card capped at the left column's height and 56svh, tops aligned. Real axes, a legend, a peak marker, a six-segment progress bar, and six distinct scenes. |
+| **04** | Rebuilt as **one SVG**: chips, labels, curves, track, nodes and packet in a single viewBox. That is what stops a curve ever starting in empty space. A second, vertical viewBox takes over below 768px, because an SVG cannot reflow and scaling the wide one put its 17px labels at 4.7px. |
+| **05** | Card capped at 56svh. Counter, area chart with a stepped capacity line, twelve servers lighting in turn, three mini stats. The empty dot grid is gone. |
+| **06** | Category tabs plus a lit/dim comparison table from `js/lib/compare.js`. The split-screen chip graphic is gone. **No `[FROM CLIENT]` markers remain.** |
+| **07** | Six segments with real metrics, a dummy screenshot with image parallax, floating chips anchored to the frame, and a per-segment background glyph. |
+| **08** | Dummy newsroom image with Ken Burns and parallax; the deck behind shows the next letters. **Never a face** — see §7. |
+| **09** | Four plans with the client's published limits, features, CTAs and add-ons strip. Features start under the price. |
+| **10** | Dummy images with parallax inside each card and a hover zoom. |
+| **11** | A real exchange: your question as a right-aligned bubble, a 600ms typing indicator, then the desk's answer, two quick actions and a footer link. Auto-height, top-aligned. |
+| **12** | New headline, support line, contact line, eight orbiting publisher chips, globe masked into the background. |
+| **13** | Wordmark is **SVG**, so it fills the container width exactly at every size and before the font loads. Full address and five socials. |
+
+### Verified
+
+Hero title after down→up and after reload-at-mid-page→up. No `cursor: none`
+anywhere. No `.todo` markers anywhere. Every section fits its window with no
+overflow in either axis and no horizontal page scroll, at 1920×960, 1440×900,
+1366×657, 1280×720, 1024×768, 820×1180, 390×844, 360×740 and 844×390 — with
+every monitor scene, comparison tab, segment, question and flow node clicked
+through first. Footer 63–97%.
+
+**Still not verified:** Lighthouse and `prefers-reduced-motion` — see §7.
+
+---
+
 ## 0a · The second redesign — "one continuous world" (7 Oct 2026)
 
 The first redesign (§0b below) fixed the consistency problem and created a new
@@ -980,51 +1059,58 @@ section animates delivery, structure or arrival.
 ---
 ## 7 · Open items
 
-### Open after the second redesign (7 Oct 2026) — current, not historical
+### Open after the fix round (7 Oct 2026) — current, not historical
 
-**1 · 06's WordPress column is empty, on purpose.** Eight rows, eight visible
-`[FROM CLIENT]` markers. The client offered PDFs with the real content; when
-they arrive, replace the `<em class="todo">` in each `.vs-wp` cell and delete
-nothing else. Keep them factual and non-disparaging — the table sits under a
-headline naming another product, which is exactly where an unsourced claim
-becomes a problem.
+**1 · Every image and video is a dummy.** They come from picsum.photos via
+`assets/media.js`, which means **the page currently calls an external image
+service on every load**. That is deliberate — it lets the layout be reviewed
+with pictures in it — but it is not a state to ship in. Fill in the `src`
+fields in media.js and the page makes no third-party request at all. The keys
+and sizes are listed in `README.md`.
 
-**2 · Two of 07's five segments have no numbers.** Broadcasters (MediaOne) and
-Fact-checking render `[METRICS FROM CLIENT]` instead of figures, because the
-brief gives metrics for only three of the five. Their `data-metrics` attributes
-on the tab buttons in `index.html` are where the real ones go — same
-`[["20×","growth"], …]` shape as the other three.
+**2 · 08's images must never be a face.** The quotes carry real publisher
+names and placeholder people, so a stock photograph of a plausible-looking
+person beside one reads as that person. The seeds are abstract newsroom
+frames on purpose. When real approved portraits arrive, the names have to be
+real too — see §6d.
 
-**3 · Every image and video is a placeholder path.** Listed in `README.md`
-under "Assets". The page is built so their absence is invisible and dropping
-them in is the only step. Nothing else needs changing.
+**3 · 01's last two stat cards came only from the brief.** "200% increase in
+SEO reach" and "30% lower newsroom costs" are not traceable to any earlier
+material and were marked `[confirm with client]` in the brief; the client
+confirmed publishing them on 7 Oct. Worth a second look before launch.
 
-**4 · The rate card goes stale silently.** $500 / $1,500 / $2,000 were read
-from blinkcms.ai/pricing-page on 27 Sep 2026 and nothing in the build checks
-them. Re-read before any release.
+**4 · The rate card goes stale silently.** The plans, prices, limits, features
+and add-ons are the client's published pricing page and nothing in the build
+checks them. Re-read before any release.
 
 **5 · Lighthouse has not been run.** No headless Chrome in the environment.
 The brief asks for ≥75 on mobile, LCP <2.5s and CLS <0.05. The structural work
-is done — no preloader, no photography shipped, one WebGL context, every loop
-gated on visibility, images carrying width/height — but the number is
-unmeasured.
+is done — no preloader, one WebGL context, every loop gated on visibility,
+every image carrying width/height from media.js — but the number is unmeasured.
+Note that the dummy images are full-size JPEGs from a third party, so **measure
+after the real, optimised assets are in**, not before.
 
 **6 · `prefers-reduced-motion` was read, not emulated.** The rules are in the
-stylesheet and the guards are in `lib/motion.js` and `scenes/dots.js`, and
-`onScrub()` draws the finished state rather than nothing. Worth ten minutes in
-a browser with the OS setting on.
+stylesheet and the guards are in `lib/motion.js`, `scenes/dots.js`,
+`ui/panels.js` and `scenes/flow.js`. Worth ten minutes with the OS setting on.
 
 **7 · Two headlines run to three lines on layout A.** "Why newsrooms leave
-WordPress." and "Reliability on every deadline." sit in a 5-of-12 column, and
+WordPress." and "Reliability on every deadline." sit in a 5-of-12 column and
 there is no size at which they hold two lines at every width. `text-wrap` is
-`wrap` rather than `balance` there so they break greedily, which reads better
-than three stubby balanced lines. Shortening the copy is the only other fix.
+`wrap` rather than `balance` there, so they break greedily. Shortening the
+copy is the only other fix.
 
-### Open from the first redesign, now resolved
+**8 · 06's optional competitor switch was left out**, as the brief says to
+unless approved. Adding Quintype / PubLive / Hocalwire means a second data
+set in `js/lib/compare.js` and the same sourcing discipline — nothing in that
+table is inferred.
 
-- The preloader is gone (brief forbids >1s). 
-- 150+ vs 66+ is resolved: 66+ everywhere.
-- The rate card is back on the homepage as section 09.
+### Resolved by this round
+
+- 06's `[FROM CLIENT]` column and 07's `[METRICS FROM CLIENT]` are gone; both
+  are filled from the brief's own content.
+- The India map is the official Survey of India boundary.
+- 150+ vs 66+ is resolved again, the other way: **150+ everywhere.**
 
 ### The 12-essentials audit — all three sections landed
 

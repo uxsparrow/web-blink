@@ -1,21 +1,22 @@
 /**
- * The four panels that swap their contents in place: the results-night
- * monitor in 02, the segment tabs in 07, the letters in 08 and the chat in 11.
+ * The five panels that swap their contents in place: the results-night
+ * monitor in 02, the comparison table in 06, the segment tabs in 07, the
+ * letters in 08 and the chat in 11.
  *
  * They all follow the same two rules, and both exist to protect the
  * fit-to-window system:
  *
  *   · Nothing here changes a section's height. The panels are sized by the
- *     flex layout and the contents cross-fade inside them, so choosing an
- *     answer or a segment moves nothing on screen. This is why none of them
- *     is an accordion.
+ *     flex layout and their contents cross-fade inside them, so choosing an
+ *     answer, a category or a segment moves nothing on screen.
  *   · Auto-advance only runs while the section is on screen, and stops for
  *     good the moment the reader touches it. A carousel that keeps moving
  *     under someone who has started reading is worse than no carousel.
  */
 
 import { onInView, reducedMotion } from '../lib/motion.js'
-import { setImage } from './edition.js'
+import { setImage, mediaSrc } from './edition.js'
+import { compare } from '../lib/compare.js'
 
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 const SWAP_MS = 180
@@ -36,12 +37,11 @@ function swap(el, write) {
 }
 
 /**
- * Shared auto-advance. Ticks every `every` ms while the element is in view,
- * drives a 0→1 progress for the hairline, and gives up permanently as soon as
- * the reader interacts.
+ * Shared auto-advance. Ticks while the element is in view, reports progress
+ * through the current step, and gives up permanently on interaction.
  */
-function autoCycle(el, count, onStep, every = 6000) {
-  if (!el || count < 2) return { stop() {}, touch() {} }
+function autoCycle(el, count, onStep, onTick, every = 6000) {
+  if (!el || count < 2) return { stop() {}, sync() {} }
 
   let i = 0
   let live = false
@@ -49,36 +49,37 @@ function autoCycle(el, count, onStep, every = 6000) {
   let t0 = performance.now()
   let raf = 0
 
-  const tick = (now) => {
+  const frame = (now) => {
     if (stopped || !live) {
       raf = 0
       return
     }
     const p = (now - t0) / every
-    el.style.setProperty('--t', Math.min(1, p).toFixed(3))
+    onTick?.(i, Math.min(1, p))
     if (p >= 1) {
       t0 = now
       i = (i + 1) % count
       onStep(i, true)
     }
-    raf = requestAnimationFrame(tick)
+    raf = requestAnimationFrame(frame)
   }
 
-  const start = () => {
-    if (raf || stopped) return
-    t0 = performance.now()
-    raf = requestAnimationFrame(tick)
-  }
-
-  onInView(el, (v) => {
-    live = v
-    if (v) start()
-  }, '0%')
+  onInView(
+    el,
+    (v) => {
+      live = v
+      if (v && !raf && !stopped) {
+        t0 = performance.now()
+        raf = requestAnimationFrame(frame)
+      }
+    },
+    '0%'
+  )
 
   return {
     stop() {
       stopped = true
-      el.style.setProperty('--t', '0')
+      onTick?.(i, 0)
     },
     sync(next) {
       i = next
@@ -95,19 +96,31 @@ export function initMonitor() {
 
   const stage = monitor.querySelector('[data-monitor-stage]')
   const cap = monitor.querySelector('[data-monitor-cap]')
-  const bar = monitor.querySelector('[data-monitor-time]')
+  const steps = qq('i', monitor.querySelector('[data-monitor-steps]'))
   const scenes = qq('.monitor__scene', stage)
 
   const select = (i, fromTimer) => {
     buttons.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)))
-    scenes.forEach((s, k) => s.classList.toggle('is-on', k === i))
+    scenes.forEach((s, k) => {
+      // restart the scene's CSS animations by taking the class off and back on
+      s.classList.toggle('is-on', k === i)
+    })
+    steps.forEach((s, k) => {
+      s.classList.toggle('is-done', k < i)
+      s.style.setProperty('--t', k === i ? '0' : k < i ? '1' : '0')
+    })
     swap(cap, () => {
       if (cap) cap.textContent = buttons[i].dataset.cap || ''
     })
     if (!fromTimer) cycle.sync(i)
   }
 
-  const cycle = autoCycle(bar || monitor, buttons.length, (i) => select(i, true))
+  const cycle = autoCycle(
+    monitor,
+    buttons.length,
+    (i) => select(i, true),
+    (i, p) => steps[i]?.style.setProperty('--t', p.toFixed(3))
+  )
 
   buttons.forEach((b, i) =>
     b.addEventListener('click', () => {
@@ -118,6 +131,50 @@ export function initMonitor() {
   // pointing at the monitor is also "I am reading this"
   monitor.addEventListener('pointerenter', () => cycle.stop())
 
+  select(0, true)
+}
+
+/* ── 06 · the comparison table ────────────────────────────────── */
+export function initCompare() {
+  const tabs = document.querySelector('[data-vs-tabs]')
+  const rows = document.querySelector('[data-vs-rows]')
+  if (!tabs || !rows) return
+
+  const buttons = qq('[data-vs-tab]', tabs)
+
+  const select = (i) => {
+    const key = buttons[i].dataset.vsTab
+    const set = compare[key]
+    if (!set) return
+    buttons.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)))
+
+    swap(rows, () => {
+      rows.replaceChildren(
+        ...set.rows.map((label) => {
+          const row = document.createElement('div')
+          row.className = 'vs2__row'
+
+          const name = document.createElement('span')
+          name.textContent = label
+
+          const wp = document.createElement('span')
+          wp.className = 'vs2__no'
+          wp.textContent = '✘'
+          wp.setAttribute('aria-label', 'Not in WordPress out of the box')
+
+          const bl = document.createElement('span')
+          bl.className = 'vs2__yes'
+          bl.textContent = '✔'
+          bl.setAttribute('aria-label', 'Included in Blink CMS')
+
+          row.append(name, wp, bl)
+          return row
+        })
+      )
+    })
+  }
+
+  buttons.forEach((b, i) => b.addEventListener('click', () => select(i)))
   select(0)
 }
 
@@ -127,6 +184,7 @@ export function initBeats() {
   if (!tabs) return
 
   const buttons = qq('[data-beat]', tabs)
+  const tag = document.querySelector('[data-beat-tag]')
   const name = document.querySelector('[data-beat-name]')
   const metrics = document.querySelector('[data-beat-metrics]')
   const shotWrap = document.querySelector('[data-shot]')
@@ -149,36 +207,21 @@ export function initBeats() {
     const data = read(b)
 
     swap(metrics, () => {
+      if (tag) tag.textContent = b.dataset.tag || ''
       if (name) name.textContent = b.dataset.name || ''
       metrics.replaceChildren(
-        ...(data.length
-          ? data.map(([fig, label]) => {
-              const cell = document.createElement('span')
-              cell.className = 'metric'
-              const f = document.createElement('b')
-              f.textContent = fig
-              const l = document.createElement('span')
-              l.className = 'meta'
-              l.textContent = label
-              cell.append(f, l)
-              return cell
-            })
-          : /*
-             * Two of the five segments have no published numbers. They get a
-             * visible marker rather than a plausible-looking figure — this
-             * page does not invent metrics.
-             */
-            [
-              (() => {
-                const em = document.createElement('em')
-                em.className = 'todo'
-                em.style.gridColumn = '1 / -1'
-                em.textContent = '[METRICS FROM CLIENT]'
-                return em
-              })(),
-            ])
+        ...data.map(([fig, label]) => {
+          const cell = document.createElement('span')
+          cell.className = 'metric'
+          const f = document.createElement('b')
+          f.textContent = fig
+          const l = document.createElement('span')
+          l.className = 'meta'
+          l.textContent = label
+          cell.append(f, l)
+          return cell
+        })
       )
-      // the floating chips repeat the first two metrics
       chips.forEach((chip, k) => {
         const m = data[k]
         chip.hidden = !m
@@ -195,13 +238,13 @@ export function initBeats() {
     }
 
     if (shot && b.dataset.shot) {
-      swap(shotWrap, () => setImage(shot, b.dataset.shot))
+      swap(shotWrap, () => setImage(shot, mediaSrc(b.dataset.shot)))
     }
 
     if (!fromTimer) cycle.stop()
   }
 
-  const cycle = autoCycle(tabs, buttons.length, (i) => select(i, true), 7000)
+  const cycle = autoCycle(tabs, buttons.length, (i) => select(i, true), null, 7000)
   buttons.forEach((b, i) => b.addEventListener('click', () => select(i)))
   select(0, true)
 }
@@ -220,10 +263,19 @@ export function initQuotes(letters) {
   const prev = root.querySelector('[data-quote-prev]')
   const next = root.querySelector('[data-quote-next]')
   const shot = document.querySelector('[data-quote-shot]')
+  const deck = qq('[data-deck-img]')
   if (!panel) return
 
   const total = String(letters.length).padStart(2, '0')
   let i = 0
+
+  /** The two cards behind show whichever letters come next. */
+  const paintDeck = () => {
+    deck.forEach((img, k) => {
+      const L = letters[(i + k + 1) % letters.length]
+      if (L?.shot) setImage(img, mediaSrc(L.shot))
+    })
+  }
 
   const go = (step) => {
     i = (i + step + letters.length) % letters.length
@@ -234,19 +286,22 @@ export function initQuotes(letters) {
       if (role) role.textContent = L.role
       if (org) org.textContent = L.org
       if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
-      if (shot && L.shot) setImage(shot, L.shot)
+      if (shot && L.shot) setImage(shot, mediaSrc(L.shot))
+      paintDeck()
     })
   }
 
   prev?.addEventListener('click', () => go(-1))
   next?.addEventListener('click', () => go(1))
+  paintDeck()
 }
 
 /* ── 11 · the chat ────────────────────────────────────────────── */
 /**
- * Picking a question shows the typing indicator, then the answer — the
- * indicator is the swap, not decoration on top of it, so the 300ms the panel
- * takes to change reads as the desk replying rather than as a transition.
+ * A real exchange: the question you pick appears as your own bubble, the desk
+ * types for 600ms, then answers. The typing indicator IS the swap rather than
+ * decoration over it, so the pause reads as someone replying instead of as a
+ * transition.
  */
 export function initChat() {
   const list = document.querySelector('[data-chat-list]')
@@ -254,13 +309,27 @@ export function initChat() {
   if (!list || !chat) return
 
   const buttons = qq('.qlist__q', list)
+  const ask = chat.querySelector('[data-chat-ask]')
   const answer = chat.querySelector('[data-chat-answer]')
+  let timer = 0
 
-  const select = (i) => {
+  const select = (i, instant) => {
     buttons.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)))
-    swap(chat, () => {
+    const q = buttons[i].textContent.replace(/^\s*\d+\s*/, '').trim()
+
+    if (ask) ask.textContent = q
+    if (instant || reducedMotion()) {
       if (answer) answer.textContent = buttons[i].dataset.a || ''
-    })
+      chat.classList.remove('is-typing')
+      return
+    }
+
+    chat.classList.add('is-typing')
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      if (answer) answer.textContent = buttons[i].dataset.a || ''
+      chat.classList.remove('is-typing')
+    }, 600)
   }
 
   buttons.forEach((b, i) => {
@@ -278,5 +347,5 @@ export function initChat() {
     })
   })
 
-  select(0)
+  select(0, true)
 }

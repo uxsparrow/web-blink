@@ -22,7 +22,7 @@
 import { onInView, hasGsap, ScrollTrigger } from './lib/motion.js'
 import { letters } from './lib/content.js'
 
-import { initCursor, initHeader, initSectionLabel } from './ui/chrome.js'
+import { initHeader, initSectionLabel } from './ui/chrome.js'
 import {
   initAmbient,
   initBackVideos,
@@ -31,19 +31,22 @@ import {
   initMarquee,
   initNewsletter,
   initParallax,
+  initHeroIntro,
+  initLogos,
+  initMediaParallax,
+  initOrbit,
   initReveals,
   initViewportVar,
   initVideoModal,
   initWordmark,
 } from './ui/edition.js'
-import { initBeats, initChat, initMonitor, initQuotes } from './ui/panels.js'
+import { initBeats, initChat, initCompare, initMonitor, initQuotes } from './ui/panels.js'
 
 import { mountIsoGrid, mountWave } from './scenes/dots.js'
 import { mountNetwork } from './scenes/network.js'
 import { mountBento } from './scenes/bento.js'
 import { mountFlow, mountRatesBg } from './scenes/flow.js'
 import { mountLive } from './scenes/live.js'
-import { mountVersus } from './scenes/versus.js'
 
 // Tells the boot failsafe at the end of index.html that the module ran. Must
 // stay the first statement after the imports: if any import above fails this
@@ -92,23 +95,28 @@ async function mountGlobes() {
 /* ── boot ─────────────────────────────────────────────────────── */
 
 function boot() {
-  initCursor()
   initHeader()
   initSectionLabel()
 
   initViewportVar()
   initAmbient()
+  initHeroIntro()
   initReveals()
   initParallax()
   initCounters()
-  initMarquee()
   initWordmark()
   initImages()
+  // the logo rows are built before the marquee clones them
+  initLogos()
+  initMarquee()
+  initOrbit()
+  initMediaParallax()
   initBackVideos()
   initVideoModal()
   initNewsletter()
 
   initMonitor()
+  initCompare()
   initBeats()
   initQuotes(letters)
   initChat()
@@ -127,9 +135,6 @@ function boot() {
 
   const live = q('[data-live]')
   if (live) mountLive(live)
-
-  const vs = q('[data-vs]')
-  if (vs) mountVersus(vs)
 
   const ratesBg = q('[data-rates-bg]')
   if (ratesBg) mountRatesBg(ratesBg)

@@ -12,7 +12,6 @@
  */
 
 import { onScrub, easeOut, clamp } from '../lib/motion.js'
-import { loadWorld, rasterize } from '../lib/world.js'
 import { fitCanvas, loop, token } from './dots.js'
 
 /* The cities the brief names, plus the Noida desk every arc runs back to. */
@@ -28,7 +27,11 @@ const CITIES = [
   { name: 'KOZHIKODE', lat: 11.2588, lon: 75.7804 },
 ]
 
-/* India's bounding box, with a little air so the coast is not on the edge. */
+/*
+ * The frame. These are only a sensible default for the first paint — the real
+ * values are read from the boundary file's own bbox as soon as it lands, so
+ * the whole country always fits whatever box the layout gave us.
+ */
 const BOX = { lon0: 67.0, lon1: 98.5, lat0: 5.5, lat1: 37.5 }
 
 export function mountNetwork(root) {
@@ -47,7 +50,10 @@ export function mountNetwork(root) {
   const fitProjection = ({ w, h }) => {
     const bw = BOX.lon1 - BOX.lon0
     const bh = BOX.lat1 - BOX.lat0
-    const s = Math.min(w / bw, h / bh) * 0.98
+    // 0.86, not 1: the graphic dissolves into the page at its top and bottom
+    // 9%, and the whole country has to sit inside the solid middle. A map of
+    // India with Ladakh faded out is the bug this section exists to fix.
+    const s = Math.min(w / bw, h / bh) * 0.86
     proj = { s, ox: (w - bw * s) / 2, oy: (h - bh * s) / 2 }
   }
 
@@ -87,10 +93,30 @@ export function mountNetwork(root) {
   })
 
   /* ── the dots ──────────────────────────────────────────────── */
-  loadWorld().then((world) => {
-    const polys = world.india.length ? world.india : world.land
-    // rasterise at a fixed resolution and read the mask back as a dot grid;
-    // 2° of longitude per 24px keeps the grain close to the globe's
+  /*
+   * NOT from data/countries-110m.json, which the globe uses. Natural Earth
+   * draws India without Jammu & Kashmir and Ladakh, and a map published in
+   * India has to show the official boundary. This file is the Survey of India
+   * boundary — see tools/build-india-map.js for the source and what was done
+   * to it — and its own bbox drives the projection, so the whole country
+   * fits the frame and nothing is cropped.
+   */
+  fetch('data/india-boundary.json')
+    .then((r) => r.json())
+    .then((world) => {
+    const polys = world.polygons
+    const b = world.bbox
+    // a little air so the coast is never flush against the edge
+    const padX = (b[2] - b[0]) * 0.03
+    const padY = (b[3] - b[1]) * 0.03
+    BOX.lon0 = b[0] - padX
+    BOX.lon1 = b[2] + padX
+    BOX.lat0 = b[1] - padY
+    BOX.lat1 = b[3] + padY
+    fitProjection(c)
+    placeTags()
+
+    // rasterise at a fixed resolution and read the mask back as a dot grid
     const RW = 420
     const RH = Math.round((RW * (BOX.lat1 - BOX.lat0)) / (BOX.lon1 - BOX.lon0))
     const mask = rasterizeBox(polys, RW, RH)

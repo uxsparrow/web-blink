@@ -76,7 +76,7 @@ export const letters = [
     name: 'Kavitha Iyer',
     role: 'Managing editor',
     org: 'Daily Thanthi',
-    shot: './assets/img/testimonial-kavitha-iyer.webp',
+    shot: 'letters_1',
   },
   {
     text:
@@ -84,6 +84,6 @@ export const letters = [
     name: 'Sanjay Bhat',
     role: 'Product lead',
     org: 'The Federal',
-    shot: './assets/img/testimonial-sanjay-bhat.webp',
+    shot: 'letters_2',
   },
 ]

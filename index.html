@@ -1048,7 +1048,10 @@
     <!-- ═══ 05 · LIVE ═══════════════════════════════════════════════ -->
     <section id="live" class="ed ed--a" data-label="LIVE">
       <div class="layer-back ed__fade" aria-hidden="true">
-        <span class="vidslot duo" data-depth="0.3">
+        <!-- fixed: the picture holds still and the section scrolls over it.
+             No `data-depth` — see `.vidslot--fixed` for why the two cannot
+             share the slot. -->
+        <span class="vidslot vidslot--fixed duo" data-fixedbg>
           <img data-poster="live_video" alt="" loading="lazy">
         </span>
         <video class="backvid" data-backvid="live_video" muted loop playsinline preload="none"
@@ -1072,39 +1075,59 @@
           </div>
 
           <div class="ed__gfx">
+            <!--
+              The desk monitor. Read top to bottom: who and when, what is
+              happening, the number it is happening at, the shape of it over
+              time, the machines carrying it, and what that adds up to.
+
+              The claim has its own line rather than riding in the LIVE flag —
+              as one string, "LIVE · DESK HOLDS AT FULL LOAD" filled the header
+              row and ran straight into the timestamp beside it. And the
+              capacity line is named in a legend above the chart, not in a
+              label floating on top of it, where it sat across the trace and
+              against the card's edge.
+            -->
             <div class="glass live" data-live data-in style="--i:1">
               <div class="live__top">
-                <span class="meta live__flag"><span class="sig"></span>LIVE · DESK HOLDS AT FULL LOAD</span>
+                <span class="meta live__flag"><span class="sig"></span>LIVE</span>
                 <span class="meta">NOIDA · 14:32 IST</span>
               </div>
+
+              <span class="display live__claim">Desk holds at full load</span>
 
               <div class="live__readout">
                 <span class="figure" data-live-count>43,000</span>
                 <span class="meta">concurrent readers</span>
               </div>
 
-              <!-- readers over time, with the capacity line stepping up under it -->
-              <div class="live__chart">
-                <svg viewBox="0 0 420 150" preserveAspectRatio="none" fill="none" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="liveFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="rgba(97,24,234,.55)" />
-                      <stop offset="100%" stop-color="rgba(97,24,234,0)" />
-                    </linearGradient>
-                  </defs>
-                  <path data-live-area fill="url(#liveFill)" />
-                  <path data-live-line stroke="var(--lavender)" stroke-width="2" fill="none"
-                    stroke-linejoin="round" />
-                  <path data-live-cap stroke="rgba(245,243,255,.45)" stroke-width="1.5" stroke-dasharray="5 5"
-                    fill="none" />
-                </svg>
-                <span class="meta live__capname">CAPACITY</span>
+              <!-- readers over time, with capacity stepping up above them -->
+              <div class="live__chartwrap">
+                <div class="live__legend">
+                  <span class="meta legend"><i class="legend__key legend__key--bl"></i>Readers</span>
+                  <span class="meta legend"><i class="legend__key legend__key--cap"></i>Capacity</span>
+                </div>
+                <div class="live__chart">
+                  <svg viewBox="0 0 420 150" preserveAspectRatio="none" fill="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="liveFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(97,24,234,.55)" />
+                        <stop offset="100%" stop-color="rgba(97,24,234,0)" />
+                      </linearGradient>
+                    </defs>
+                    <path data-live-area fill="url(#liveFill)" />
+                    <path data-live-line stroke="var(--lavender)" stroke-width="2" fill="none"
+                      stroke-linejoin="round" />
+                    <path data-live-cap stroke="rgba(245,243,255,.45)" stroke-width="1.5" stroke-dasharray="5 5"
+                      fill="none" />
+                  </svg>
+                </div>
               </div>
 
-              <!-- twelve servers, lighting as the load climbs -->
+              <!-- twelve servers, lighting as the load climbs. The label leads
+                   so it can never be the thing squeezed off the right edge. -->
               <div class="live__servers">
-                <span class="live__rack" data-live-rack aria-hidden="true"></span>
                 <span class="meta">AWS AUTO-SCALING</span>
+                <span class="live__rack" data-live-rack aria-hidden="true"></span>
               </div>
 
               <div class="live__mini">

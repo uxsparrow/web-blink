@@ -3768,6 +3768,34 @@ body {
   overflow: hidden;
 }
 
+/*
+ * A viewport-fixed back layer. The picture behind 05 stays where it is while
+ * the section scrolls over it, so the glass card reads as a panel held in
+ * front of a scene rather than a box printed onto a photograph.
+ *
+ * Neither obvious way works here. `position: fixed` is not clipped by
+ * `.layer-back`'s `overflow: hidden` — it would escape the section and show
+ * over the ones either side — and anything that makes an ancestor a
+ * containing block (a `transform`, a `filter`, a `clip-path`) takes the
+ * "fixed" away again. `background-attachment: fixed` is ignored on iOS and
+ * repaints the whole layer on every frame besides.
+ *
+ * So the slot is exactly one window tall and `initFixedBg()` writes `--fy` as
+ * the negated distance from the window's top edge, cancelling the section's
+ * own travel. The layer clips it. The result is a window onto a still image,
+ * on every engine, composited on the GPU.
+ *
+ * This replaces the depth-0.3 parallax on the slot rather than joining it:
+ * both want the same `transform`, and holding still is the stronger reading.
+ * The other two depths in the section are untouched.
+ */
+.vidslot--fixed {
+  bottom: auto;
+  height: 100svh;
+  transform: translate3d(0, var(--fy, 0px), 0);
+  will-change: transform;
+}
+
 .vidslot img {
   width: 100%;
   height: 100%;
@@ -5670,10 +5698,109 @@ button:disabled,
 }
 
 /* ── 05 · the live card, rebuilt ──────────────────────────────── */
+/*
+ * The desk monitor, built exactly like `.monitor` in 02: a flex column that
+ * fills the graphic area, where the header, the claim, the counter, the
+ * servers and the three figures take the room they need and the chart takes
+ * whatever is left. That is why the card is the same shape at 1440×900 and at
+ * 1366×657 without a single height being guessed.
+ *
+ * It had no rule of its own at all until now. Its children all declared
+ * `flex`, but the card itself was a plain unpadded block, so it collapsed to
+ * its content height at the top of a 737px column with its text against the
+ * border — the cramped card in the screenshot.
+ */
+.live {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: clamp(14px, 2.4svh, 28px);
+  gap: clamp(8px, 1.4svh, 18px);
+  overflow: hidden;
+}
+
+/*
+ * Who and when. It wraps, because at a narrow card width these two strings
+ * cannot both fit on one line and `space-between` does not stop them meeting
+ * in the middle — it only stops them overlapping. They used to touch.
+ */
+.live__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 2vw, 24px);
+  flex: none;
+}
+
+/* the red signal is the only red in the card, and it means exactly one thing */
+.live__flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  color: var(--txt);
+}
+
+/*
+ * The claim has its own line now. As one string the flag read "LIVE · DESK
+ * HOLDS AT FULL LOAD", which filled the header row and ran into the timestamp
+ * beside it; and the card's one sentence belongs at card scale, not at 12px
+ * meta scale.
+ */
+.live__claim {
+  flex: none;
+  font-size: clamp(15px, min(2.4svh, 2.8vw), 26px);
+  color: var(--txt);
+}
+
+/* the number, with its unit on the same baseline rather than stacked under it */
+.live__readout {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px clamp(8px, 1.6vw, 18px);
+  flex: none;
+}
+
+.live__readout .figure {
+  color: var(--txt);
+}
+
+/* readers over time, with capacity stepping up above them */
+.live__chartwrap {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.8svh, 10px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/*
+ * The two lines are named here, above the plot. The capacity line used to be
+ * labelled by a word positioned on top of the chart and flush to the card's
+ * right edge, where it sat across the trace it was naming.
+ */
+.live__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 2vw, 22px);
+  flex: none;
+}
+
+/* dashed, at the same 5-on-5-off and the same ink as the line it stands for */
+.legend__key--cap {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(245, 243, 255, 0.45) 0 5px,
+    transparent 5px 10px
+  );
+}
+
 .live__chart {
   position: relative;
   flex: 1 1 auto;
-  min-height: clamp(70px, 14svh, 150px);
+  min-height: clamp(60px, 12svh, 150px);
 }
 
 .live__chart svg {
@@ -5683,23 +5810,29 @@ button:disabled,
   height: 100%;
 }
 
-.live__capname {
-  position: absolute;
-  right: 0;
-  top: 4px;
-}
-
+/*
+ * Twelve servers, lighting as the load climbs. The label leads and the rack
+ * takes the rest, so the label can never be the thing squeezed off the right
+ * edge — which is what happened when the rack had `flex: 1 1 auto` and the
+ * text came after it.
+ */
 .live__servers {
   display: flex;
   align-items: center;
-  gap: 0.8em;
+  gap: clamp(8px, 1.6vw, 18px);
   flex: none;
+}
+
+.live__servers .meta {
+  flex: none;
+  white-space: nowrap;
 }
 
 .live__rack {
   display: flex;
   gap: 4px;
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .live__rack i {

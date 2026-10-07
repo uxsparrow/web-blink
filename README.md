@@ -151,6 +151,14 @@ assembled rather than never arriving.
   revealed and a plain observer reporting nothing.
 - **Parallax**: back 0.3, mid 0.7, chips 1.15, capped at ±80px. Content itself
   is never parallaxed.
+- **The fixed back layer in 05.** Its picture is held still while the section
+  scrolls over it. `position: fixed` cannot do it — it escapes the layer's
+  `overflow: hidden` and shows over the neighbouring sections, and any
+  `transform`/`filter`/`clip-path` on an ancestor cancels it anyway — and
+  `background-attachment: fixed` is ignored on iOS. So `.vidslot--fixed` is one
+  window tall and `initFixedBg()` writes `--fy` as the negated distance from the
+  window top. It is the one motion that still runs under reduced motion: a
+  background that holds still is the calmer option, not the busier one.
 - **Ambient loops only in view.** Every canvas loop and every CSS micro-UI is
   gated on an IntersectionObserver. Twelve sections of animation running at
   once is how a phone loses 60fps.

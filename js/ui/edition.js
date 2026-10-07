@@ -563,6 +563,34 @@ export function initMediaParallax() {
   })
 }
 
+/* ── the fixed back layer ─────────────────────────────────────── */
+/**
+ * Holds a `[data-fixedbg]` slot still while its section scrolls over it.
+ *
+ * The slot is one window tall inside a layer that clips (see
+ * `.vidslot--fixed`), so writing `--fy` as the negated distance from the
+ * window's top edge cancels the section's own travel and the picture stays
+ * put. It is one custom property per frame and the transform is composited,
+ * so this costs no layout.
+ *
+ * Unlike every other motion on the page it runs under reduced motion too: a
+ * background that holds still is the calmer option, not the busier one, and
+ * leaving `--fy` unwritten would park the picture at the top of the section
+ * and let it scroll — which is more movement, not less.
+ */
+export function initFixedBg() {
+  const slots = qq('[data-fixedbg]')
+  if (!slots.length) return
+
+  onScroll(() => {
+    slots.forEach((slot) => {
+      const host = slot.parentElement
+      if (!host) return
+      slot.style.setProperty('--fy', Math.round(-host.getBoundingClientRect().top) + 'px')
+    })
+  })
+}
+
 /* ── the "Watch video" modal ──────────────────────────────────── */
 export function initVideoModal() {
   const modal = document.querySelector('[data-video-modal]')

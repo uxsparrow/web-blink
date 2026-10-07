@@ -34,6 +34,7 @@ import {
   initHeroIntro,
   initLogos,
   initMediaParallax,
+  initFixedBg,
   initOrbit,
   initReveals,
   initViewportVar,
@@ -111,6 +112,7 @@ function boot() {
   initMarquee()
   initOrbit()
   initMediaParallax()
+  initFixedBg()
   initBackVideos()
   initVideoModal()
   initNewsletter()

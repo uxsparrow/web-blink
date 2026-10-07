@@ -4,7 +4,7 @@
  * These are the values the scenes need at runtime.
  */
 
-/** Bureau cities — shared by the preloader map, the globe and the footer map. */
+/** Bureau cities, shared by the globe. */
 export const bureaus = [
   { city: 'NOIDA', label: 'NOIDA / DELHI', lat: 28.5355, lon: 77.391, hq: true },
   { city: 'CHENNAI', label: 'CHENNAI', lat: 13.0827, lon: 80.2707, hq: false },
@@ -15,18 +15,6 @@ export const bureaus = [
   { city: 'BHOPAL', label: 'BHOPAL', lat: 23.2599, lon: 77.4126, hq: false },
 ]
 
-/** Sample wire lines typed into the preloader. Clearly sample text. */
-export const wireFeed = [
-  { time: '14:32', bureau: 'CHENNAI', text: 'ELECTION COUNT BEGINS' },
-  { time: '14:33', bureau: 'MUMBAI', text: 'MONSOON ALERT ISSUED' },
-  { time: '14:33', bureau: 'DELHI', text: 'MARKETS OPEN HIGHER' },
-  { time: '14:34', bureau: 'HYDERABAD', text: 'CIVIC POLL DATES ANNOUNCED' },
-  { time: '14:35', bureau: 'GUWAHATI', text: 'RIVER LEVELS UNDER WATCH' },
-  { time: '14:36', bureau: 'BHOPAL', text: 'BUDGET SESSION EXTENDED' },
-  { time: '14:36', bureau: 'KOLKATA', text: 'PORT TRAFFIC RESUMES' },
-  { time: '14:37', bureau: 'BENGALURU', text: 'TECH HIRING NUMBERS FILED' },
-  { time: '14:38', bureau: 'JAIPUR', text: 'HEAT ADVISORY EXTENDED' },
-]
 
 /**
  * Pings on the globe, all arcing back to the Noida desk. Sample markers, not
@@ -74,13 +62,70 @@ export const pings = [
 /** Longitude parked in front of the camera when the globe first appears. */
 export const START_LON = 78
 
-/** Timestamps down the live-blog rail; the travelling card reads these. */
-export const liveTicks = ['14:32', '14:35', '14:41', '14:46', '14:52', '15:04', '15:11', '15:19']
 
 /**
- * The story the Desk writes and the Platform rail carries — one headline, split
- * into the lines it breaks on, typed out a character at a time. Every screen in
- * sections 03 and 04 renders this same article.
+ * 08 · LETTERS. The only section whose copy is not in index.html, because a
+ * carousel showing one item at a time has nowhere to put the others: the
+ * first letter is in the markup and reads fine with no scripts, and these are
+ * what the arrows page through.
+ *
+ * ⚠ MIXED PROVENANCE — read `source` on every entry before this ships.
+ *
+ * `source: 'sample'` means the name, the role and the words are invented. Two
+ * of these are, at the user's request, for an internal review build. A
+ * fabricated quote beside a real customer's masthead reads as an endorsement
+ * that customer never gave, so those two have to be replaced or flagged before
+ * the page is public — see HANDOFF §6d.
+ *
+ * `source: <url>` means the quote is verbatim from that published case study,
+ * not paraphrased and not shortened. If one ever has to be cut, mark the cut:
+ * the section claims nothing is paraphrased.
+ *
+ * Two more verbatim ones exist and are not used here — Hari Bhoomi's digital
+ * team and EVO India's team, from the same `/case-study/` set. They are in
+ * HANDOFF §6d and can replace the two samples without any other change.
+ *
+ * `shot` is one frame per letter now. They are frames and never faces on
+ * purpose: a stock photograph of a plausible-looking person beside a named
+ * quote reads as that person. ⚠ letters_3 and letters_4 are byte-identical
+ * copies of letters_2 at the moment, so three of the four show the same
+ * picture — see the note beside them in assets/media.js.
  */
-export const articleHeadline = ['EVERY STAGE', 'OF THE', 'STORY']
-export const articleDateline = 'NOIDA — 14:32 IST'
+export const letters = [
+  {
+    text:
+      'Our reporters file from the district in Tamil, on their phones, and it reaches the front page without anyone retyping it.',
+    name: 'Karthik Subramanian',
+    role: 'Executive Editor',
+    org: 'Daily Thanthi',
+    shot: 'letters_1',
+    source: 'sample',
+  },
+  {
+    text:
+      'Election night, we watched the traffic climb and did nothing at all, which is exactly what we were paying for.',
+    name: 'Siddharth Menon',
+    role: 'Head of Digital Product',
+    org: 'The Federal',
+    shot: 'letters_2',
+    source: 'sample',
+  },
+  {
+    text:
+      'The platform’s stability has been remarkable, and we’ve seen a significant increase in readership and revenue since the switch.',
+    name: 'Adv Rohan Verma',
+    role: 'Co-founder & Legal Editor',
+    org: 'LiveLaw',
+    shot: 'letters_3',
+    source: 'blinkcms.ai /case-study/ — LiveLaw, verbatim',
+  },
+  {
+    text:
+      'After partnering with Blink CMS, we saw immediate improvements in traffic, search visibility, and overall site speed.',
+    name: 'Pradeep Reddy',
+    role: 'Chief Digital Officer',
+    org: 'Deccan Chronicle',
+    shot: 'letters_4',
+    source: 'blinkcms.ai /case-study/ — Deccan Chronicle, verbatim',
+  },
+]

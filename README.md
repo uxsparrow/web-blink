@@ -1,261 +1,331 @@
-# Blink CMS — one-page scroll story
+# Blink CMS — one continuous world
 
-A single-page marketing site for Blink CMS, built to the structure and motion
-system of unitedcarriers.com but told through a news story rather than a
-shipping container: **Monitor → Gather → Create → Publish → Monetize → Analyze.**
+A single-page marketing site for Blink CMS. **Every section after the hero is
+exactly one browser window tall, fills at least three-quarters of it with its
+own signature graphic, and is built from one shared visual language.**
 
-**Plain HTML, CSS and JavaScript. No framework, no build step, no runtime
-dependencies.** Drop this folder on any static host and it works.
+That sentence is the whole design, and it is the second attempt at it. The
+first pass fixed consistency and overshot: one background, one card, one
+motion — and small content floating in large dark screens. This pass keeps the
+consistency and puts something in the screens. Twelve sections, twelve
+graphics, one world.
 
-> Picking this up fresh? Read [HANDOFF.md](HANDOFF.md) first — it covers the
-> decisions behind the setup, what is still open, and the tooling gotchas.
+**Plain HTML, CSS and JavaScript. No framework, no build step.** Drop this
+folder on any static host and it works.
+
+> Picking this up fresh? Read [HANDOFF.md](HANDOFF.md) §0 — it covers both
+> redesigns and what is still open.
 
 ## Running it
 
-**There is no build step and no dependencies.** The folder *is* the site — put
-it behind any web server and it works. nginx, Apache, cPanel, S3, Netlify,
-GitHub Pages and any CMS that serves static files will all take it as-is.
+**There is no build step.** The folder *is* the site — put it behind any web
+server and it works. nginx, Apache, cPanel, S3, Netlify, GitHub Pages and any
+CMS that serves static files will take it as-is.
 
-It does have to be *served over http*, though. The page uses ES modules and
-`fetch`, and both are blocked on the `file://` origin, so **double-clicking
-`index.html` will not give you the real page.** This is a browser security
-rule, not a missing dependency — serving the folder is all it needs.
-
-Opened from disk you get the static page instead: all the copy, none of the
-scroll story, and a warning in the console explaining why. That fallback is
-there to catch a worse case — if `js/main.js` ever fails to load after an
-integration (moved files, a 404, a CSP that forbids modules), the preloader
-would otherwise cover the site with a black screen forever. See "The boot
-failsafe" below.
-
-Anything that serves a directory will do:
+It does have to be *served over http*. The page uses ES modules and `fetch`,
+and both are blocked on the `file://` origin, so **double-clicking `index.html`
+will not give you the real page.** Serving the folder is all it needs:
 
 ```bash
 npx serve .
 ```
 
-```bash
-python3 -m http.server 8080
-```
-
-```bash
-php -S localhost:8080
-```
-
-Then open <http://localhost:8080>.
+Then open <http://localhost:8080> (or whichever port it prints).
 
 ## What's in the folder
 
 ```
-index.html            the whole page — all 16 sections as static markup
+index.html            the whole page — hero, twelve sections, footer
+assets/media.js       EVERY image, video and logo path, in one place
+data/
+  india-boundary.json the official Survey of India boundary, for 01
+  countries-110m.json Natural Earth land, for the globe
 css/
-  styles.css          all styles — edit directly, there is nothing to compile
+  styles.css          all styles — edit directly, nothing to compile
   fonts.css           @font-face rules for the self-hosted fonts
 js/
-  main.js             entry point: boots the UI and the scroll story
-  lib/                motion helpers, land geometry, canvas plumbing, copy
-  ui/                 header, cursor, reveals, counters, accordion, tabs…
-  scenes/             the canvas and WebGL scenes
-vendor/               GSAP, ScrollTrigger, Lenis, Three.js, topojson-client
-fonts/                Tomorrow, Space Grotesk, Space Mono, Playfair Display
-data/                 Natural Earth 110m land geometry
-assets/               logo, and the ON AIR background video (4.4MB, lazy-loaded)
-.claude/              Claude Code tooling — not part of the site, safe to delete
+  main.js             entry point
+  lib/motion.js       gsap/ScrollTrigger, onScrub, onInView, easings
+  lib/content.js      the copy the scripts need as data
+  lib/compare.js      06's comparison rows
+  lib/world.js        Natural Earth land geometry, for the globe
+  ui/edition.js       page-wide: reveal, ambient, parallax, media, wordmark
+  ui/panels.js        the five swapping panels (02, 06, 07, 08, 11)
+  ui/chrome.js        header, overlay menu, section label
+  scenes/dots.js      the canvas toolkit + the two ambient dot fields
+  scenes/network.js   01 · the dot-matrix map of India
+  scenes/bento.js     03 · tile tilt and the micro-UI gate
+  scenes/flow.js      04 · the node diagram, and 09's rate-card lines
+  scenes/live.js      05 · counter, area chart, server rack
+  scenes/globe.js     the hero globe (Three.js, lazy), used twice
+tools/
+  build-india-map.js  one-off generator for india-boundary.json — NOT a build step
+vendor/               GSAP, ScrollTrigger, topojson-client, Three.js
+fonts/                Tomorrow, Space Grotesk, Space Mono
 ```
 
-Every one of those paths is **relative**, so the folder structure has to stay
-intact. If your CMS rewrites or flattens asset URLs, fix the references in
-`index.html` and `css/fonts.css` to match.
+## The four rules
 
-One thing to check when mounting this inside a larger site: the footer's
-navigation links are **root-relative** (`/pricing/`, `/case-studies/livelaw/`
-and about a dozen more). They are correct if the page is the site root, and
-wrong if it is served from a subdirectory.
+Read the `BLINK · EDITION` banner in `css/styles.css` before changing anything
+below the hero. In short:
 
-Nothing is fetched from a CDN **except the brand video**, which is a YouTube
-embed in the "Watch video" modal. It is `youtube-nocookie.com` and carries no
-`src` until someone opens the modal, so a reader who never presses play never
-contacts YouTube — but behind a firewall that blocks it, the modal will be the
-one thing on the page that does not work. Everything else still runs offline.
+**1 · One screen.** `.ed` is `height: 100svh` and nothing is ever taller than
+the window. Three height breakpoints take content away as the window shortens
+(800px drops support lines, 680px thins grids and lists, 520px gives up and
+lets sections grow, because clipping is worse than scrolling on a phone in
+landscape). **Nothing fakes a fit with `overflow: hidden`.**
 
-## Libraries
+**2 · Every section is full.** This is the rule the previous build failed, and
+the fix is structural rather than a table of guessed heights:
 
-Vendored into `vendor/`, loaded by `<script>` tags at the bottom of
-`index.html`:
+```css
+.ed__shell { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0 }
+.ed__head  { flex: none }
+.ed__gfx   { flex: 1 1 auto; min-height: 0 }
+```
 
-| | | |
+The graphic takes exactly the room the text leaves, at every window size. One
+declaration satisfies "fits" and "fills" at once. **Do not give a graphic a
+fixed height** — give its contents `height: 100%` and let the flex box decide.
+Measured: the content block is 86% of every section at 1440×900.
+
+**3 · One visual DNA.** Dot-matrix, purple light, lavender hairlines, glass
+panels, mono meta, three parallax depths — and red *only* for live, alert and
+breaking states. Every section graphic uses at least three. A graphic that
+does not will look like it came off another website, which is the thing both
+redesigns exist to stop.
+
+**4 · No hard edges.** No section sets a background. The base and the 64px grid
+are one fixed layer behind the whole page; the hero's two glows live inside the
+hero; every section graphic dissolves into the page top and bottom with
+`.ed__fade`. Scrolling past a section boundary should show nothing happening.
+
+### Traps this hit, so you do not have to
+
+1. **`ch` resolves against the element's own font.** `max-width: 24ch` on a
+   wrapper set in body copy is ~235px while the headline inside it runs at
+   62px. Size display text in its own units or in px.
+2. **`svh` alone is not enough.** A 360×740 phone has height and no width.
+   Every display-sized clamp needs `min(Xsvh, Yvw)` — and in layout A the
+   headline needs a `vw` cap too, because it lives in a 5-of-12 column.
+3. **`100vw` includes the scrollbar.** The graphics that bleed to the window
+   edge are sized off `--vpw`, written from `documentElement.clientWidth`.
+   With `100vw` the bleed overshot by exactly the scrollbar width.
+4. **A definite height beats `max-width` when an `aspect-ratio` is in play.**
+   `height: 100%` + `aspect-ratio` + `max-width: 100%` still overflows a short
+   wide column. Make the width the definite side and clamp with `max-height`.
+5. **An entry reveal on a percentage threshold can be skipped.** A section is a
+   whole window tall; a fast scroll or an in-page link can jump clean over 10%
+   of it, and a section that never gets `.is-in` stays invisible forever. Use
+   `threshold: 0` with a negative bottom `rootMargin`.
+
+## Motion
+
+Scroll-linked or ambient, **never pinned**. ScrollTrigger scrubs; it does not
+pin, and nothing takes the scroll away from the reader. `onScrub()` in
+`lib/motion.js` is the one entry point — and with reduced motion or no GSAP it
+calls `draw(1)` once, so a graphic that would have assembled arrives already
+assembled rather than never arriving.
+
+- **The one entry reveal**: fade in, up 24px, 600ms, staggered 80ms by `--i`.
+  It covers everything — the hero copy, every section's label, headline and
+  support line, and the items *inside* each module. Rather than tagging
+  hundreds of elements by hand, `STAGGER` in `ui/edition.js` lists the
+  containers whose children each take their own place in the sequence
+  (`.stats`, `.bento`, `.rates`, `.wire`, `.qlist`, the footer columns…);
+  `expandStagger()` assigns them at boot, counting on from the container's own
+  `--i`, and removes the container's — otherwise a child would move 24px
+  inside a parent moving 24px.
+
+  The hero is the exception, and deliberately so: its copy rides `.is-loaded`
+  on `<html>`, not the shared `.is-in`, because `.is-in` belongs to an
+  IntersectionObserver and putting hero text back under an observer is exactly
+  what had the title coming back cut.
+
+  **Every revealed element starts at `opacity: 0`, so a reveal that never
+  fires is a blank page.** `initReveals()` therefore carries a safety net: a
+  document that loads *hidden* — a background tab, a minimised window — gets
+  no IntersectionObserver callbacks at all in Chrome, so the reveal also runs
+  on `visibilitychange` and once on a 2.5s timer. This is not theoretical; it
+  was found by measuring the page in a hidden preview pane and finding nothing
+  revealed and a plain observer reporting nothing.
+- **Parallax**: back 0.3, mid 0.7, chips 1.15, capped at ±80px. Content itself
+  is never parallaxed.
+- **The fixed back layer in 05.** Its picture is held still while the section
+  scrolls over it. It is a **scroll-driven CSS animation** (`view-timeline-name`
+  on `.layer-back--fixed`, `hold-still` on the slot), because that is evaluated
+  by the compositor on the same frame as the scroll. Driving it from a scroll
+  event instead — which is what `initFixedBg()` does, and all it is now — hands
+  the script a scroll the browser has already painted, so the transform lands a
+  frame late and the picture shudders. The script runs only where scroll-driven
+  animations do not.
+  `position: fixed` is not an option: it escapes the layer's `overflow: hidden`
+  and shows over the neighbouring sections, and any `transform`/`filter`/
+  `clip-path` on an ancestor cancels it anyway. `background-attachment: fixed`
+  is ignored on iOS.
+  Two cases need stating. Under `prefers-reduced-motion` the animation stays
+  (a picture holding still is the calmer option) but its duration has to be
+  re-asserted as `auto`, because on a progress timeline a duration is a slice
+  of the timeline, not a speed, and the blanket 0.001ms reset would park the
+  picture a window low. Below 520px of height the sections grow past one
+  window, the fixed distance stops matching the section's travel, and the slot
+  goes back to simply covering its section.
+- **Ambient loops only in view.** Every canvas loop and every CSS micro-UI is
+  gated on an IntersectionObserver. Twelve sections of animation running at
+  once is how a phone loses 60fps.
+- **`prefers-reduced-motion`**: no parallax, no loops, videos never load, the
+  reveal becomes an opacity fade and every scrubbed graphic draws its finished
+  state.
+
+## Assets — local placeholders, all from one file
+
+**Every image and video on the page comes from `assets/media.js`.** Nothing in
+the markup carries a path: the HTML says `data-img="wire_1"` and the script
+resolves it. To ship real assets, change `src` on the entry — that is the
+whole change, in one file.
+
+```js
+images.wire_1     = { src: 'assets/images/wire-1.jpg', w: 1400, h: 900, … }
+videos.live_video = { src: 'assets/video/live-newsroom.mp4', poster: { … } }
+logos[0]          = { name: 'Daily Thanthi', src: 'assets/logos/daily-thanthi.svg' }
+```
+
+| Key | File | Used by |
 |---|---|---|
-| GSAP + ScrollTrigger | 115 kB | the scroll story and the pins |
-| Lenis | 18 kB | smooth scroll |
-| topojson-client | 7 kB | decodes the land geometry |
-| Three.js | 703 kB | the hero globe only — **lazy-loaded**, never blocks first paint |
+| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | `assets/images/beats-*.jpg` | 07, one per segment |
+| `letters_1` · `letters_2` | `assets/images/letters-*.jpg` | 08's card and the deck behind it |
+| `wire_1` · `wire_2` · `wire_3` | `assets/images/wire-*.jpg` | 10's three post cards |
+| `live_video` · `cta_video` posters | `assets/images/poster-*.jpg` | the 05 and 12 back layers |
+| `logos[]` | — | 01's marquees and 12's orbit; set as type until SVGs exist |
 
-## The scenes are code, not renders
+**The page makes no third-party request for media.** All thirteen pictures are
+in `assets/images/`. The only external call left on the whole site is the YouTube
+embed behind "Watch video", and that is not made until someone presses it.
 
-Every 3D/illustrated element is drawn at runtime, so there are no frame
-sequences to produce or ship:
+### ⚠ They are still placeholders
 
-| Brief asset | How it's built |
-|---|---|
-| Dotted globe, pings, arcs | `js/scenes/globe.js` — Three.js points placed on **real land geometry**, red ping flares, bezier arcs back to Noida, headline tags projected to screen space |
-| Bureau map + wire feed | `js/scenes/preloader.js` — Natural Earth land rasterised to a dot grid, centred on India |
-| Laptop → tablet → phone | `js/scenes/desk.js` — the headline types into the Blink editor, the finished story lifts off the screen and flies across the desk, then lights up a tablet and a phone with the same article. One article renderer draws all four surfaces, and a dotted world map sways behind them |
-| The platform itself | `js/scenes/platform.js` — a dotted sea in perspective moving under a level ink deck that the six module cards stand on; each column’s water takes that module’s accent as its cards land, and the deck thickens into the ink strip that carries into HOW IT WORKS |
-| The edition going out | `js/scenes/press.js` — the published feed races up a dark bus, hopping through violet-lit relays, then fans out to endpoint screens |
-| Pipeline, end to end | `js/main.js` — `setupPipeline()`: inputs, six stages and audience channels on one rail; the curves are SVG drawn from the pills’ measured positions, the rest is CSS |
-| The story on every screen | same file — ~320 reader screens burst outward and clear to white |
-| Reader signal | `js/scenes/reader-signal.js` — a return trace that rises as the section scrolls, response marks lighting as it passes them; no axis, scale or number |
-| Halftone wordmark | `js/scenes/halftone-wordmark.js` — the type is rendered offscreen, sampled, and redrawn as dots sized by ink coverage |
+Each was fetched once from Lorem Picsum, which serves photographs from
+Unsplash, and saved locally so the layout could be reviewed without calling
+out to anything. `seed` and `credit` in `media.js` record exactly which
+picture each one is. They are generic stock photographs of nothing in
+particular — **not** Blink CMS screenshots, **not** client newsrooms, **not**
+cleared brand assets. Replace all of them before launch.
 
-The 12 pixel-dot icons and the registration marks are an inline SVG sprite at
-the top of `index.html`; elements reference them with `<use href="#px-mic">`.
+**08 is never a face.** Its quotes carry real publisher names and placeholder
+people, so a stock photograph of a plausible-looking person beside one reads
+as that person. Those two are abstract frames on purpose, and when real
+portraits arrive the names have to be real too.
 
-## The boot failsafe
+**There are no videos.** There was nothing to save: `src` is empty on both and
+the page never requests one, so the poster carries the slot with a slow zoom.
+Drop a file in `assets/video/`, point `src` at it, and it starts playing in
+view with no other change. Supply MP4 + WebM, 1920×1080, 8–12s seamless loop,
+≤3MB.
 
-The preloader is a full-screen black overlay in the markup, and `js/main.js`
-is what removes it. So anything that stops that module running leaves the
-overlay covering the site permanently — the page looks dead.
+A missing file is never an error — an image that 404s hides itself and the
+drawn stand-in behind it shows through. The same purple duotone —
+`grayscale(1) contrast(1.1) brightness(0.8)` plus `#6118EA` at 60% in `color`
+blend mode — is applied to every picture, so a client screenshot and a
+stand-in sit in the same world.
 
-`<noscript>` does not catch this. Scripting is *enabled* in the cases that
-matter; it is the module specifically that fails to load:
-
-- the page was opened from disk (`file://` blocks ES modules)
-- a Content-Security-Policy forbids modules
-- an integration moved the files and the path 404s
-
-So there is a second guard. `js/main.js` sets `window.__blinkBooted` as its
-first statement, and a small **classic** script at the end of `index.html`
-checks the flag 1.5s after load. If it is missing, it puts `.boot-failed` on
-`<html>` and logs why. That class applies the same rules `<noscript>` does:
-drop the preloader, and open anything whose open state is normally
-JavaScript's job.
-
-It is deliberately not a module — a module guard would be blocked by the very
-failure it exists to catch.
-
-The result is the page as static markup: every headline, every answer, the
-rate card and all the copy, with no scroll story and no canvas scenes. Two
-groups of elements stay hidden on purpose, because JavaScript positions them
-and showing them unplaced looks broken: the globe's `.ping-tag` labels and the
-press scene's `.press-feature` callouts.
-
-If you change what the preloader covers, or add anything that starts hidden
-and is revealed by JS, add it to **both** style blocks at the top of
-`index.html` — the `.boot-failed` one and the `<noscript>` one.
+The thirteen placeholders are 2.0 MB in total, unoptimised, straight from the
+source. **Do not measure Lighthouse against them** — see "Verification status".
 
 ## Editing content
 
-All copy is written directly into `index.html`, so the page reads correctly
-with JavaScript disabled and search engines see everything. The only copy in
-JavaScript is in `js/lib/content.js` — the bureau coordinates, the preloader's
-sample wire feed, the globe's ping tags, the live-blog timestamps and the
-headline the Desk types out, because the scenes need those as data.
+All copy is in `index.html` so the page reads with JavaScript disabled. The
+only copy in JavaScript is `js/lib/content.js`: bureau coordinates, the globe's
+ping tags, and the two letters in 08 (a carousel has nowhere in the markup to
+put the items it is not showing).
 
-## Editing the CSS
+**Text rules**: headline ≤6 words · support ≤12 words · card title 1–3 words
+plus a ≤6-word descriptor · answers and quotes ≤25 words · about 40 visible
+words per section, numbers and logos excluded. No paragraphs.
 
-`css/styles.css` is the source. Edit it directly — there is no Sass, no build
-and nothing to regenerate.
+## Tokens
 
-It was compiled from SCSS once; those sources and the Node toolchain were
-removed on request, so the compiled file became the thing you maintain. It is
-~12k lines, which is only navigable because of the banner comments that divide
-it. In order:
+- **Base** `#06040E` · **primary** `#6118EA` · **primary-light** `#9A6CF1` ·
+  **lavender** `#B9A6FF` · **text** `#F5F3FF`, secondary 70%, muted 50%.
+- **Red** `#E5243B` is a **signal**, not a colour: live, alert and breaking
+  states only. If something red is not reporting a state, it is wrong.
+- **Glass**: white 4%, 1px white 8% border, blur 12px, radius 18px. One card.
+- **Three fonts, three roles**: Tomorrow for uppercase headlines, Space Mono
+  for labels and meta (never below 12px), Space Grotesk for body. No serif.
+- **Grid**: 12 columns, container 1440px, padding 24px mobile / 48px desktop.
+  Layout A is text 5 + graphic 7 (graphic may bleed right); layout B is a
+  centred headline over a full-width graphic.
 
-| Block | |
-|---|---|
-| `BOOTSTRAP · REBOOT` | vendor — normalises the browser |
-| `BOOTSTRAP · GRID` | vendor — `.container`, `.row`, `.col-*` |
-| `BOOTSTRAP · HELPERS` | vendor — `.ratio`, `.text-truncate`… |
-| `BLINK · TOKENS` | custom properties: colours, ink scale, accents |
-| `BLINK · BASE` | element defaults |
-| `BLINK · TYPE` | the type scale |
-| `BLINK · UI` | hairlines, buttons, pills, cursor, ticker |
-| `BLINK · LAYOUT` | the sections and their scenes — **most edits land here** |
-| `BLINK · STATIC` | lists, tables, footer, modal |
-| `BOOTSTRAP · UTILITIES` | vendor, generated, **all `!important`** |
+## The map in 01
 
-Search for the banner, then work inside that block. The header at the top of
-the file repeats this map.
+Section 01 does **not** use `data/countries-110m.json`, which the globe draws
+from. Natural Earth renders India without Jammu & Kashmir and Ladakh, and a
+map published in India has to show the official boundary.
 
-Four Bootstrap decisions are baked into the generated output and will look
-wrong without the explanation:
+`data/india-boundary.json` is the **official boundary of India as per the
+Survey of India** — J&K, Ladakh, Aksai Chin and the island territories
+included — simplified from `datameet/maps` `Country/india-composite.geojson`,
+which is CC-0. 252,604 points became 5,616 and 10.7 MB became 86 kB; at a dot
+grid about 420px across the two are indistinguishable.
 
-- **`$spacers` used Tailwind's numeric scale** (`1 = .25rem` … `12 = 3rem`), not
-  Bootstrap's stock 1–5. So `.mt-7` is `1.75rem`.
-- **Breakpoints are Tailwind's** (sm 640 / md 768 / lg 1024).
-- **`$position-values` was extended with the spacing scale**, so `bottom-7`
-  exists; stock Bootstrap only ships `0/50/100`.
-- **The type scale is `.t-xl` … `.t-giant`**, deliberately not `.d-*`, which
-  would read as Bootstrap's display utilities.
-
-**The utilities block is last and carries `!important`**, so it beats every
-component rule above it. Add component CSS in the `BLINK` blocks — anything
-written below that banner will be overridden by the next utility class someone
-puts in the markup.
-
-If you would rather have the Sass back, the partials are recoverable from git
-history; they were last present in the commit before "chore: drop the Node
-toolchain".
-## What still needs real assets
-
-Marked in the UI so nothing reads as finished:
-
-- **Publisher logos** — the masthead wall currently sets the names as
-  mastheads; swap in SVGs if you have them
-- **Case-study photos** — the Letters clipping slots
-
-## What still needs real copy
-
-Every gap is wrapped in `[SQUARE BRACKETS]` and renders in red mono on the page:
-
-- **The Wire** — four headlines supplied, no article bodies
-
-## Content rules held
-
-- **The four letters in 09 are placeholder copy — invented names, roles and
-  quotes.** The mastheads are real customers (all four are on the publisher
-  wall), but the words are not theirs. **Nothing on screen says so any more**:
-  this build is for internal review and the sample flag was removed on request.
-  Restore that flag or swap in real quotes before this goes public — see
-  HANDOFF §6d. Real verbatim quotes are recoverable at commit 761d3c3.
-- Nothing else on the page invents a person, a quote or a number.
-- The preloader wire feed and the live-blog card are labelled sample text.
-- Every headline is live HTML — nothing is baked into an image.
-- **The F.A.Q answers and the rate card are sourced from outside the brief.**
-  The answers come from `Docs/Blink CMS - Feature List.pdf` plus copy already on
-  the page; one gap is still marked in answer 03.
-- **The rate card is sourced from outside the brief too.** Its four
-  plans, prices, limits and small print come from
-  <https://www.blinkcms.ai/pricing-page>, read 27 Sep 2026. Nothing in the
-  build checks that against the live page, so if the rates move this section
-  goes stale silently — re-read it before a release.
-- `WHY NEWSROOMS LEAVE` makes no claim about any other product. Its left column
-  is a question a publisher asks; its right column is Blink's own supplied
-  answer. Keep that shape if you add rows.
-
-## Behaviour notes
-
-- Total scroll is roughly **33k px** at 1440×900. Pins shorten by about half
-  below 900px, via `gsap.matchMedia()` in `js/main.js`.
-- `prefers-reduced-motion` collapses every pinned scene to a single key frame
-  and disables smooth scroll.
-- Canvas and WebGL loops pause when their section scrolls out of view.
-- The preloader is timer-driven with a 7-second failsafe, so a backgrounded tab
-  can never leave the page scroll-locked.
-  That failsafe is inside the module, though, so it cannot help when the module
-  itself never runs — see "The boot failsafe".
-- The native cursor is only hidden once the custom cursor has mounted, so a
-  script failure leaves a normal pointer rather than none.
-- `window.__lenis` and `window.__ST` are exposed for console debugging. Plain
-  `window.scrollTo` will not stick — Lenis owns the scroll position.
+`tools/build-india-map.js` is the generator. **It is not a build step** — the
+site still has no toolchain — and the file it writes is committed. Run it only
+if the source changes.
 
 ## Verification status
 
-Verified at 1440×900 and 375×812 with no console errors: the preloader, hero
-globe, desk, platform, press, masthead tabs, F.A.Q accordion, tickers, custom
-cursor, self-hosted fonts and the full scroll length.
+Verified with no runtime errors at **1920×960, 1440×900, 1366×657, 1280×720,
+1024×768, 820×1180, 390×844, 360×740** and **844×390** (phone landscape):
 
-**Not exhaustively verified:** the very end of each pinned scene (the newspaper
-landing on the bundles, the platform slab's rotation to edge-on, the press burst into
-flying pages) and the reader signal's full rise. Scroll through those on a
-real screen — they are the first things to look at.
+- no section taller than the window, no section with vertical or horizontal
+  overflow, no horizontal page scroll;
+- every section reaches `.is-in` and no revealed element is left hidden;
+- the hero title fully visible, clearing the header, after scroll down → up
+  **and** after a reload at mid-page → up;
+- no element anywhere with `cursor: none`; no `[FROM CLIENT]` markers left;
+- the footer at 63–97% of the window (budget: 100svh).
+
+The interactive sweep ran at each size before re-measuring: all six monitor
+scenes in 02, all five comparison tabs in 06, all six segments in 07, both
+letters in 08, all seven questions in 11, and all three flow nodes in 04.
+
+**Measure elements, not just sections.** The section-level check above has a
+blind spot: a grid item that overflows inside a `min-height: 0` grid does not
+grow its section, so the section still reports "fits". That is how four rate
+cards in a three-column grid went unnoticed while each one spilled 120px over
+its own box and painted across the card below. Run this too:
+
+```js
+const SKIP = '.marquee,.page-bg,.layer-back,.cta-globe,.rail,.rates,.pxm,' +
+             '.post__art,.vidslot,.deck__card,.tile__art,.hero,svg,.shot';
+document.querySelectorAll('main *, .ed-footer *').forEach((el) => {
+  if (el.closest(SKIP) || el.matches(SKIP)) return;
+  const y = el.scrollHeight - el.clientHeight, x = el.scrollWidth - el.clientWidth;
+  if ((y > 12 || x > 12) && el.clientHeight) console.log(el, 'y' + y, 'x' + x);
+});
+```
+
+Everything in `SKIP` overflows on purpose — a marquee, a bleeding graphic, a
+picture oversized to have somewhere to parallax. Anything else is a bug.
+
+**Neutralise the reveal before measuring**, or every container will report
+about 24px of overflow that is only an un-run `translateY`:
+
+```js
+document.head.insertAdjacentHTML('beforeend',
+  '<style>[data-in],[data-hero-in],.line-inner{opacity:1!important;' +
+  'transform:none!important;transition:none!important}</style>');
+```
+
+Paste this into the console after any edit:
+
+```js
+document.querySelectorAll('main > section').forEach((s, i) => {
+  const h = s.getBoundingClientRect().height, over = s.scrollHeight - s.clientHeight;
+  console.log(i, s.id, (h > innerHeight + 1 || over > 1) ? 'TOO TALL' : 'fits');
+});
+```
+
+**Not verified in this pass:** Lighthouse and `prefers-reduced-motion` (read
+in the rules, not emulated). Measure Lighthouse **after** the real assets are
+in — the dummies are full-size third-party JPEGs and will dominate any number
+taken now. See HANDOFF §7.

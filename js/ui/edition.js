@@ -1,48 +1,27 @@
 /**
- * The edition system — every behaviour the eleven sections have between them.
+ * The page-wide behaviours: the one entry reveal, the ambient glow, the
+ * count-ups, the parallax layers, the marquees, the footer wordmark, the
+ * video modal, the newsletter form, and the two bits of asset plumbing that
+ * let the brief's placeholder paths ship before the files exist.
  *
- * All of it put together is smaller than the old 06 pipeline was on its own,
- * and that is the point: the page has one entry animation, one way to swap a
- * panel, one carousel and one marquee, so a new section needs no new code.
- *
- * Nothing in here measures a layout or writes a size. The sections fit the
- * window because the stylesheet sizes them in `svh`, not because JavaScript
- * checks and corrects them — a reader resizing the window would otherwise see
- * the page catch up one frame late, and a reader with no scripts would see a
- * page that never fits at all.
+ * Nothing here measures a layout in order to size it. Sections fit and fill
+ * because the stylesheet makes `.ed__gfx` a flex child that takes the room
+ * the text leaves — not because JavaScript checks and corrects, which would
+ * always be one frame late and would do nothing at all with scripts off.
  */
 
-import { reducedMotion, onScroll, clamp } from '../lib/motion.js'
-import { letters } from '../lib/content.js'
+import { gsap, hasGsap, onInView, onScroll, reducedMotion, clamp } from '../lib/motion.js'
 
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 
-/** Cross-fade: hide, swap while hidden, show. The one swap on the page. */
-const SWAP_MS = 150
-
-function swap(el, write) {
-  if (!el) return
-  if (reducedMotion()) {
-    write()
-    return
-  }
-  el.classList.add('is-swapping')
-  clearTimeout(el._swap)
-  el._swap = setTimeout(() => {
-    write()
-    el.classList.remove('is-swapping')
-  }, SWAP_MS)
-}
-
-/* ── the one entry animation ──────────────────────────────────── */
+/* ── the one entry reveal ─────────────────────────────────────── */
 /**
- * Adds `.is-in` to a section the first time it is reached; the stylesheet does
- * the rest — fade in, up 24px, 600ms, staggered 80ms by each element's `--i`.
+ * Adds `.is-in` the first time a section is reached; the stylesheet does the
+ * rest — fade in, up 24px, 600ms, staggered 80ms by each element's `--i`.
  * Once per section, never reversed, so scrolling back up does not replay it.
  *
- * The threshold is low on purpose. A section is a whole window tall, so by the
- * time 12% of it is showing the reader is already looking at it; waiting for
- * more would mean the headline fades in after they have read it.
+ * The threshold is low on purpose. A section is a whole window tall, so by
+ * the time 10% of it shows the reader is already looking at it.
  */
 export function initReveals() {
   const blocks = qq('#hero, .ed, .ed-footer')
@@ -60,20 +39,25 @@ export function initReveals() {
         e.target.classList.add('is-in')
         io.unobserve(e.target)
       }),
-    { threshold: 0.12 }
+    /*
+     * threshold 0 with a negative bottom margin, not a percentage of the
+     * section. A section is a whole window tall, so a percentage threshold
+     * can be jumped clean over by a fast scroll or an in-page link — and a
+     * section that never gets `.is-in` stays at opacity 0 forever. This fires
+     * the moment any part of it crosses 92% of the viewport, which nothing
+     * short of a page reload can skip.
+     */
+    { threshold: 0, rootMargin: '0px 0px -8% 0px' }
   )
   blocks.forEach((b) => io.observe(b))
 }
 
 /* ── the ambient glow ─────────────────────────────────────────── */
 /**
- * Writes the two custom properties the fixed background layer reads.
- *
- * `--glow` is a cosine of scroll progress, so it is at full strength at the
- * very top and the very bottom and at its softest in the middle: the page
- * opens and closes with the same light. `--drift` runs -1 → 1 and the
- * stylesheet turns that into at most 10% of the viewport, which is enough to
- * feel alive and little enough that nobody notices it moving.
+ * `--glow` is a cosine of scroll progress: full at the very top and the very
+ * bottom, softest in the middle, so the page opens and closes on the same
+ * light. `--drift` runs -1 → 1 and the stylesheet turns it into at most 9% of
+ * the viewport.
  */
 export function initAmbient() {
   const layer = document.querySelector('[data-ambient]')
@@ -82,13 +66,64 @@ export function initAmbient() {
   onScroll(() => {
     const span = document.documentElement.scrollHeight - window.innerHeight
     const p = span > 0 ? clamp(window.scrollY / span) : 0
-    layer.style.setProperty('--glow', (0.45 + 0.55 * Math.abs(Math.cos(p * Math.PI))).toFixed(3))
+    layer.style.setProperty('--glow', (0.4 + 0.6 * Math.abs(Math.cos(p * Math.PI))).toFixed(3))
     layer.style.setProperty('--drift', (p * 2 - 1).toFixed(3))
   })
 }
 
-/* ── 01 · the stats ───────────────────────────────────────────── */
-/** Counts up once, when it is reached. Indian digit grouping, as before. */
+/* ── the viewport width, minus the scrollbar ──────────────────── */
+/**
+ * Writes `--vpw`. The graphics that bleed to the window edge are sized off it
+ * rather than off `100vw`, because `100vw` includes the scrollbar: on a 1920
+ * window with a 15px scrollbar the bleed overshot the layout by exactly that,
+ * and the section reported horizontal overflow it could do nothing about.
+ */
+export function initViewportVar() {
+  const set = () =>
+    document.documentElement.style.setProperty('--vpw', document.documentElement.clientWidth + 'px')
+  set()
+  window.addEventListener('resize', set)
+}
+
+/* ── parallax ─────────────────────────────────────────────────── */
+/**
+ * Three depths per section — back 0.3, mid 0.7, floating chips 1.15 — written
+ * as `--py` on each `[data-depth]` element from its section's own scroll
+ * progress. Capped at ±80px, which is the difference between depth and
+ * seasickness.
+ *
+ * Content itself is never parallaxed. Depth 1.0 in the brief is the content
+ * layer: it moves with the page, which is to say it does not move.
+ */
+export function initParallax() {
+  if (!hasGsap || reducedMotion()) return
+
+  qq('.ed, .ed-footer').forEach((section) => {
+    const layers = qq('[data-depth]', section)
+    if (!layers.length) return
+
+    const state = { p: 0 }
+    const draw = () => {
+      // -1 at the top of its pass, +1 at the bottom
+      const t = state.p * 2 - 1
+      layers.forEach((el) => {
+        const depth = Number(el.dataset.depth) || 0.3
+        const shift = clamp(t * (1 - depth) * 160, -80, 80)
+        el.style.setProperty('--py', shift.toFixed(1) + 'px')
+      })
+    }
+
+    gsap.to(state, {
+      p: 1,
+      ease: 'none',
+      onUpdate: draw,
+      scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 0.6 },
+    })
+  })
+}
+
+/* ── count-ups ────────────────────────────────────────────────── */
+/** Counts up once, when it is reached. Indian digit grouping. */
 export function initCounters() {
   const els = qq('[data-count-to]')
   if (!els.length) return
@@ -105,7 +140,7 @@ export function initCounters() {
       return
     }
     const t0 = performance.now()
-    const DUR = 1400
+    const DUR = 1500
     const tick = (now) => {
       const t = clamp((now - t0) / DUR)
       write(el, value * (1 - Math.pow(1 - t, 3)), suffix)
@@ -134,162 +169,9 @@ export function initCounters() {
   els.forEach((el) => io.observe(el))
 }
 
-/* ── 02 + 10 · question list → fixed answer panel ─────────────── */
+/* ── marquees ─────────────────────────────────────────────────── */
 /**
- * Selecting a question cross-fades the panel's contents. The panel's height is
- * fixed in CSS, so nothing on screen moves and the section cannot grow — the
- * reason this is not an accordion.
- */
-export function initQa() {
-  qq('[data-qa]').forEach((root) => {
-    const buttons = qq('[data-qa-q]', root)
-    const panel = root.querySelector('[data-qa-panel]')
-    const answer = root.querySelector('[data-qa-a]')
-    const count = root.querySelector('[data-qa-count]')
-    if (!buttons.length || !panel) return
-
-    const total = String(buttons.length).padStart(2, '0')
-
-    const select = (i) => {
-      buttons.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)))
-      swap(panel, () => {
-        if (answer) answer.textContent = buttons[i].dataset.qaQ
-        if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
-      })
-    }
-
-    buttons.forEach((b, i) => {
-      b.addEventListener('click', () => select(i))
-      // a list of questions is a list: up and down should walk it
-      b.addEventListener('keydown', (e) => {
-        const step = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0
-        if (!step) return
-        e.preventDefault()
-        const next = (i + step + buttons.length) % buttons.length
-        buttons[next].focus()
-        select(next)
-      })
-    })
-
-    select(0)
-  })
-}
-
-/* ── 05 · the flow ────────────────────────────────────────────── */
-/** Pointing at or selecting a stage writes the one line under the diagram. */
-export function initFlow() {
-  const flow = document.querySelector('[data-flow]')
-  if (!flow) return
-
-  const stages = qq('[data-flow-stage]', flow)
-  const readout = flow.querySelector('[data-flow-read]')
-  const name = flow.querySelector('[data-flow-name]')
-  const copy = flow.querySelector('[data-flow-copy]')
-  if (!stages.length || !readout) return
-
-  let selected = 0
-
-  const show = (i) => {
-    swap(readout, () => {
-      if (name) name.textContent = stages[i].textContent.trim().toUpperCase()
-      if (copy) copy.textContent = stages[i].dataset.flowLine
-    })
-  }
-
-  stages.forEach((st, i) => {
-    st.addEventListener('click', () => {
-      selected = i
-      stages.forEach((s, k) => s.setAttribute('aria-selected', String(k === i)))
-      show(i)
-    })
-    // hover previews without committing; leaving falls back to the selection
-    st.addEventListener('pointerenter', () => show(i))
-    st.addEventListener('pointerleave', () => show(selected))
-    st.addEventListener('focus', () => show(i))
-  })
-}
-
-/* ── 08 · the letters ─────────────────────────────────────────── */
-export function initQuotes() {
-  const root = document.querySelector('[data-quotes]')
-  if (!root || letters.length < 2) return
-
-  const panel = root.querySelector('[data-quote-panel]')
-  const text = root.querySelector('[data-quote-text]')
-  const name = root.querySelector('[data-quote-name]')
-  const org = root.querySelector('[data-quote-org]')
-  const count = root.querySelector('[data-quote-count]')
-  const prev = root.querySelector('[data-quote-prev]')
-  const next = root.querySelector('[data-quote-next]')
-  if (!panel) return
-
-  const total = String(letters.length).padStart(2, '0')
-  let i = 0
-
-  const go = (step) => {
-    i = (i + step + letters.length) % letters.length
-    const L = letters[i]
-    swap(panel, () => {
-      if (text) text.textContent = L.text
-      if (name) name.textContent = L.name
-      if (org) org.textContent = L.org
-      if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
-    })
-  }
-
-  prev?.addEventListener('click', () => go(-1))
-  next?.addEventListener('click', () => go(1))
-}
-
-/* ── the carousel dots ────────────────────────────────────────── */
-/**
- * A `.rail` is a CSS grid in a tall enough window and a swipe strip otherwise,
- * and the stylesheet decides which. This only builds the dots and keeps them
- * in step; in grid mode the dots are `display: none` and the scroll listener
- * never fires, so there is nothing to tear down when the window grows.
- */
-export function initRails() {
-  qq('[data-rail]').forEach((rail) => {
-    const dots = rail.parentElement?.querySelector('[data-rail-dots]')
-    const cards = [...rail.children]
-    if (!dots || cards.length < 2) return
-
-    dots.replaceChildren(
-      ...cards.map((_, i) => {
-        const dot = document.createElement('button')
-        dot.type = 'button'
-        dot.className = 'rail__dot' + (i === 0 ? ' is-on' : '')
-        dot.setAttribute('aria-label', `Card ${i + 1} of ${cards.length}`)
-        dot.addEventListener('click', () =>
-          rail.scrollTo({ left: cards[i].offsetLeft - rail.offsetLeft, behavior: 'smooth' })
-        )
-        return dot
-      })
-    )
-
-    const marks = [...dots.children]
-    let raf = 0
-    rail.addEventListener(
-      'scroll',
-      () => {
-        if (raf) return
-        raf = requestAnimationFrame(() => {
-          raf = 0
-          // the step is one card plus the gap, not one viewport: a wide short
-          // window shows three cards at a time and the dots track cards
-          const step = Math.max(1, cards[1].offsetLeft - cards[0].offsetLeft)
-          const at = Math.min(cards.length - 1, Math.round(rail.scrollLeft / step))
-          marks.forEach((d, i) => d.classList.toggle('is-on', i === at))
-        })
-      },
-      { passive: true }
-    )
-  })
-}
-
-/* ── the publisher marquee ────────────────────────────────────── */
-/**
- * The markup carries one copy of the row; this fills the strip and clones the
+ * The markup carries one copy of each row; this fills the strip and clones the
  * track so the loop is seamless. With no JavaScript the row still reads, it
  * just does not move.
  */
@@ -307,7 +189,112 @@ export function initMarquee() {
   })
 }
 
-/* ── the hero's "Watch video" modal ───────────────────────────── */
+/* ── the footer wordmark ──────────────────────────────────────── */
+/**
+ * Scales BLINKCMS to exactly the container width.
+ *
+ * `vw` cannot do this. The container is capped at 1440px and padded, so a
+ * vw-sized wordmark either overflows the container on a wide monitor or
+ * leaves a gap at the sides on a narrow one — which is the bug this fixes.
+ * Measure the rendered width at a known size, then scale by the ratio.
+ */
+export function initWordmark() {
+  const el = document.querySelector('[data-wordmark]')
+  if (!el) return
+
+  const fit = () => {
+    // the element's OWN content box, not the parent's clientWidth — the
+    // parent's includes its 24–48px side padding, and scaling to that put
+    // the last letter outside the container
+    el.style.setProperty('--wm', '100px')
+    const box = el.clientWidth
+    const natural = el.scrollWidth
+    if (!box || !natural) return
+    el.style.setProperty('--wm', Math.floor((box / natural) * 100) + 'px')
+  }
+
+  fit()
+  window.addEventListener('resize', fit)
+  // webfonts land after first layout and change the measurement
+  if (document.fonts?.ready) document.fonts.ready.then(fit)
+}
+
+/* ── background video and placeholder images ──────────────────── */
+/**
+ * The two pieces of asset plumbing that let this ship before the client sends
+ * the files.
+ *
+ * A background video carries `data-src`, never `src`, so nothing is requested
+ * until its section is close; it fades in only on `canplay`. A 404 on one of
+ * the brief's placeholder paths is therefore invisible — the drawn fallback
+ * behind it is what the section was always going to show first anyway.
+ *
+ * It never loads at all under reduced motion, and never below 768px, where
+ * the brief asks for a still instead.
+ */
+export function initBackVideos() {
+  const small = window.matchMedia('(max-width: 767px)').matches
+  if (reducedMotion() || small) return
+
+  qq('[data-backvid]').forEach((video) => {
+    onInView(
+      video,
+      (inView) => {
+        if (!inView) {
+          video.pause()
+          return
+        }
+        if (!video.getAttribute('src')) {
+          video.addEventListener('canplay', () => video.classList.add('is-playing'), { once: true })
+          video.setAttribute('src', video.dataset.src)
+        }
+        video.play().catch(() => {
+          /* autoplay refused, or the file is not there yet; the fallback stands */
+        })
+      },
+      '25%'
+    )
+  })
+}
+
+/**
+ * Hides an <img> whose file is missing so the drawn stand-in behind it shows
+ * through. Every image path on this page is a placeholder from the brief, so
+ * without this the page is a grid of broken-image icons until the client
+ * sends the assets.
+ */
+const missing = new Set()
+
+function hide(img) {
+  missing.add(img.getAttribute('src'))
+  img.style.display = 'none'
+}
+
+export function initImages() {
+  qq('.shot__frame img, .post__art img, .deck__card img').forEach((img) => {
+    if (img.complete && img.naturalWidth === 0) hide(img)
+    img.addEventListener('error', () => hide(img))
+  })
+}
+
+/**
+ * Points an <img> at a new file, remembering the ones that are not there.
+ * The segment tabs and the letters both swap images, and without the memo
+ * every tab click re-requested a file the browser already 404'd — the console
+ * filled up and the network panel was unreadable during review.
+ */
+export function setImage(img, src) {
+  if (!img || !src) return
+  if (missing.has(src)) {
+    img.style.display = 'none'
+    img.setAttribute('src', src)
+    return
+  }
+  img.style.display = ''
+  img.setAttribute('src', src)
+}
+
+/* ── the "Watch video" modal ──────────────────────────────────── */
 export function initVideoModal() {
   const modal = document.querySelector('[data-video-modal]')
   if (!modal) return
@@ -336,4 +323,33 @@ export function initVideoModal() {
     if (e.key === 'Escape') set(false)
   })
   set(false)
+}
+
+/* ── the newsletter form ──────────────────────────────────────── */
+/**
+ * There is no endpoint to post to yet, so the form does not pretend there is.
+ * It validates, says what will happen, and leaves a single obvious place to
+ * add the real submit.
+ */
+export function initNewsletter() {
+  const form = document.querySelector('[data-news]')
+  if (!form) return
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const input = form.querySelector('input[type="email"]')
+    const ok = input?.checkValidity()
+    const note = form.querySelector('[data-news-note]') || document.createElement('span')
+    if (!note.dataset.newsNote) {
+      note.dataset.newsNote = ''
+      note.className = 'meta'
+      note.setAttribute('role', 'status')
+      note.style.cssText = 'flex:1 0 100%'
+      form.appendChild(note)
+    }
+    note.textContent = ok
+      ? 'NOT WIRED UP YET — POST THIS TO YOUR LIST PROVIDER'
+      : 'THAT DOES NOT LOOK LIKE AN EMAIL ADDRESS'
+    note.style.color = ok ? 'var(--lavender)' : 'var(--live)'
+  })
 }

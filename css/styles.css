@@ -2394,8 +2394,9 @@ progress {
    serif on the page any more; the Playfair face the old masthead wall and
    drop-caps used was dropped from fonts.css and from fonts/ with them.
 
-   The red is for exactly one thing: the pulsing LIVE dot in 06. Nothing
-   else on the page is allowed to be red.
+   Red is a SIGNAL, not a colour. It marks live, alert and breaking states —
+   the LIVE dot, the 02:00 alert, the publisher pulses on the map — and
+   nothing else. If something red is not reporting a state, it is wrong.
    ========================================================================== */
 :root {
   --font-tomorrow: 'Tomorrow';
@@ -2404,20 +2405,34 @@ progress {
   --black: #000000;
   --ink: #111111;
   --white: #ffffff;
-  --breaking: #e10600;
+
+  /* the palette — the whole page is these nine values */
+  --bg: #06040e;
   --blink: #6118ea;
-  --blink-lift: #b9a4ff;
+  --blink-light: #9a6cf1;
+  --lavender: #b9a6ff;
+  --live: #e5243b;
+  --txt: #f5f3ff;
+  --txt-2: rgba(245, 243, 255, 0.7);
+  --txt-3: rgba(245, 243, 255, 0.5);
   --hairline-inv: rgba(255, 255, 255, 0.14);
 
-  /* the edition palette — the whole page is these six values */
-  --edition-bg: #07060b;
-  --txt: #f5f3ff;
-  --txt-2: rgba(245, 243, 255, 0.65);
-  --txt-3: rgba(245, 243, 255, 0.45);
-  --card-bg: rgba(255, 255, 255, 0.04);
-  --card-line: rgba(255, 255, 255, 0.08);
+  /* the one glass panel, used by every card on the page */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-line: rgba(255, 255, 255, 0.08);
+  --glass-line-hi: rgba(154, 108, 241, 0.45);
+  --glass-blur: 12px;
+  --glass-radius: 18px;
+
+  /* the shared visual DNA, as values rather than as prose */
+  --dot: rgba(185, 166, 255, 0.45);
+  --dot-size: 1.7px;
+  --dot-gap: 7px;
+  --wire: rgba(185, 166, 255, 0.2);
 
   --shell-pad: clamp(16px, 3.4vw, 54px);
+  --ed-pad: clamp(24px, 4vw, 48px);
+  --ed-max: 1440px;
   --header-h: 54px;
 }
 
@@ -3225,47 +3240,51 @@ html.lenis body {
 
 /* ==========================================================================
    BLINK · EDITION
-   One page, one edition. Everything after the hero is built from the rules
-   in this block, and nothing in it is section-specific styling in the old
-   sense — the sections differ only in which module they drop into the same
-   frame.
+   One continuous world. Every section after the hero is built from this
+   block: same frame, same glass, same dot-matrix, same light.
 
-   Three rules hold the whole thing together:
+   FOUR RULES, and most of what follows is one of them in CSS.
 
-     1. ONE SCREEN. `.ed` is `height: 100svh` and centres its content. It is
-        never taller than the window, so there is nothing to scroll inside.
-        That only works if the content is genuinely small, which is why
-        almost every size below is a clamp() whose middle term is in `svh`:
-        the page scales with the window's HEIGHT, not just its width. A
-        short laptop window gets smaller type and tighter gaps rather than a
-        section that runs off the bottom.
+     1. ONE SCREEN. `.ed` is `height: 100svh` and centres its content.
+        Nothing is ever taller than the window and nothing fakes it with
+        `overflow: hidden`.
 
-     2. ONE BACKGROUND. Nothing here sets a background on a section. The
-        near-black comes from <body>, the purple comes from the single fixed
-        `.ambient` layer, and that is the entire background system. No bands,
-        no dividers, no transition shapes.
+     2. EVERY SECTION IS FULL. This is the rule the previous build failed —
+        it fitted the window by being nearly empty. The fix is structural
+        rather than a set of guessed heights: `.ed__shell` is a flex column
+        that fills the section, the head is `flex: none`, and the graphic is
+        `flex: 1 1 auto; min-height: 0`. The graphic therefore takes exactly
+        the room that is left, at every window size, which satisfies "fits"
+        and "fills" with the same declaration. Do not give a graphic a fixed
+        height; give its contents `height: 100%` and let the flex box decide.
 
-     3. ONE MOTION. `[data-in]` + `.is-in` is the only entry animation on the
-        page: fade in, up 24px, 600ms, staggered 80ms by `--i`. Everything
-        else that moves is listed in `.ambient`, `.count`, `.flow__rail`,
-        `.live-dot` and the 300ms panel cross-fades.
+     3. ONE VISUAL DNA. Dot-matrix (--dot), purple light, red only for live
+        states, lavender hairlines, glass panels, mono meta, three parallax
+        depths. A section graphic that does not use at least three of those
+        will look like it came off another website, which is the thing this
+        redesign exists to stop.
 
-   Height breakpoints drop secondary content as the window gets shorter:
-   800px hides support lines, 680px thins grids and lists, 520px gives up on
-   one-screen and lets sections grow (phone landscape), because clipping text
-   is worse than scrolling.
+     4. NO HARD EDGES. No section sets a background. The base and the grid
+        are one fixed layer behind the whole page; every section graphic
+        dissolves into it top and bottom with a gradient mask. Scrolling past
+        a section boundary should show nothing happening.
+
+   Motion is scroll-linked or ambient, never pinned. ScrollTrigger scrubs;
+   it never pins and never takes the scroll away from the reader.
    ========================================================================== */
 
 /* ── the page ─────────────────────────────────────────────────── */
 html {
-  background: var(--edition-bg);
+  background: var(--bg);
   scroll-behavior: smooth;
 }
 
 body {
-  background: var(--edition-bg);
+  background: var(--bg);
   color: var(--txt);
   font-family: var(--bs-body-font-family);
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3275,211 +3294,250 @@ body {
 }
 
 /*
- * Optional, and proximity only. `mandatory` would fight every drag, every
- * keyboard scroll and every in-page link; proximity just lets a section
- * settle in the window when the reader stops near one. Off below lg, off on
- * touch, and off once the window is too short for a section to fill it.
+ * The background, for the whole page. The hero's own two glows sit inside
+ * the hero (`.hero__glow`); this is the base and the 64px grid that run
+ * under everything, so there is no edge where the hero ends.
  */
-@media (min-width: 1024px) and (min-height: 601px) and (pointer: fine) {
-  html {
-    scroll-snap-type: y proximity;
-  }
-
-  #hero,
-  .ed {
-    scroll-snap-align: start;
-  }
-}
-
-/* ── the ambient layer ────────────────────────────────────────── */
-/*
- * The only background on the page: two blurred radial gradients and a dot
- * grid, fixed behind everything at z-index -1. `--glow` is strongest at the
- * hero and at the final CTA and softer in between, so the page opens and
- * closes with the same light; `--drift` moves the gradients by at most 10%
- * of the viewport across the whole scroll. Both are written by
- * initAmbient() — with no JavaScript they rest at their default, which is
- * the hero's setting.
- */
-.ambient {
+.page-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
-  overflow: hidden;
+  z-index: -2;
   pointer-events: none;
-  --glow: 1;
-  --drift: 0;
+  background: var(--bg);
 }
 
-.ambient__a,
-.ambient__b,
-.ambient__grid {
+.page-bg__grid {
   position: absolute;
-  will-change: transform;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 62%, transparent 100%);
 }
 
-.ambient__a {
+/*
+ * The travelling light. Strongest at the hero and at the closing CTA, softer
+ * between, so the page opens and closes on the same glow. `--glow` and
+ * `--drift` are written by initAmbient(); with no JavaScript it rests at the
+ * hero's setting, which is the one the page opens on.
+ */
+.page-bg__glow {
+  position: absolute;
   left: 50%;
-  top: -46vmax;
-  width: 128vmax;
-  height: 128vmax;
+  top: -40vmax;
+  width: 130vmax;
+  height: 130vmax;
   border-radius: 50%;
   background: radial-gradient(
     circle closest-side,
-    rgba(97, 24, 234, 0.26) 0%,
-    rgba(97, 24, 234, 0.15) 42%,
+    rgba(97, 24, 234, 0.22) 0%,
+    rgba(97, 24, 234, 0.1) 44%,
     rgba(97, 24, 234, 0) 72%
   );
-  opacity: calc(0.4 + 0.6 * var(--glow));
-  transform: translate(-50%, calc(var(--drift) * 10vh));
+  opacity: calc(0.35 + 0.65 * var(--glow, 1));
+  transform: translate(-50%, calc(var(--drift, 0) * 9vh));
+  will-change: transform, opacity;
 }
 
-.ambient__b {
-  left: 8%;
-  bottom: -52vmax;
-  width: 104vmax;
-  height: 104vmax;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle closest-side,
-    rgba(154, 112, 255, 0.12) 0%,
-    rgba(154, 112, 255, 0.06) 46%,
-    rgba(154, 112, 255, 0) 74%
-  );
-  opacity: calc(0.45 + 0.55 * var(--glow));
-  transform: translate(-50%, calc(var(--drift) * -8vh));
-}
-
-.ambient__grid {
+/* ── the hero's background, and only the hero's ───────────────── */
+/*
+ * The one change the hero was allowed. Two ellipses from the reference: a
+ * wide warm-violet wash off the top edge and a tighter lift off the bottom,
+ * both inside the hero so they end with it rather than banding the page.
+ */
+.hero__glow {
+  position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.9) 0.5px, transparent 0.6px);
-  background-size: 3px 3px;
-  opacity: 0.035;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 45% 0%, #140b30 0%, #0d0720 35%, transparent 70%),
+    radial-gradient(ellipse 45% 30% at 50% 100%, #0c071b 0%, transparent 70%);
 }
 
 /* ── the section frame ────────────────────────────────────────── */
 .ed {
-  --ed-pad: clamp(16px, 6svh, 80px);
   --ed-gap: clamp(8px, 2.5svh, 32px);
-  --ed-vis: 45svh;
   position: relative;
   z-index: 1;
   height: 100vh;
   height: 100svh;
   display: flex;
   flex-direction: column;
+  padding-top: calc(var(--header-h) + clamp(16px, 4svh, 48px));
+  padding-bottom: clamp(16px, 4svh, 48px);
+}
+
+.ed__shell {
+  width: 100%;
+  max-width: var(--ed-max);
+  margin-inline: auto;
+  padding-inline: var(--ed-pad);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   justify-content: center;
-  padding-top: calc(var(--header-h) + var(--ed-pad));
-  padding-bottom: var(--ed-pad);
+  gap: var(--ed-gap);
+  min-height: 0;
 }
 
 /*
- * The grid. Two layouts only — (A) headline left, module right, and
- * (B) headline centred above the module — and below lg both are the same
- * single column, which is why there is no third rule for mobile.
- */
-/*
- * `minmax(0, 1fr)` rather than the implicit `auto`. An auto column sizes to
- * its content's max-content width, and the marquee in 08 is eight thousand
- * pixels of publisher names — the column grew to match it and took the
- * section, the headline and the quote out to 16,000px with it, clipped out of
- * sight by `body { overflow-x: hidden }`. Any grid holding something
- * deliberately wider than the page needs the 0 floor.
+ * Layout A — text 5 columns, graphic 7. `stretch`, not `center`: the graphic
+ * column has to be able to fill the row's height, and the text column centres
+ * itself inside it instead.
  */
 .ed__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ed-gap);
-  align-items: center;
-  width: 100%;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 @media (min-width: 1024px) {
   .ed--a .ed__grid {
-    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
-    column-gap: clamp(32px, 5vw, 96px);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(28px, 4vw, 72px);
   }
+}
 
-  /*
-   * 02 and 10 get a narrower headline column, because their module is itself
-   * two columns: at the standard split the answer panel was only 355px wide
-   * even on a 1920 window, and a 20-word answer at 28px ran six lines and out
-   * of its own box. Their headlines are three words, so the room is there.
-   */
-  .ed--qa .ed__grid {
-    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+.ed__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--ed-gap);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* the graphic column: fills what is left, never more */
+.ed__gfx {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/*
+ * Bleed. Pulls the graphic's right edge out to the window edge on wide
+ * screens, which is what stops a 1440px container reading as a box on a
+ * 1920px monitor.
+ */
+/*
+ * `--vpw` is the document's client width, written by initViewportVar(). It is
+ * NOT `100vw`: `100vw` includes the scrollbar, so on a 1920 window with a
+ * 15px scrollbar the bleed overshot the layout by exactly that much and the
+ * section reported horizontal overflow. The fallback is `100vw`, which is
+ * right on every overlay-scrollbar platform and 15px generous on the rest.
+ */
+@media (min-width: 1024px) {
+  .ed__gfx--bleed {
+    margin-right: calc(-1 * max(0px, (var(--vpw, 100vw) - var(--ed-max)) / 2) - var(--ed-pad));
   }
+}
+
+/*
+ * Every graphic dissolves into the page top and bottom. This is rule 4 in one
+ * declaration — it is why there is never a visible section edge.
+ */
+.ed__fade {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+}
+
+/* ── the section template: label → headline → support ─────────── */
+.ed__label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--txt-3);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  flex: none;
+}
+
+.ed__label::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--lavender);
+  opacity: 0.7;
+  flex: none;
+}
+
+.ed--b .ed__label {
+  justify-content: center;
+}
+
+/*
+ * No mask, no clipping. The previous build revealed headlines through
+ * `overflow: hidden` line masks and the first line of "One platform. Six
+ * desks." lost its top edge to one. The entry animation here is opacity plus
+ * transform on the element itself, which cannot clip anything.
+ */
+.ed__h2 {
+  font-size: clamp(40px, min(7.5svh, 9.5vw), 96px);
+  line-height: 0.97;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow: visible;
+}
+
+/*
+ * Layout A's headline lives in a 5-of-12 column, so it is capped against the
+ * window's WIDTH as well as its height. At the full scale "leave WordPress."
+ * needed 512px inside a 437px column and the headline ran to four lines where
+ * the brief allows two. Layout B keeps the big scale — it has the whole width.
+ */
+@media (min-width: 1024px) {
+  .ed--a .ed__h2 {
+    font-size: clamp(36px, min(6.6svh, 4.4vw), 76px);
+    /*
+     * Greedy, not balanced. There is no size at which "Why newsrooms leave
+     * WordPress." fits two lines in a 5-of-12 column at every width, so it
+     * will break to three — and balancing three lines gives three stubby ones
+     * where filling gives two full lines and a short tail, which is the
+     * shape a headline wants. Layout B keeps `balance`: it is centred, and
+     * centred text with a long last line looks like a mistake.
+     */
+    text-wrap: wrap;
+  }
+}
+
+.ed__h3 {
+  font-size: clamp(18px, min(2.6svh, 4.4vw), 28px);
+  line-height: 1.05;
+}
+
+.ed__sup {
+  font-size: clamp(15px, 1.9svh, 18px);
+  line-height: 1.45;
+  color: var(--txt-2);
+  max-width: 44ch;
 }
 
 .ed--b .ed__head {
   text-align: center;
-  margin-inline: auto;
-}
-
-.ed--b .ed__eyebrow {
-  justify-content: center;
-}
-
-/* ── the section template: eyebrow → headline → support ───────── */
-/*
- * The caps are in px, not `ch`. `ch` resolves against the element's own
- * font — and `.ed__head` is set in body copy, so `max-width: 24ch` was about
- * 235px while the headline inside it was running at 62px. The headline spilled
- * out of its own column at every window over roughly 1400px wide. Anything
- * sizing a display headline has to be measured in the headline's units or in
- * absolute ones; `ch` on the wrapper is neither.
- */
-.ed__head {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, 1.6svh, 20px);
-  max-width: 680px;
-}
-
-.ed--b .ed__head {
   max-width: 900px;
-}
-
-.ed__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.9em;
-  color: rgba(245, 243, 255, 0.45);
-  font-size: clamp(9px, 1.25svh, 11px);
-}
-
-.ed__eyebrow::before {
-  content: "";
-  width: clamp(14px, 2.2svh, 26px);
-  height: 1px;
-  background: var(--blink-lift);
-  opacity: 0.6;
-  flex: none;
-}
-
-/*
- * Scales with the window's height — that is what keeps a section inside a
- * short laptop window — but capped by its width as well. Height alone is not
- * enough: a 360×740 phone has plenty of `svh` and no room across, and at
- * 6.5svh = 48px a five-word headline wrapped to four lines and pushed 05 and
- * 02 off the bottom. `min()` means the width cap only bites on narrow screens
- * and the height still drives everything above about 720px wide.
- */
-.ed__h2 {
-  font-size: clamp(28px, min(6.5svh, 9.5vw), 64px);
-  line-height: 0.96;
-  text-wrap: balance;
-}
-
-.ed__sup {
-  font-size: clamp(13px, 2svh, 18px);
-  line-height: 1.4;
-  color: var(--txt-2);
-  max-width: 34ch;
+  margin-inline: auto;
 }
 
 .ed--b .ed__sup {
   margin-inline: auto;
+}
+
+.ed__head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.8svh, 22px);
+  flex: none;
+  max-width: 720px;
 }
 
 .ed__link {
@@ -3487,8 +3545,8 @@ body {
   align-items: center;
   gap: 0.6em;
   align-self: flex-start;
-  color: var(--blink-lift);
-  font-size: clamp(9px, 1.25svh, 11px);
+  color: var(--lavender);
+  font-size: 12px;
   transition: gap 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s;
 }
 
@@ -3501,846 +3559,190 @@ body {
   align-self: center;
 }
 
-/* ── the card. One component, every section. ──────────────────── */
-.card {
+/* ── the glass panel. One card, every section. ────────────────── */
+.glass {
   position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  /* the vw term matters on the 2-up stat grid, where a tall-but-narrow phone
-     window gives 32px of padding inside a 158px card and leaves the figure
-     nothing to sit in */
-  padding: clamp(14px, min(3svh, 4.5vw), 32px);
-  transition: border-color 0.35s, background 0.35s, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--glass-radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: border-color 0.3s, background 0.3s, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.card:hover {
-  border-color: rgba(97, 24, 234, 0.4);
+.glass--pad {
+  padding: clamp(14px, min(2.6svh, 3.4vw), 28px);
+}
+
+.glass--hover:hover {
+  border-color: var(--glass-line-hi);
   background: rgba(255, 255, 255, 0.055);
 }
 
-.card__num {
-  color: rgba(245, 243, 255, 0.35);
-}
-
-.card__title {
-  font-size: clamp(13px, 2.1svh, 19px);
-  line-height: 1.1;
-  color: var(--txt);
-}
-
-.card__desc {
-  font-size: clamp(12px, 1.7svh, 15px);
-  line-height: 1.35;
-  color: var(--txt-2);
-}
-
-/* ── the rail: a grid on desktop, a swipe carousel when short ──── */
-/*
- * One component for every card row on the page. The carousel is the base
- * state, not the exception: a phone and a 650px-tall laptop window get the
- * same one-card-at-a-time strip, and only a window with room for the full
- * grid is given one. `--cols` is set per section.
- */
-.rail {
-  display: flex;
-  gap: var(--ed-gap);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-inline: calc(var(--shell-pad) * -1);
-  padding-inline: var(--shell-pad);
-  overscroll-behavior-x: contain;
-}
-
-.rail::-webkit-scrollbar {
-  display: none;
-}
-
-.rail > * {
-  flex: 0 0 100%;
-  scroll-snap-align: center;
-}
-
-/*
- * One card at a time is right on a phone and wrong on a 1366×657 laptop,
- * which also gets the carousel because it is short rather than because it is
- * narrow. So the strip keeps as many cards per view as the width allows and
- * swipes through the rest — a short window loses the second row of the grid,
- * not four of the six cards.
- */
-@media (min-width: 640px) {
-  .rail > * {
-    flex-basis: calc((100% - var(--ed-gap)) / 2);
-  }
-}
-
-@media (min-width: 1024px) {
-  .rail > * {
-    flex-basis: calc((100% - var(--ed-gap) * (var(--cols, 3) - 1)) / var(--cols, 3));
-  }
-}
-
-.rail__dots {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  margin-top: clamp(8px, 1.6svh, 18px);
-}
-
-.rail__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(245, 243, 255, 0.22);
-  transition: background 0.3s, transform 0.3s;
-}
-
-.rail__dot.is-on {
-  background: var(--blink-lift);
-  transform: scale(1.25);
-}
-
-@media (min-width: 768px) and (min-height: 681px) {
-  .rail {
-    display: grid;
-    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-    overflow: visible;
-    margin-inline: 0;
-    padding-inline: 0;
-  }
-
-  .rail > * {
-    flex: none;
-  }
-
-  .rail__dots {
-    display: none;
-  }
-}
-
-/* ── 01 · the stat cards ──────────────────────────────────────── */
-/*
- * 2×2, at every width. Four across looks like the obvious reading of "4 stat
- * cards" and does not survive contact with the layout: the module column in
- * layout A is about 710px even on a 1920 window, so four cards are 160px wide
- * with 107px inside the padding, and "396%" needs 140px. Either the figure
- * shrinks to something that is no longer a headline number, or the cards go
- * two by two. Two by two, and the figures get their full size back.
- */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--ed-gap);
-}
-
-/* "396%" is four glyphs wide and shares a 2-up grid on a phone, so the figure
-   is capped by width as well as height — at 5.5svh alone it ran out of the
-   card on a 390px screen */
-.stat__figure {
-  display: block;
-  font-size: clamp(22px, min(5.5svh, 9vw), 54px);
-  line-height: 0.88;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat__label {
-  display: block;
-  margin-top: clamp(6px, 1.4svh, 14px);
-  color: var(--txt-3);
-}
-
-/* ── 02 + 10 · the question list and its fixed answer panel ───── */
-/*
- * The reason this is a swapping panel rather than an accordion: an
- * accordion changes the section's height when it opens, and a section that
- * changes height cannot be guaranteed to fit the window. The panel is a
- * fixed box that cross-fades its contents in 300ms, so selecting an answer
- * moves nothing.
- */
-.qa {
-  display: grid;
-  gap: var(--ed-gap);
-  width: 100%;
-}
-
-@media (min-width: 1024px) {
-  .qa {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: stretch;
-    column-gap: clamp(24px, 3vw, 56px);
-  }
-}
-
-.qa__list,
-.qa__side {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2px, 0.6svh, 8px);
-  min-width: 0;
-}
-
-.qa__side {
-  justify-content: center;
-  gap: clamp(8px, 1.6svh, 18px);
-}
-
-.qa__q {
-  display: flex;
-  align-items: baseline;
-  gap: 0.85em;
-  width: 100%;
-  text-align: left;
-  padding: clamp(7px, 1.5svh, 14px) clamp(10px, 1.7svh, 18px);
-  border: 1px solid transparent;
-  border-radius: 12px;
-  color: var(--txt-2);
-  font-size: clamp(12.5px, 1.95svh, 16px);
-  line-height: 1.25;
-  transition: color 0.3s, background 0.3s, border-color 0.3s;
-}
-
-.qa__q:hover {
-  color: var(--txt);
-  border-color: rgba(97, 24, 234, 0.4);
-}
-
-.qa__q[aria-selected="true"] {
-  color: var(--txt);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(97, 24, 234, 0.4);
-}
-
-.qa__q i {
-  flex: none;
-  font-style: normal;
-  color: rgba(245, 243, 255, 0.35);
+/* mono meta — city, timestamp, coordinate. Never below 12px. */
+.meta {
   font-family: var(--font-spacemono), ui-monospace, monospace;
-  font-size: 0.72em;
-  letter-spacing: 0.12em;
-}
-
-.qa__q[aria-selected="true"] i {
-  color: var(--blink-lift);
-}
-
-.qa__panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(8px, 1.8svh, 18px);
-  height: clamp(130px, 26svh, 230px);
-}
-
-@media (max-width: 1023.98px) {
-  .qa__panel {
-    height: clamp(120px, 20svh, 190px);
-  }
-}
-
-/* capped by width as well as height for the same reason the quote in 08 is:
-   the panel is a fixed box, so the longest answer has to fit it everywhere */
-.qa__a {
-  font-size: clamp(15px, min(3svh, 4.6vw), 28px);
-  line-height: 1.22;
-  transition: opacity 0.3s;
-}
-
-.qa__panel.is-swapping .qa__a,
-.qa__panel.is-swapping .qa__count {
-  opacity: 0;
-}
-
-.qa__count {
-  color: var(--blink-lift);
-  transition: opacity 0.3s;
-}
-
-/* ── 03 · the device line-up ──────────────────────────────────── */
-/*
- * Four separate SVGs rather than one drawing, so a phone can leave two of
- * them out without a hole in the middle. Each is sized off one shared
- * `--dev-h`, which is capped by both the window's height and its width —
- * `height` + `width: auto` on an SVG with a viewBox gives the intrinsic
- * ratio, so the row's total width follows automatically.
- */
-/*
- * `--dev-h` is capped by the row's own arithmetic, not by a guessed `vw`.
- * The four SVGs are 1.339, 1.208, 0.466 and 0.239 of `--dev-h` wide, so the
- * row measures 3.26 × --dev-h plus three gaps; dividing the container by that
- * is what keeps it inside the shell instead of 16px past it at 1920.
- */
-.devices {
-  --dev-row: calc(min(100vw, 1560px) - 2 * var(--shell-pad));
-  --dev-h: min(var(--ed-vis), calc((var(--dev-row) - 84px) / 3.26));
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: clamp(8px, 2.2svh, 28px);
-  width: 100%;
-  max-height: var(--ed-vis);
-}
-
-.devices svg {
-  width: auto;
-  flex: none;
-  color: var(--blink-lift);
-}
-
-.dev--monitor {
-  height: var(--dev-h);
-}
-
-.dev--laptop {
-  height: calc(var(--dev-h) * 0.8);
-}
-
-.dev--tablet {
-  height: calc(var(--dev-h) * 0.64);
-}
-
-.dev--phone {
-  height: calc(var(--dev-h) * 0.47);
-}
-
-/* two of the four, so the row is 1.45 × --dev-h plus one gap */
-@media (max-width: 767.98px) {
-  .devices {
-    --dev-h: min(var(--ed-vis), calc((var(--dev-row) - 30px) / 1.5));
-  }
-
-  .dev--monitor,
-  .dev--tablet {
-    display: none;
-  }
-}
-
-/* ── 05 · the flow ────────────────────────────────────────────── */
-.flow {
-  display: grid;
-  gap: clamp(10px, 2.4svh, 28px);
-  width: 100%;
-  justify-items: center;
-}
-
-@media (min-width: 1024px) {
-  .flow {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    column-gap: clamp(16px, 2.4vw, 44px);
-  }
-}
-
-.flow__ends {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-}
-
-@media (min-width: 1024px) {
-  .flow__ends {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-  }
-
-  .flow__ends--out {
-    align-items: flex-end;
-  }
-}
-
-.flow__end {
-  display: flex;
-  align-items: center;
-  gap: 0.55em;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
   color: var(--txt-3);
+}
+
+.meta--sm {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.55em 1em;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  color: var(--txt-2);
+  font-size: 12px;
   white-space: nowrap;
 }
 
-.flow__end::before {
-  content: "";
-  width: 4px;
-  height: 4px;
+.chip__dot {
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
-  background: var(--blink-lift);
-  opacity: 0.55;
+  background: var(--lavender);
   flex: none;
 }
 
-.flow__rail {
+/* the live signal — red, and only ever for a live/alert/breaking state */
+.sig {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--live);
   position: relative;
-  display: flex;
-  gap: clamp(5px, 1.1svh, 14px);
-  width: 100%;
-  justify-content: center;
+  flex: none;
+  display: inline-block;
 }
 
-/*
- * The one line that draws. `scaleX(0) → 1` once, when the section enters —
- * the pipeline's single allowed extra. It is behind the chips, which is why
- * the chips carry a background.
- */
-.flow__rail::before {
+.sig::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(97, 24, 234, 0) 0%,
-    rgba(185, 164, 255, 0.5) 12%,
-    rgba(185, 164, 255, 0.5) 88%,
-    rgba(97, 24, 234, 0) 100%
-  );
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s;
+  inset: -3px;
+  border-radius: 999px;
+  border: 1px solid var(--live);
+  animation: sig-ring 1.8s ease-out infinite;
 }
 
-.ed.is-in .flow__rail::before {
-  transform: scaleX(1);
-}
-
-.flow__stage {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 0;
-  min-width: 0;
-  padding: clamp(8px, 1.7svh, 16px) clamp(4px, 1vw, 14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  background: #0b0916;
-  color: var(--txt-2);
-  text-align: center;
-  font-size: clamp(9px, 1.35svh, 12px);
-  transition: color 0.3s, border-color 0.3s, background 0.3s;
-}
-
-.flow__stage:hover {
-  color: var(--txt);
-  border-color: rgba(97, 24, 234, 0.4);
-}
-
-.flow__stage[aria-selected="true"] {
-  color: var(--txt);
-  border-color: rgba(97, 24, 234, 0.4);
-  background: rgba(97, 24, 234, 0.16);
-}
-
-.flow__read {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8em;
-  min-height: clamp(30px, 5svh, 54px);
-  text-align: center;
-  transition: opacity 0.3s;
-}
-
-.flow__read.is-swapping {
-  opacity: 0;
-}
-
-.flow__read b {
-  color: var(--blink-lift);
-  font-weight: inherit;
-  font-family: var(--font-spacemono), ui-monospace, monospace;
-  letter-spacing: 0.12em;
-}
-
-.flow__read span {
-  color: var(--txt-2);
-  font-size: clamp(12px, 1.8svh, 16px);
-}
-
-@media (min-width: 1024px) {
-  .flow__read {
-    grid-column: 1 / -1;
+@keyframes sig-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
   }
 }
 
-/* below lg the diagram is a vertical stepper */
-@media (max-width: 1023.98px) {
-  .flow__rail {
-    flex-direction: column;
-  }
-
-  .flow__rail::before {
-    left: 50%;
-    right: auto;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    height: auto;
-    background: linear-gradient(
-      180deg,
-      rgba(97, 24, 234, 0) 0%,
-      rgba(185, 164, 255, 0.5) 12%,
-      rgba(185, 164, 255, 0.5) 88%,
-      rgba(97, 24, 234, 0) 100%
-    );
-    transform: scaleY(0);
-    transform-origin: top center;
-  }
-
-  .ed.is-in .flow__rail::before {
-    transform: scaleY(1);
-  }
-
-  /* six chips stacked is the tallest module on the page; they get the
-     tightest padding they can carry and still be a comfortable tap target */
-  .flow__stage {
-    flex: none;
-    padding-block: clamp(6px, 1.1svh, 11px);
-  }
-}
-
-/* ── 06 · the LIVE module ─────────────────────────────────────── */
-.live-stack {
-  display: grid;
-  gap: var(--ed-gap);
-  width: 100%;
-}
-
-.live-card {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(8px, 1.8svh, 18px);
-}
-
-.live-card__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1em;
-  color: var(--txt-3);
-}
-
-.live-card__flag {
-  display: flex;
-  align-items: center;
-  gap: 0.7em;
-  color: var(--txt);
-}
-
-.live-card__line {
-  font-size: clamp(16px, 3.4svh, 32px);
-  line-height: 1.04;
-}
-
-/* the load trace: eight bars holding steady at full load */
-.live-card__trace {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: clamp(18px, 4svh, 40px);
-}
-
-.live-card__trace i {
-  flex: 1 1 0;
-  border-radius: 2px;
-  background: linear-gradient(180deg, rgba(185, 164, 255, 0.75), rgba(97, 24, 234, 0.25));
-  height: var(--h, 60%);
-}
-
-/* ── 07 · the case cards ──────────────────────────────────────── */
-.case__name {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1em;
-}
-
-.case__nums {
-  display: flex;
-  justify-content: space-between;
-  gap: clamp(8px, 1.6vw, 24px);
-  margin-top: clamp(10px, 2.2svh, 24px);
-}
-
-.case__num {
+/* big numbers */
+.figure {
   display: block;
-  font-size: clamp(18px, 3.4svh, 32px);
-  line-height: 0.9;
+  font-family: var(--font-tomorrow), "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, min(8svh, 9vw), 104px);
+  line-height: 0.86;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
-.case__cap {
-  display: block;
-  margin-top: clamp(4px, 1svh, 10px);
-  color: var(--txt-3);
+.figure--sm {
+  font-size: clamp(26px, min(5svh, 7vw), 56px);
 }
 
-/* ── 08 · the letters ─────────────────────────────────────────── */
-.quote {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(10px, 2.2svh, 24px);
-  width: 100%;
-  max-width: 760px;
-  margin-inline: auto;
-  height: clamp(150px, 28svh, 260px);
-  text-align: center;
-  transition: opacity 0.3s;
-}
-
-.quote.is-swapping > * {
-  opacity: 0;
-}
-
-.quote > * {
-  transition: opacity 0.3s;
-}
-
-/* the panel is a fixed height so the arrows never move, which means the
-   longest quote has to fit it at every width — hence the vw cap, without
-   which a 20-word quote ran seven lines on a phone and sat on the by-line */
-.quote__text {
-  font-size: clamp(17px, min(3.6svh, 5.2vw), 34px);
-  line-height: 1.2;
-}
-
-.quote__by {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4em 1.2em;
-  color: var(--txt-3);
-}
-
-.quote__by b {
-  color: var(--txt);
-  font-weight: inherit;
-}
-
-.quote__nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2vw, 20px);
-  color: var(--txt-3);
-}
-
-.quote__arrow {
-  width: clamp(30px, 4.6svh, 40px);
-  height: clamp(30px, 4.6svh, 40px);
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  color: var(--txt-2);
-  transition: border-color 0.3s, color 0.3s, background 0.3s;
-}
-
-.quote__arrow:hover {
-  border-color: rgba(97, 24, 234, 0.4);
-  color: var(--txt);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-/* the publisher logos: one slow row, never a grid */
-.logos {
-  --marquee-dur: 46s;
-  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-}
-
-.logos .marquee-track {
-  gap: clamp(22px, 4vw, 54px);
-  padding-right: clamp(22px, 4vw, 54px);
-  align-items: center;
-}
-
-.logos span {
-  color: rgba(245, 243, 255, 0.6);
-  font-size: clamp(11px, 1.7svh, 15px);
-  white-space: nowrap;
-  transition: color 0.3s;
-}
-
-.logos span:hover {
-  color: var(--txt);
-}
-
-/* ── 09 · the wire ────────────────────────────────────────────── */
-.wire {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.wire__row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(10px, 2vw, 30px);
-  padding-block: clamp(8px, 1.8svh, 20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--txt-2);
-  transition: color 0.3s, border-color 0.3s;
-}
-
-.wire__row:last-of-type {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.wire__row:hover {
-  color: var(--txt);
-  border-color: rgba(97, 24, 234, 0.4);
-}
-
-.wire__date {
-  color: var(--txt-3);
-}
-
-.wire__title {
-  font-size: clamp(13px, 2.2svh, 21px);
-  line-height: 1.2;
-}
-
-.wire__go {
-  color: var(--blink-lift);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.wire__row:hover .wire__go {
-  transform: translateX(4px);
-}
-
-/* ── 11 · the front page ──────────────────────────────────────── */
+/* ── parallax ─────────────────────────────────────────────────── */
 /*
- * The closing headline is the longest on the page — nine words, where every
- * other section has four or five — so it gets a wider column than the other
- * centred sections rather than a bigger size. At 22ch and 86px it wrapped to
- * nine lines and ran 9px past the window; 28ch at 68px holds it to two.
+ * `--py` is written by initParallax() from the section's scroll progress and
+ * the element's `data-depth`. Capped at ±80px in the script, not here.
  */
-.ed--cta .ed__head {
-  max-width: 780px;
-  gap: clamp(10px, 2.2svh, 26px);
+[data-depth] {
+  will-change: transform;
+  transform: translate3d(0, var(--py, 0px), 0);
 }
 
-.ed--cta .ed__h2 {
-  font-size: clamp(30px, min(6.4svh, 9vw), 68px);
+.layer-back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-/* ── the footer ───────────────────────────────────────────────── */
-.ed-footer {
-  position: relative;
-  z-index: 1;
-  padding-top: clamp(28px, 6svh, 76px);
-  padding-bottom: clamp(20px, 4svh, 44px);
-}
-
-.ed-footer__word {
-  display: block;
+.layer-back canvas,
+.layer-back img,
+.layer-back video {
   width: 100%;
-  font-size: clamp(42px, min(14.5vw, 19svh), 196px);
-  line-height: 0.82;
-  letter-spacing: -0.02em;
-  background: linear-gradient(180deg, #b9a4ff 0%, #6118ea 86%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.ed-footer__cols {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(18px, 3svh, 40px);
-  padding-block: clamp(20px, 4svh, 48px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-@media (min-width: 768px) {
-  .ed-footer__cols {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-/* the footer has a 60svh budget; two rows of columns on a phone is most of
-   it, so everything here gets its tightest setting below md */
-@media (max-width: 767.98px) {
-  .ed-footer {
-    padding-top: clamp(20px, 4svh, 76px);
-    padding-bottom: clamp(16px, 3svh, 44px);
-  }
-
-  .ed-footer__cols {
-    padding-block: clamp(14px, 2.6svh, 48px);
-    gap: clamp(12px, 2svh, 40px);
-  }
-
-  .ed-footer__col h3 {
-    margin-bottom: clamp(5px, 1svh, 16px);
-  }
-
-  .ed-footer__col a {
-    padding-block: 2px;
-  }
-
-  .ed-footer__word {
-    font-size: clamp(38px, 13vw, 196px);
-  }
-
-  .ed-footer__base {
-    padding-top: clamp(10px, 2svh, 28px);
-  }
-}
-
-.ed-footer__col h3 {
-  color: var(--txt-3);
-  margin-bottom: clamp(8px, 1.6svh, 16px);
-  font-weight: inherit;
-}
-
-.ed-footer__col a {
+  height: 100%;
+  object-fit: cover;
   display: block;
-  color: var(--txt-2);
-  font-size: clamp(12px, 1.7svh, 14px);
-  padding-block: 3px;
-  transition: color 0.25s;
 }
 
-.ed-footer__col a:hover {
-  color: var(--blink-lift);
+/* a back-layer video: purple duotone, masked into the page, never a block */
+.backvid {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  filter: grayscale(1) contrast(1.15) brightness(0.62);
+  mix-blend-mode: screen;
+  transition: opacity 1.2s ease-out;
 }
 
-.ed-footer__base {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.8em 2em;
-  padding-top: clamp(14px, 2.6svh, 28px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--txt-3);
+.backvid.is-playing {
+  opacity: 0.3;
 }
 
-/* ── the one entry animation ──────────────────────────────────── */
+.backvid-tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(97, 24, 234, 0.5), rgba(154, 108, 241, 0.22) 60%, transparent);
+  mix-blend-mode: color;
+}
+
 /*
- * Armed by JavaScript, not by the stylesheet: `.js` is set by an inline
- * script in <head>, so a reader with no JavaScript — or a boot that fails —
- * sees every element at rest rather than a page of invisible blocks. Same
- * rule the old build used for the letters and the ON AIR video.
+ * The fallback that makes a missing asset a non-event. It is always there,
+ * under the video; the video fades in over it only once it can actually
+ * play, so the placeholder paths in the brief can 404 all day and the
+ * section still reads as designed.
+ */
+.backvid-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 30%, rgba(97, 24, 234, 0.3), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 108, 241, 0.16), transparent 70%);
+}
+
+/* ── the one entry reveal ─────────────────────────────────────── */
+/*
+ * Armed by `html.js`, set by an inline script in <head>, so a reader with no
+ * JavaScript sees the page at rest rather than a column of invisible blocks.
  */
 .js [data-in] {
   opacity: 0;
   transform: translateY(24px);
 }
 
-/*
- * The hero's exception, and the only one. Its headline rolls up out of two
- * masks rather than fading up 24px, because that roll-up is part of the hero
- * the client asked to keep untouched. It used to be a GSAP tween; this is the
- * same movement — same 1.05s, same easing, same 85ms between the two lines —
- * as a plain transition, so nothing on the page needs GSAP any more.
- */
+.js .is-in [data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+/* the hero's roll-up is the one exception, because the hero is unchanged */
 .js .hero-head .line-inner {
   transform: translateY(112%);
   opacity: 0.25;
@@ -4356,43 +3758,1809 @@ body {
   transition-delay: 0.085s;
 }
 
-.js .is-in [data-in] {
+/* ══ 01 · THE NETWORK ═════════════════════════════════════════ */
+.net {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.net canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.net__tag {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  color: rgba(185, 166, 255, 0.85);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1.6svh, 16px);
+}
+
+.stat__label {
+  display: block;
+  margin-top: clamp(4px, 1svh, 10px);
+  color: var(--txt-3);
+}
+
+/* two rows, opposite directions, with the edge fades the brief asks for */
+.logos {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2svh, 14px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 80px, #000 calc(100% - 80px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 80px, #000 calc(100% - 80px), transparent 100%);
+}
+
+.logos .marquee-track {
+  gap: clamp(24px, 3.4vw, 56px);
+  padding-right: clamp(24px, 3.4vw, 56px);
+  align-items: center;
+}
+
+.logos--rev .marquee-track {
+  animation-direction: reverse;
+}
+
+.logos span {
+  color: rgba(245, 243, 255, 0.6);
+  font-size: clamp(13px, 1.9svh, 17px);
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.logos span:hover {
+  color: var(--txt);
+}
+
+/* ══ 02 · THE PROBLEM ═════════════════════════════════════════ */
+/*
+ * Two columns, not three. The previous build put the headline, the list and
+ * the answer in three cramped columns; the brief's fix is headline + list on
+ * the left and one large monitor on the right, with the monitor's top edge
+ * aligned to the first question.
+ */
+.qlist {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2px, 0.5svh, 6px);
+}
+
+.qlist__q {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+  width: 100%;
+  text-align: left;
+  padding: clamp(6px, 1.3svh, 12px) clamp(10px, 1.6svh, 16px);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--txt-2);
+  font-size: clamp(13px, min(1.9svh, 4vw), 18px);
+  line-height: 1.25;
+  transition: color 0.25s, background 0.25s, border-color 0.25s;
+}
+
+.qlist__q:hover {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+}
+
+.qlist__q[aria-selected="true"] {
+  color: var(--txt);
+  background: var(--glass-bg);
+  border-color: var(--glass-line-hi);
+}
+
+.qlist__q i {
+  flex: none;
+  font-style: normal;
+  color: var(--txt-3);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.qlist__q[aria-selected="true"] i {
+  color: var(--lavender);
+}
+
+/* the results-night monitor */
+.monitor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: clamp(12px, 2.2svh, 24px);
+  gap: clamp(8px, 1.4svh, 16px);
+  overflow: hidden;
+}
+
+.monitor__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  flex: none;
+}
+
+/*
+ * The scenes keep their aspect ratio, so in a tall panel they letterbox. The
+ * leftover is graph paper rather than flat black — a monitor with nothing on
+ * part of its screen still looks like a monitor, which an empty rectangle
+ * does not. Same dot grid as everywhere else.
+ */
+.monitor__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.monitor__stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(185, 166, 255, 0.55) 1px, transparent 1.2px);
+  background-size: 18px 18px;
+  opacity: 0.12;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000, transparent 85%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000, transparent 85%);
+  pointer-events: none;
+}
+
+.monitor__scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.monitor__scene.is-on {
   opacity: 1;
-  transform: none;
-  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+.monitor__scene svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.monitor__cap {
+  flex: none;
+  min-height: clamp(34px, 5.2svh, 54px);
+  display: flex;
+  align-items: center;
+  color: var(--txt-2);
+  font-size: clamp(13px, 1.8svh, 16px);
+  line-height: 1.3;
+  transition: opacity 0.3s;
+}
+
+.monitor__cap.is-swapping {
+  opacity: 0;
+}
+
+/* the progress hairline that shows the 6s auto-advance */
+.monitor__time {
+  flex: none;
+  height: 1px;
+  background: var(--glass-line);
+  overflow: hidden;
+}
+
+.monitor__time i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--lavender);
+  transform-origin: left center;
+  transform: scaleX(var(--t, 0));
+}
+
+/* ══ 03 · THE PLATFORM — the bento grid ═══════════════════════ */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: clamp(8px, 1.4svh, 16px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(4px, 0.8svh, 10px);
+  padding: clamp(12px, 2svh, 22px);
+  min-height: 0;
+  transform-style: preserve-3d;
+}
+
+.tile--lg {
+  grid-column: span 2;
+}
+
+/* the sheen that follows the cursor tilt */
+.tile__sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle 220px at var(--mx, 50%) var(--my, 50%),
+    rgba(154, 108, 241, 0.22),
+    transparent 70%
+  );
+  transition: opacity 0.3s;
+}
+
+.tile:hover .tile__sheen {
+  opacity: 1;
+}
+
+.tile__art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 48%, rgba(0, 0, 0, 0.25) 100%);
+  mask-image: linear-gradient(180deg, #000 48%, rgba(0, 0, 0, 0.25) 100%);
+}
+
+.tile__title,
+.tile__meta {
+  position: relative;
+  z-index: 1;
+  color: var(--lavender);
+}
+
+.tile__meta b {
+  font-weight: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile__desc {
+  position: relative;
+  z-index: 1;
+}
+
+.tile__desc {
+  color: var(--txt-2);
+  font-size: clamp(12px, 1.6svh, 15px);
+  line-height: 1.3;
+}
+
+/* ══ 04 · THE FLOW ════════════════════════════════════════════ */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2svh, 24px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.flow__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.flow__stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.flow__ends {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(4px, 1svh, 12px);
+  pointer-events: none;
+}
+
+.flow__ends--in {
+  left: 0;
+  align-items: flex-start;
+}
+
+.flow__ends--out {
+  right: 0;
+  align-items: flex-end;
+}
+
+.flow__end {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  white-space: nowrap;
+  transition: color 0.4s;
+}
+
+.flow__end::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lavender);
+  opacity: 0.4;
+  flex: none;
+  transition: opacity 0.4s, box-shadow 0.4s;
+}
+
+.flow__end.is-on {
+  color: var(--txt);
+}
+
+.flow__end.is-on::before {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--blink-light);
+}
+
+.flow__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1.4svh, 16px);
+  flex: none;
+}
+
+.flow__step {
+  transition: border-color 0.4s, background 0.4s;
+}
+
+.flow__step.is-on {
+  border-color: var(--glass-line-hi);
+  background: rgba(97, 24, 234, 0.14);
+}
+
+.flow__step p {
+  color: var(--txt-2);
+  font-size: clamp(12px, 1.6svh, 15px);
+  line-height: 1.3;
+  margin-top: clamp(4px, 0.8svh, 8px);
+}
+
+/* ══ 05 · LIVE ════════════════════════════════════════════════ */
+.live {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: clamp(8px, 1.6svh, 18px);
+  padding: clamp(14px, 2.4svh, 28px);
+  overflow: hidden;
+}
+
+.live__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  flex: none;
+}
+
+.live__flag {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  color: var(--txt);
+}
+
+.live__readout {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  flex: none;
+}
+
+.live__nodes {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.live__nodes canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.live__spark {
+  flex: none;
+  height: clamp(28px, 5svh, 56px);
+}
+
+.live__spark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.live__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  flex: none;
+}
+
+/* ══ 06 · HEAD TO HEAD ════════════════════════════════════════ */
+.vs {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-line);
+  --split: 50%;
+}
+
+.vs__side {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(6px, 1.2svh, 14px);
+  padding: clamp(12px, 2.2svh, 26px);
+}
+
+/* the left side is clipped to the divider; the right one sits under it */
+.vs__side--wp {
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.02);
+  clip-path: inset(0 calc(100% - var(--split)) 0 0);
+}
+
+.vs__side--blink {
+  z-index: 1;
+  background: radial-gradient(ellipse 80% 70% at 70% 50%, rgba(97, 24, 234, 0.22), transparent 70%);
+  align-items: flex-end;
+  text-align: right;
+}
+
+.vs__plugins {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 320px);
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+
+.vs__plugin {
+  padding: 8px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(245, 243, 255, 0.55);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.vs__core {
+  width: min(100%, 300px);
+  padding: clamp(10px, 1.8svh, 20px);
+  border-radius: 14px;
+  border: 1px solid var(--glass-line-hi);
+  background: rgba(97, 24, 234, 0.18);
+  text-align: center;
+  box-shadow: 0 0 46px rgba(97, 24, 234, 0.4);
+}
+
+.vs__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 1px;
+  background: var(--lavender);
+  z-index: 3;
+  box-shadow: 0 0 16px var(--blink-light);
+}
+
+.vs__grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--lavender);
+  background: rgba(10, 6, 24, 0.86);
+  display: grid;
+  place-items: center;
+  cursor: ew-resize;
+  color: var(--lavender);
+  font-size: 11px;
+}
+
+.vstable {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 clamp(8px, 1.6vw, 24px);
+}
+
+.vstable > * {
+  display: contents;
+}
+
+.vstable span {
+  padding-block: clamp(4px, 0.9svh, 9px);
+  border-top: 1px solid var(--glass-line);
+  font-size: clamp(12px, 1.6svh, 15px);
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+}
+
+.vstable .vs-h {
+  border-top: 0;
+  color: var(--txt-3);
+}
+
+.vstable .vs-k {
+  color: var(--txt-2);
+}
+
+.vstable .vs-wp {
+  color: var(--txt-3);
+}
+
+.vstable .vs-bl {
+  color: var(--txt);
+}
+
+/* an unsourced cell is marked on screen, never quietly filled */
+.todo {
+  color: var(--live);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* ══ 07 · THE BEATS ═══════════════════════════════════════════ */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: none;
+}
+
+.tabs button {
+  padding: 0.5em 0.95em;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  color: var(--txt-3);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.tabs button:hover {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+}
+
+.tabs button[aria-selected="true"] {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+  background: rgba(97, 24, 234, 0.2);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: clamp(8px, 1.6vw, 20px);
+  transition: opacity 0.4s;
+}
+
+.metrics.is-swapping {
+  opacity: 0;
+}
+
+/*
+ * Each metric in its own cell with a 120px floor and a figure that cannot
+ * wrap — the previous build let three numbers share a flex row and they
+ * collided at exactly the sizes a case-study card is read at.
+ */
+.metric {
+  min-width: 0;
+}
+
+.metric b {
+  display: block;
+  font-family: var(--font-tomorrow), "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: clamp(26px, min(5.4svh, 5.4vw), 64px);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric span {
+  display: block;
+  margin-top: clamp(4px, 0.9svh, 10px);
+  color: var(--txt-3);
+}
+
+/* the device frame + its floating chips */
+.shot {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+ * `width: 100%` with `height: auto`, not `height: 100%`. With a definite
+ * height the aspect ratio wins and the frame runs out of a short, wide
+ * column — `max-width` cannot pull it back, because the height it is sized
+ * from is already fixed. This way the width is the definite side and
+ * `max-height` clamps the other, which costs a little of the 16:10 in a short
+ * window and nothing at all visually, since the image inside is `cover`.
+ */
+.shot__frame {
+  position: relative;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--glass-line);
+  background: #0a0718;
+  overflow: hidden;
+  transition: opacity 0.4s;
+}
+
+.shot.is-swapping .shot__frame {
+  opacity: 0;
+}
+
+.shot__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/*
+ * The drawn stand-in. It is behind the <img>, always; the script hides the
+ * <img> if its file 404s, which is what lets the brief's placeholder asset
+ * paths ship without a broken-image icon on the page.
+ */
+/*
+ * The drawn stand-in behind every <img> on the page.
+ *
+ * It is built from the same DNA as the real graphics — dot matrix, two purple
+ * light sources, hairline rules — rather than being a grey box, because every
+ * image here is a placeholder path the client has not filled yet and a flat
+ * rectangle in a 70%-of-the-window graphic slot is exactly the emptiness this
+ * pass exists to remove. When the files arrive the <img> covers it and none of
+ * this is ever seen.
+ */
+.shot__stub {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 24% 26%, rgba(97, 24, 234, 0.42), transparent 70%),
+    radial-gradient(ellipse 45% 55% at 82% 76%, rgba(154, 108, 241, 0.26), transparent 70%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 9px),
+    radial-gradient(rgba(185, 166, 255, 0.4) 1px, transparent 1.2px) 0 0 / 14px 14px,
+    linear-gradient(180deg, #0b0718 0%, #080513 100%);
+}
+
+.shot__stub::after {
+  content: attr(data-stub);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(245, 243, 255, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.shot__chip {
+  position: absolute;
+  z-index: 2;
+}
+
+/* the giant language glyph on the back layer */
+.glyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: min(52svh, 40vw);
+  line-height: 1;
+  color: rgba(245, 243, 255, 0.05);
+  white-space: nowrap;
+  transition: opacity 0.5s;
+  font-family: var(--font-grotesk), sans-serif;
+}
+
+/* ══ 08 · LETTERS ═════════════════════════════════════════════ */
+.quote {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 2svh, 22px);
+  transition: opacity 0.3s;
+}
+
+.quote.is-swapping > * {
+  opacity: 0;
+}
+
+.quote > * {
+  transition: opacity 0.3s;
+}
+
+.quote__text {
+  font-size: clamp(18px, min(3.4svh, 5.2vw), 34px);
+  line-height: 1.22;
+}
+
+.quote__by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em 1.2em;
+  color: var(--txt-3);
+}
+
+.quote__by b {
+  color: var(--txt);
+  font-weight: inherit;
+}
+
+.quote__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 18px);
+  color: var(--txt-3);
+}
+
+.quote__arrow {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  color: var(--txt-2);
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+
+.quote__arrow:hover {
+  border-color: var(--glass-line-hi);
+  color: var(--txt);
+  background: var(--glass-bg);
+}
+
+/* the portrait and the deck of the other letters behind it */
+.deck {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck__card {
+  position: absolute;
+  height: 86%;
+  /* the portrait is the one place a definite height is right — the deck
+     behind it is offset from it — so the ratio gives way instead. 76%, not
+     88%: the two cards behind are translated 14% and 26% right, and at 88%
+     the far one put the whole section into horizontal overflow at 1024. */
+  max-width: 76%;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  border: 1px solid var(--glass-line);
+  background: #0a0718;
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
+}
+
+.deck__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.1);
+}
+
+.deck__card .backvid-tint {
+  mix-blend-mode: color;
+}
+
+.deck__card--0 {
+  z-index: 3;
+  transform: translateX(0) scale(1);
+}
+
+.deck__card--1 {
+  z-index: 2;
+  transform: translateX(14%) scale(0.9) rotate(4deg);
+  opacity: 0.6;
+}
+
+.deck__card--2 {
+  z-index: 1;
+  transform: translateX(26%) scale(0.82) rotate(8deg);
+  opacity: 0.35;
+}
+
+/* the Ken Burns drift on the front portrait */
+.deck__card--0 .deck__media {
+  position: absolute;
+  inset: -6%;
+  animation: ken 18s ease-in-out infinite alternate;
+}
+
+@keyframes ken {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.1) translate(-2%, -2%);
+  }
+}
+
+.bigquote {
+  position: absolute;
+  left: 4%;
+  top: 46%;
+  transform: translateY(-50%);
+  font-size: min(54svh, 42vw);
+  line-height: 0.7;
+  color: rgba(245, 243, 255, 0.045);
+  font-family: var(--font-tomorrow), sans-serif;
+}
+
+/* ══ 09 · THE RATE CARD ═══════════════════════════════════════ */
+.rates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.8svh, 20px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rate {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2svh, 14px);
+  padding: clamp(14px, 2.4svh, 28px);
+  min-height: 0;
+}
+
+/*
+ * Three tiers side by side means each card is a third of the container, and
+ * at 820px that is 241px — where "$1,500 / month" at the full figure size
+ * measured 263px and pushed the page into horizontal scroll. The figure is
+ * capped against the width as well as the height, and the unit is allowed to
+ * wrap under it rather than fighting for the same line.
+ */
+.rate__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2em;
+}
+
+.rate__price .figure {
+  font-size: clamp(24px, min(5svh, 5.4vw), 56px);
+}
+
+.rate__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3px, 0.7svh, 7px);
+  margin-top: auto;
+}
+
+.rate__list span {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  color: var(--txt-2);
+  font-size: clamp(12px, 1.6svh, 15px);
+  line-height: 1.3;
+}
+
+.rate__list span::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--lavender);
+  flex: none;
+  transform: translateY(-0.25em);
+}
+
+/* the recommended tier's travelling border light */
+.rate--best {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    conic-gradient(from var(--spin, 0deg), var(--blink), var(--lavender), var(--blink-light), var(--blink)) border-box;
+  border: 1px solid transparent;
+  animation: spin-border 7s linear infinite;
+}
+
+@property --spin {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin-border {
+  to {
+    --spin: 360deg;
+  }
+}
+
+.rate__flag {
+  position: absolute;
+  top: calc(-1 * clamp(8px, 1.2svh, 12px));
+  left: clamp(14px, 2.4svh, 28px);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--blink);
+  color: #fff;
+}
+
+/* ══ 10 · THE WIRE ════════════════════════════════════════════ */
+.wire {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.6svh, 18px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.post {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(4px, 0.8svh, 10px);
+  padding: clamp(12px, 2svh, 24px);
+  min-height: 0;
+}
+
+.post--lg {
+  grid-row: span 2;
+}
+
+.post__art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.post__art > * {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.post:hover .post__art > * {
+  transform: scale(1.06);
+}
+
+.post__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 4, 14, 0.25) 0%, rgba(6, 4, 14, 0.88) 72%);
+}
+
+.post__title,
+.post__meta {
+  position: relative;
+  z-index: 1;
+}
+
+.post__title {
+  font-size: clamp(14px, min(2.4svh, 4.2vw), 26px);
+  line-height: 1.1;
+}
+
+.post--lg .post__title {
+  font-size: clamp(18px, min(3.4svh, 5vw), 38px);
+}
+
+/* the faint headline ticker on the back layer */
+.ticker-back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.05;
+  font-size: min(14svh, 11vw);
+  line-height: 1;
+  white-space: nowrap;
+  font-family: var(--font-tomorrow), sans-serif;
+  text-transform: uppercase;
+}
+
+/* ══ 11 · QUESTIONS ═══════════════════════════════════════════ */
+/*
+ * A chat with the desk. The answer is deliberately SMALLER than the question
+ * (16–17px against 18px) — in the previous build the answer was set bigger
+ * than the list and the eye went to it first, which made the list look like
+ * a caption for the panel rather than the thing you choose from.
+ */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6svh, 16px);
+  padding: clamp(14px, 2.4svh, 26px);
+  flex: 1 1 auto;
+  min-height: 0;
+  justify-content: flex-start;
+}
+
+.chat__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  flex: none;
+}
+
+.chat__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(97, 24, 234, 0.3);
+  border: 1px solid var(--glass-line-hi);
+  color: var(--lavender);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  flex: none;
+}
+
+.chat__bubble {
+  align-self: flex-start;
+  max-width: 44ch;
+  padding: clamp(10px, 1.8svh, 18px) clamp(12px, 2svh, 20px);
+  border-radius: 16px 16px 16px 4px;
+  background: rgba(97, 24, 234, 0.16);
+  border: 1px solid var(--glass-line);
+  font-size: clamp(14px, 1.8svh, 17px);
+  line-height: 1.4;
+  color: var(--txt);
+  transition: opacity 0.3s;
+}
+
+.chat.is-swapping .chat__bubble,
+.chat.is-swapping .chat__dots {
+  opacity: 0;
+}
+
+.chat__dots {
+  display: flex;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line);
+  transition: opacity 0.3s;
+}
+
+.chat__dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--lavender);
+  animation: typing 1.2s ease-in-out infinite;
+}
+
+.chat__dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat__dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ══ 12 · FRONT PAGE ══════════════════════════════════════════ */
+.ed--cta .ed__h2 {
+  font-size: clamp(38px, min(8.5svh, 9vw), 104px);
+}
+
+.ed--cta .ed__head {
+  max-width: 980px;
+}
+
+.cta-globe {
+  position: absolute;
+  left: 50%;
+  bottom: calc(-46vmin);
+  width: min(130vw, 1100px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cta-globe canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* ══ the footer ═══════════════════════════════════════════════ */
+.ed-footer {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(28px, 6svh, 72px);
+  padding-bottom: clamp(16px, 3svh, 32px);
+}
+
+.ed-footer__shell {
+  width: 100%;
+  max-width: var(--ed-max);
+  margin-inline: auto;
+  padding-inline: var(--ed-pad);
+}
+
+.news {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(12px, 2.4svh, 24px);
+  padding-bottom: clamp(20px, 4svh, 40px);
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.news__form {
+  display: flex;
+  gap: 8px;
+  flex: 1 1 320px;
+  max-width: 460px;
+}
+
+.news__form input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.85em 1.1em;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-bg);
+  color: var(--txt);
+  font: inherit;
+  font-size: 15px;
+}
+
+.news__form input::placeholder {
+  color: var(--txt-3);
+}
+
+.news__form input:focus-visible {
+  outline: none;
+  border-color: var(--glass-line-hi);
+}
+
+.ed-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 3svh, 36px);
+  padding-block: clamp(20px, 4svh, 44px);
+}
+
+@media (min-width: 768px) {
+  .ed-footer__cols {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ed-footer__col h3 {
+  color: var(--txt-3);
+  margin-bottom: clamp(8px, 1.6svh, 14px);
+  font-weight: inherit;
+}
+
+.ed-footer__col a {
+  display: block;
+  color: var(--txt-2);
+  font-size: 14px;
+  padding-block: 3px;
+  transition: color 0.25s;
+}
+
+.ed-footer__col a:hover {
+  color: var(--lavender);
+}
+
+.ed-footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em 2em;
+  padding-block: clamp(12px, 2.4svh, 24px);
+  border-top: 1px solid var(--glass-line);
+  color: var(--txt-3);
+}
+
+.social {
+  display: flex;
+  gap: 8px;
+}
+
+.social a {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  display: grid;
+  place-items: center;
+  color: var(--txt-2);
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.social a:hover {
+  color: var(--txt);
+  border-color: var(--glass-line-hi);
+  background: var(--glass-bg);
+}
+
+/*
+ * The wordmark, scaled to exactly the container width. `vw` cannot do it —
+ * the container is capped at 1440px and padded, so a vw-sized wordmark either
+ * overflows or leaves a gap at the sides. initWordmark() measures the element
+ * and writes `--wm`, and this falls back to a sane vw if that never runs.
+ */
+.wordmark {
+  display: block;
+  width: 100%;
+  font-size: var(--wm, 13vw);
+  line-height: 0.76;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  background: linear-gradient(100deg, var(--lavender) 0%, var(--blink) 45%, var(--blink-light) 70%, var(--blink) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sweep 9s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0%, 100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+/* ── the micro-UI animations ──────────────────────────────────── */
+/*
+ * Every loop on this page is gated twice: it only runs when its scene is the
+ * one on screen (`.is-on`, `.is-live`), and `initTiles()` only adds `.is-live`
+ * while the grid is actually in view. Twelve sections of looping SVG all
+ * running at once is exactly how a page loses 60fps on a phone, and none of
+ * these can be seen from anywhere else on the page anyway.
+ *
+ * Draw-on animations use a generous `stroke-dasharray` rather than a measured
+ * `getTotalLength()`: every path here is well under its dash length, so the
+ * CSS needs no help from JavaScript and cannot fall out of step with it.
+ */
+
+/* 02 · the monitor scenes */
+.mon-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mon-line--wp {
+  stroke: var(--live);
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+}
+
+.mon-line--bl,
+.mon-line--traffic {
+  stroke: var(--lavender);
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+}
+
+.mon-line--bill {
+  stroke: var(--blink-light);
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+}
+
+.mon-break,
+.mon-hold,
+.mon-core,
+.mon-core-t,
+.mon-climb,
+.mon-score,
+.mon-reply,
+.mon-alert {
+  opacity: 0;
+}
+
+.mon-wires path {
+  fill: none;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+}
+
+.mon-ring {
+  fill: none;
+  stroke-dasharray: 264;
+  stroke-dashoffset: 264;
+}
+
+.mon-race {
+  transform-origin: 10px 78px;
+  transform: scaleX(0);
+}
+
+.mon-tag {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.5s 0.7s;
+}
+
+.mon-tag--wp {
+  left: 52%;
+  top: 76%;
+  color: var(--live);
+}
+
+.mon-tag--bl {
+  right: 0;
+  top: 6%;
+  color: var(--lavender);
+}
+
+.monitor__scene.is-on .mon-tag {
+  opacity: 1;
+}
+
+.monitor__scene.is-on .mon-line--wp {
+  animation: draw-700 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.monitor__scene.is-on .mon-line--bl,
+.monitor__scene.is-on .mon-line--traffic {
+  animation: draw-900 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.monitor__scene.is-on .mon-line--bill {
+  animation: draw-900 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.monitor__scene.is-on .mon-break {
+  animation: fade-in 0.3s 1.4s forwards, sig-blink 1.1s 1.7s infinite;
+}
+
+.monitor__scene.is-on .mon-hold {
+  animation: fade-in 0.4s 1.8s forwards;
+}
+
+.monitor__scene.is-on .mon-wires path {
+  animation: draw-400 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.monitor__scene.is-on .mon-core,
+.monitor__scene.is-on .mon-core-t {
+  animation: pop-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+}
+
+.monitor__scene.is-on .mon-climb {
+  animation: climb 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.monitor__scene.is-on .mon-ring {
+  animation: ring-92 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+}
+
+.monitor__scene.is-on .mon-score {
+  animation: fade-in 0.5s 1.1s forwards;
+}
+
+.monitor__scene.is-on .mon-alert {
+  animation: fade-in 0.3s 0.3s forwards, sig-blink 1s 0.6s 3;
+}
+
+.monitor__scene.is-on .mon-reply {
+  animation: pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 1.9s forwards;
+}
+
+.monitor__scene.is-on .mon-race {
+  animation: race 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+
+@keyframes draw-400 {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes draw-700 {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes draw-900 {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    transform-origin: center;
+  }
+}
+
+@keyframes sig-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes climb {
+  from {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-90px);
+  }
+}
+
+/* 92 of 100 around a 264-unit circumference */
+@keyframes ring-92 {
+  to {
+    stroke-dashoffset: 21;
+  }
+}
+
+@keyframes race {
+  to {
+    transform: scaleX(0.38);
+  }
+}
+
+/* 03 · the bento tiles. `.is-live` is added only while the grid is in view. */
+.bt-upload,
+.bt-type {
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.bt-chips rect {
+  opacity: 0;
+}
+
+.bt-ring {
+  fill: none;
+  stroke-dasharray: 189;
+  stroke-dashoffset: 189;
+}
+
+.bt-chart {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+}
+
+.bt-page {
+  transform-origin: 80px 90px;
+}
+
+.bt-clip,
+.bt-dot,
+.bt-gps {
+  opacity: 0;
+}
+
+.tile.is-live .bt-upload {
+  animation: bt-fill 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.tile.is-live .bt-gps {
+  animation: sig-blink 1.4s infinite;
+  opacity: 1;
+}
+
+.tile.is-live .bt-phone {
+  animation: bt-float 5s ease-in-out infinite alternate;
+}
+
+.tile.is-live .bt-type {
+  animation: bt-type 4.5s steps(24) infinite;
+}
+
+.tile.is-live .bt-chips rect {
+  animation: fade-in 0.4s forwards;
+}
+
+.tile.is-live .bt-chips rect:nth-child(1) {
+  animation-delay: 1.4s;
+}
+
+.tile.is-live .bt-chips rect:nth-child(2) {
+  animation-delay: 1.7s;
+}
+
+.tile.is-live .bt-chips rect:nth-child(3) {
+  animation-delay: 2s;
+}
+
+.tile.is-live .bt-ring {
+  animation: bt-ring 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.tile.is-live .bt-frame {
+  animation: bt-morph 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.tile.is-live .bt-shackle {
+  animation: bt-unlock 4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.tile.is-live .bt-page {
+  animation: bt-turn 5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.tile.is-live .bt-clip {
+  animation: bt-clip 5s ease-in-out infinite;
+}
+
+.tile.is-live .bt-chart {
+  animation: draw-chart 4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.tile.is-live .bt-dot {
+  animation: fade-in 0.3s 1.8s forwards, sig-blink 1.6s 2.1s infinite;
+}
+
+@keyframes bt-fill {
+  0% {
+    transform: scaleX(0);
+  }
+  70%, 100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bt-float {
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes bt-type {
+  0% {
+    transform: scaleX(0);
+  }
+  45%, 100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bt-ring {
+  0% {
+    stroke-dashoffset: 189;
+  }
+  55%, 100% {
+    stroke-dashoffset: 15;
+  }
+}
+
+@keyframes bt-morph {
+  0%, 26% {
+    transform: scaleX(1);
+  }
+  33%, 59% {
+    transform: scaleX(0.72);
+  }
+  66%, 93% {
+    transform: scaleX(0.88);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bt-unlock {
+  0%, 40% {
+    transform: translateY(0);
+  }
+  55%, 85% {
+    transform: translateY(-7px) rotate(-7deg);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bt-turn {
+  0%, 20% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  55%, 100% {
+    transform: rotateY(-168deg);
+    opacity: 0.12;
+  }
+}
+
+@keyframes bt-clip {
+  0%, 30% {
+    opacity: 0;
+  }
+  45%, 85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes draw-chart {
+  0% {
+    stroke-dashoffset: 420;
+  }
+  60%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* the e-paper page turn needs a 3D context to turn in */
+[data-tile="epaper"] .tile__art svg {
+  perspective: 600px;
+}
+
+[data-tile="epaper"] .bt-page {
+  transform-style: preserve-3d;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js [data-in],
-  .js .hero-head .line-inner {
-    transform: none;
+  .monitor__scene .mon-line,
+  .monitor__scene .mon-wires path,
+  .monitor__scene .mon-ring,
+  .tile .bt-ring,
+  .tile .bt-chart {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
   }
 
-  .js .is-in [data-in] {
-    transition: opacity 0.4s;
+  .monitor__scene .mon-break,
+  .monitor__scene .mon-hold,
+  .monitor__scene .mon-core,
+  .monitor__scene .mon-core-t,
+  .monitor__scene .mon-climb,
+  .monitor__scene .mon-score,
+  .monitor__scene .mon-reply,
+  .monitor__scene .mon-alert,
+  .monitor__scene .mon-tag,
+  .tile .bt-clip,
+  .tile .bt-dot,
+  .tile .bt-gps {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
   }
 
-  .js #hero.is-in .hero-head .line-inner {
-    transition: opacity 0.4s;
+  .mon-race,
+  .bt-upload,
+  .bt-type {
+    transform: scaleX(1) !important;
+    animation: none !important;
   }
 
-  .flow__rail::before,
-  .ed.is-in .flow__rail::before {
-    transition: none;
-    transform: none;
+  .tile.is-live * {
+    animation: none !important;
   }
 }
 
 /* ── height breakpoints ───────────────────────────────────────── */
 /*
- * Progressive, not responsive: each step takes away the least important
- * thing still on screen. Nothing here hides a number, a headline or an
- * answer — only support lines, card descriptors and the tail of a list,
- * which is why every step still leaves the section making its point.
+ * Progressive, not responsive. Each step removes the least important thing
+ * still on screen and never a number, a headline or an answer.
  */
 @media (max-height: 800px) {
-  .ed__sup {
+  .ed__sup,
+  .hide-800 {
     display: none;
   }
 
@@ -4402,38 +5570,26 @@ body {
 }
 
 @media (max-height: 680px) {
-  .card__desc,
-  .flow__ends,
-  .logos {
+  .hide-680 {
     display: none;
-  }
-
-  .ed .wire__row:nth-of-type(4) {
-    display: none;
-  }
-
-  .ed .wire__row:nth-of-type(3) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .ed__sup {
     display: none;
   }
+
+  .vstable span:nth-child(n + 7) {
+    display: none;
+  }
 }
 
-/*
- * Lists are thinned by width as well as by height. A six-question list is
- * fine beside a headline on a laptop and is the tallest thing on the page
- * once the layout stacks, so mobile portrait sees four and the rest move
- * behind the link — which is why the link's visibility is tied to exactly the
- * states that trim a list, and hidden everywhere else.
- */
+/* lists thin by width as well as by height */
 .ed__link--overflow {
   display: none;
 }
 
 @media (max-height: 680px), (max-width: 1023.98px) {
-  .ed .qa__q:nth-of-type(n + 5) {
+  .qlist__q:nth-of-type(n + 5) {
     display: none;
   }
 
@@ -4442,31 +5598,249 @@ body {
   }
 }
 
+/* ── below lg: one graphic and one module per screen ──────────── */
+@media (max-width: 1023.98px) {
+  /*
+   * Stacked, the two rows would otherwise split the section in half and the
+   * text would float in the middle of its share — which is the "small content
+   * in a large dark screen" this pass exists to fix. The text takes what it
+   * needs; the graphic takes everything that is left.
+   */
+  .ed--a .ed__grid {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .ed__gfx--bleed {
+    margin-right: 0;
+  }
+
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tile--lg {
+    grid-column: span 2;
+  }
+
+  /*
+   * Stacked, not split. A draggable divider needs two readable halves and a
+   * 390px window has room for one — at 1023px and below the two stacks sit
+   * one above the other, WordPress first so the section still builds to the
+   * better answer, and the handle goes away with the thing it dragged.
+   */
+  .vs {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    --split: 100%;
+  }
+
+  .vs__side {
+    position: relative;
+    inset: auto;
+    clip-path: none;
+    align-items: flex-start;
+    text-align: left;
+    justify-content: center;
+  }
+
+  .vs__side--wp {
+    order: 1;
+    border-bottom: 1px solid var(--glass-line);
+  }
+
+  .vs__side--blink {
+    order: 2;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .vs__plugins,
+  .vs__core {
+    width: 100%;
+  }
+
+  .vs__core {
+    text-align: left;
+  }
+
+  .vs__handle {
+    display: none;
+  }
+
+  .vstable {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /*
+   * The header row's first cell is the empty one above the key column. On two
+   * columns it would take the WordPress slot and push both labels one cell
+   * along — which is exactly what it did — so it goes.
+   */
+  .vstable .vs-h:first-child {
+    display: none;
+  }
+
+  /* the key column is the row header on narrow screens */
+  .vstable .vs-k {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--glass-line);
+    padding-bottom: 0;
+    color: var(--txt-3);
+    font-size: 12px;
+  }
+
+  .vstable .vs-wp,
+  .vstable .vs-bl {
+    border-top: 0;
+    padding-top: 0;
+    align-items: flex-start;
+  }
+
+  .flow__ends {
+    display: none;
+  }
+
+  .wire {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+
+  .post--lg {
+    grid-row: span 1;
+  }
+
+  .post:nth-child(3) {
+    display: none;
+  }
+
+  .deck__card--1,
+  .deck__card--2 {
+    display: none;
+  }
+
+  .deck__card {
+    height: 100%;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .bento {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: minmax(0, 1fr);
+  }
+
+  .bento .tile:nth-child(n + 4) {
+    display: none;
+  }
+
+  .rates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rates .rate:nth-child(n + 3) {
+    display: none;
+  }
+
+  .flow__steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  /* the footer has a 100svh budget and four columns, a newsletter, socials,
+     legal and a wordmark to fit in it; below md everything takes its
+     tightest setting */
+  .ed-footer {
+    padding-top: clamp(20px, 4svh, 72px);
+    padding-bottom: clamp(12px, 2svh, 32px);
+  }
+
+  .ed-footer__cols {
+    gap: 14px;
+    padding-block: clamp(14px, 2.6svh, 44px);
+  }
+
+  .ed-footer__col a {
+    padding-block: 2px;
+    font-size: 13px;
+  }
+
+  .news {
+    padding-bottom: clamp(14px, 2.6svh, 40px);
+  }
+
+  .ed-footer__base {
+    padding-block: clamp(10px, 1.8svh, 24px);
+  }
+}
+
+/* ── phone landscape ──────────────────────────────────────────── */
 /*
- * Phone landscape. One screen stops being the right answer at this height —
- * a 390px window cannot hold a headline, a module and a label without
- * shrinking one of them to nothing — so the sections are allowed to grow
- * and the reader scrolls instead. Clipping would be worse.
+ * One screen stops being the right answer here: a 390px window cannot hold a
+ * headline, a graphic and a module without shrinking one of them to nothing.
+ * The sections grow and the reader scrolls. Clipping would be worse.
  */
 @media (max-height: 520px) {
   .ed {
     height: auto;
     min-height: 0;
-    padding-top: clamp(40px, 12svh, 72px);
-    padding-bottom: clamp(24px, 8svh, 48px);
+    padding-top: clamp(36px, 10svh, 64px);
+    padding-bottom: clamp(20px, 7svh, 44px);
   }
 
   .ed:first-of-type {
-    padding-top: calc(var(--header-h) + 24px);
+    padding-top: calc(var(--header-h) + 20px);
   }
 
-  .ed--b .ed__h2,
-  .ed--cta .ed__h2 {
-    font-size: clamp(24px, 6.6vw, 40px);
+  .ed__gfx,
+  .net,
+  .monitor,
+  .bento,
+  .flow__stage,
+  .live,
+  .vs,
+  .shot,
+  .deck,
+  .rates,
+  .wire,
+  .chat {
+    min-height: 180px;
   }
 
-  .devices {
-    --dev-h: min(34vh, 22vw);
+  .ed__h2 {
+    font-size: clamp(24px, 6.4vw, 40px);
+  }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .js [data-in],
+  .js .hero-head .line-inner {
+    transform: none;
+  }
+
+  .js .is-in [data-in],
+  .js #hero.is-in .hero-head .line-inner {
+    transition: opacity 0.4s;
+  }
+
+  [data-depth] {
+    transform: none !important;
+  }
+
+  .deck__card--0 .deck__media,
+  .wordmark,
+  .rate--best,
+  .chat__dots i {
+    animation: none !important;
+  }
+
+  .backvid {
+    display: none;
   }
 }
 

@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blink CMS — The engine behind modern newsrooms.</title>
   <meta name="description"
-    content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform. The extended tech team behind 150+ newsrooms.">
-  <meta name="theme-color" content="#07060B">
+    content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform. The extended tech team behind 66+ newsrooms.">
+  <meta name="theme-color" content="#06040E">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Blink CMS — The engine behind modern newsrooms.">
   <meta property="og:description"
@@ -30,44 +30,28 @@
   </script>
 
   <!--
-    Two separate failure modes, both of which would otherwise leave the page
-    unreadable:
-
-    1. Scripting disabled  -> <noscript> below. `html.js` is never set, so the
-       entry animation never arms and only the preloader needs dropping.
-    2. Scripting enabled but js/main.js never runs. This is NOT covered by
-       <noscript>: `html.js` IS set by the inline script above, so every
-       `[data-in]` element is sitting at opacity 0 with nothing coming to
-       reveal it. It happens when the page is opened from disk (ES modules are
-       blocked on the file:// origin), behind a CSP that forbids modules, or
-       after an integration moves the files and the path 404s. The inline
-       script at the end of <body> detects it and sets .boot-failed.
-
-    Both land on the same rules: drop the preloader, show the globe's wrapper,
-    and put every revealed element at rest.
+    The failsafe's stylesheet. There is no preloader any more — the brief
+    forbids holding first paint for more than a second — so the only thing at
+    stake is the entry animation: `html.js` is set above, which means every
+    `[data-in]` element sits at opacity 0 waiting for a module that may never
+    run. `<noscript>` does not cover that case, because scripting IS enabled
+    in the ones that matter (opened from disk, blocked by CSP, moved files).
+    `.boot-failed` is set by the classic script at the end of <body>.
   -->
   <style>
-    .boot-failed .preloader {
-      display: none;
-    }
-
-    .boot-failed [data-globe-wrap] {
-      opacity: 1;
-    }
-
     .boot-failed [data-in],
     .boot-failed .line-inner {
       opacity: 1 !important;
       transform: none !important;
     }
+
+    .boot-failed [data-globe-wrap] {
+      opacity: 1;
+    }
   </style>
 
   <noscript>
     <style>
-      .preloader {
-        display: none;
-      }
-
       [data-globe-wrap] {
         opacity: 1;
       }
@@ -78,20 +62,15 @@
 <body>
 
   <!--
-    The background. The whole of it.
-
-    Two blurred radial gradients and a dot grid on one fixed layer at
-    z-index -1, so every section scrolls over the same light and no section
-    carries a background, a band, an image or a transition shape of its own.
-    initAmbient() writes `--glow` (strongest at the hero and at the closing
-    CTA, softer in between) and `--drift` (at most 10% of the viewport across
-    the entire page). With no JavaScript it rests at the hero's setting, which
-    is the one the page opens on anyway.
+    The page background. Base and the 64px grid, fixed behind everything, so
+    there is no edge where the hero ends and no section needs a background of
+    its own. The hero's two glows are inside the hero; the travelling glow
+    here is strongest at the hero and the closing CTA and softer between, so
+    the page opens and closes on the same light.
   -->
-  <div class="ambient" data-ambient aria-hidden="true">
-    <div class="ambient__a"></div>
-    <div class="ambient__b"></div>
-    <div class="ambient__grid"></div>
+  <div class="page-bg" data-ambient aria-hidden="true">
+    <div class="page-bg__glow"></div>
+    <div class="page-bg__grid"></div>
   </div>
 
   <svg class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -312,40 +291,6 @@
     </svg>
   </div>
 
-  <!-- ═══ 00 · PRELOADER ══════════════════════════════════════════ -->
-  <div class="preloader position-fixed inset-0 z-loader overflow-hidden" data-preloader>
-    <canvas class="position-absolute inset-0 h-100 w-100" data-preloader-canvas></canvas>
-
-    <div class="loader-col loader-col--left">
-      <div class="display mb-5" style="font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff">BLINK<span
-          style="color:var(--blink-lift)">CMS</span></div>
-      <div class="mono-xs mb-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.34)">
-        <span style="width:12px;height:1px;background:currentColor"></span> WIRE · SAMPLE FEED
-      </div>
-      <ul class="d-flex flex-column gap-1" data-wire></ul>
-    </div>
-
-    <div class="loader-col loader-col--right d-none d-md-block">
-      <div class="mono-xs mb-2" style="color:rgba(255,255,255,.34)">LANGUAGES</div>
-      <div class="mono-xs loader-lang" data-lang>TAMIL</div>
-      <div class="mono-xs loader-lang" data-lang>TELUGU</div>
-      <div class="mono-xs loader-lang" data-lang>HINDI</div>
-      <div class="mono-xs loader-lang" data-lang>MALAYALAM</div>
-      <div class="mono-xs loader-lang" data-lang>ENGLISH</div>
-      <div class="mono-xs loader-lang" data-lang>ASSAMESE</div>
-    </div>
-
-    <div class="loader-clock">
-      <div class="mono-xs mb-1" style="color:rgba(255,255,255,.3)" data-state>STANDBY</div>
-      <div class="display d-flex align-items-baseline justify-content-end gap-2"
-        style="font-size:clamp(2.6rem,6vw,5rem);color:#fff;font-variant-numeric:tabular-nums">
-        <span class="live-dot" data-onair-dot style="margin-bottom:.9em" hidden></span>
-        <span data-count>000</span>
-      </div>
-      <div class="mono-xs" style="color:rgba(255,255,255,.3)" data-count-caption>LOADING BUREAUS</div>
-    </div>
-  </div>
-
   <!-- ═══ header ══════════════════════════════════════════════════ -->
   <header class="site-header position-fixed start-0 top-0 w-100 z-header" data-header>
     <div class="site-header__bar">
@@ -432,6 +377,9 @@
     <!-- ═══ 01 · HERO ═══════════════════════════════════════════════ -->
     <section id="hero" class="hero position-relative" data-label="FRONT PAGE">
       <div class="position-sticky top-0 h-svh overflow-hidden">
+        <!-- the hero background, and the only change the hero was allowed -->
+        <div class="hero__glow" aria-hidden="true"></div>
+
         <div class="hero-globe z-1" data-globe-wrap>
           <div class="position-absolute inset-0" data-globe-dim>
             <canvas class="w-100 h-100" data-scene="globe"></canvas>
@@ -482,457 +430,771 @@
     </section>
 
     <!--
-      ═══ 01 — 11 ══════════════════════════════════════════════════════════
+      ═══ 01 — 12 ══════════════════════════════════════════════════════════
 
-      One template, eleven times:
+      One template, twelve times:
 
-        <section class="ed ed--a|b">          one window tall, content centred
-          <div class="shell">
+        <section class="ed ed--a|b">          one window tall
+          [.layer-back]                       parallax back layer, optional
+          <div class="ed__shell">             1440px, flex column, fills
             <div class="ed__grid">
-              <div class="ed__head">        eyebrow → headline → support
-              <div>                        ONE module
-          [optional] a single link
+              <div class="ed__col">           label → headline → support → module
+              <div class="ed__gfx">           THE signature graphic
 
-      `data-in` marks what the entry animation moves and `--i` is its place in
-      the 80ms stagger; `data-label` feeds the fixed label down the left edge.
-      There is no `data-nav` any more — the chrome used it to invert over light
-      sections, and there are no light sections.
+      `.ed__gfx` is `flex: 1 1 auto; min-height: 0`, so it takes exactly the
+      room the text leaves at any window size. That one declaration is what
+      makes the sections both fit the window and fill it — the previous build
+      fitted by being half empty, which is the thing this pass exists to fix.
 
-      `.shell` rather than a new 1280px container on purpose. The brief asks
-      for both a 1280px container and the same left edge everywhere, and the
-      hero — which may not change — sits in `.shell`'s 1560px. The left edge
-      is the one a reader can see going from section to section, so the
-      sections share the hero's container and the text inside is capped in
-      `ch` instead.
+      `data-in` marks what the entry reveal moves, `--i` is its place in the
+      80ms stagger, `data-depth` marks a parallax layer, and `data-label`
+      feeds the fixed label down the left edge.
     -->
 
-    <!-- ═══ 01 · THE DESK ═══════════════════════════════════════════ -->
-    <section id="desk" class="ed ed--a" data-label="THE DESK">
-      <div class="shell">
+    <!-- ═══ 01 · THE NETWORK ════════════════════════════════════════ -->
+    <section id="network" class="ed ed--a" data-label="THE NETWORK">
+      <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">01 — THE DESK</span>
-            <h2 class="display ed__h2" data-in style="--i:1">We build newsrooms.<br>We own <span
-                class="head-lilac">the uptime.</span></h2>
-            <p class="ed__sup" data-in style="--i:2">One platform. One accountable team.</p>
-          </div>
-
-          <div class="stats" data-in style="--i:3">
-            <div class="card">
-              <span class="display stat__figure" data-count-to="66" data-suffix="+">66+</span>
-              <span class="mono-xs stat__label">newsrooms powered</span>
-            </div>
-            <div class="card">
-              <span class="display stat__figure" data-count-to="43" data-suffix="K">43K</span>
-              <span class="mono-xs stat__label">concurrent readers</span>
-            </div>
-            <div class="card">
-              <span class="display stat__figure" data-count-to="20" data-suffix="+">20+</span>
-              <span class="mono-xs stat__label">fact-checking sites</span>
-            </div>
-            <div class="card">
-              <span class="display stat__figure" data-count-to="396" data-suffix="%">396%</span>
-              <span class="mono-xs stat__label">faster page loads</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 02 · THE QUESTION ═══════════════════════════════════════ -->
-    <!--
-      The question list and its answer panel. Deliberately not an accordion:
-      an accordion changes the section's height as it opens, and a section
-      that changes height cannot be promised to fit the window. The panel is a
-      fixed box whose contents cross-fade in 300ms, so choosing an answer
-      moves nothing on screen. Section 10 uses the same component.
-    -->
-    <section id="why-leave" class="ed ed--a ed--qa" data-label="THE QUESTION">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">02 — THE QUESTION</span>
-            <h2 class="display ed__h2" data-in style="--i:1">Why newsrooms <span class="head-lilac">leave
-                WordPress</span></h2>
-          </div>
-
-          <div class="qa" data-qa data-in style="--i:2">
-            <div class="qa__list" role="tablist" aria-label="Why newsrooms leave WordPress">
-              <button class="qa__q" type="button" role="tab" aria-selected="true" aria-controls="qa-a-1"
-                data-qa-q="Auto-scales on AWS. Zero downtime at 43K concurrent readers."><i>01</i>Will it hold on
-                results night?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
-                data-qa-q="One. CMS, apps, paywall, ads and analytics together."><i>02</i>How many vendors is
-                that?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
-                data-qa-q="Google News setup and AI-SEO scoring on every story."><i>03</i>What happens to our
-                rankings?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
-                data-qa-q="No. You pay for features, not traffic."><i>04</i>Does the bill grow with traffic?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
-                data-qa-q="The extended tech team behind 150+ newsrooms. No ticket queues."><i>05</i>Who fixes it at 2
-                a.m.?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
-                data-qa-q="396% faster. 1.5s on a Tamil daily at 20× its old traffic."><i>06</i>How fast do pages have
-                to be?</button>
+          <div class="ed__col">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">01 — THE NETWORK</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Powering <span class="head-lilac">66+
+                  newsrooms.</span></h2>
             </div>
 
-            <!-- the link sits beside the panel, never inside it: the panel is
-                 a fixed box sized for the longest answer, and anything else in
-                 it eats the room that answer needs -->
-            <div class="qa__side">
-              <div class="card qa__panel" id="qa-a-1" role="tabpanel" data-qa-panel>
-                <span class="mono-xs qa__count" data-qa-count>01 / 06</span>
-                <p class="qa__a" data-qa-a>Auto-scales on AWS. Zero downtime at 43K concurrent readers.</p>
+            <div class="stats" data-in style="--i:2">
+              <div class="glass glass--pad glass--hover">
+                <span class="figure figure--sm" data-count-to="66" data-suffix="+">66+</span>
+                <span class="meta stat__label">newsrooms powered</span>
               </div>
-              <!-- only on screen in the states that trim the list above -->
-              <a class="mono-xs ed__link ed__link--overflow" href="#faq">Read the F.A.Q <span
-                  aria-hidden="true">→</span></a>
+              <div class="glass glass--pad glass--hover">
+                <span class="figure figure--sm" data-count-to="43" data-suffix="K">43K</span>
+                <span class="meta stat__label">concurrent readers</span>
+              </div>
+              <div class="glass glass--pad glass--hover">
+                <span class="figure figure--sm" data-count-to="20" data-suffix="+">20+</span>
+                <span class="meta stat__label">fact-checking sites</span>
+              </div>
+              <div class="glass glass--pad glass--hover">
+                <span class="figure figure--sm" data-count-to="396" data-suffix="%">396%</span>
+                <span class="meta stat__label">faster page loads</span>
+              </div>
+            </div>
+          </div>
+
+          <!--
+            The map. Same dot style as the hero globe — this is the first and
+            loudest statement of the shared DNA, which is why it is section 01.
+            Canvas 2D rather than a second WebGL context: it is a flat map, the
+            globe already owns the one renderer, and a 2D canvas costs nothing
+            on the phones most of this traffic is on.
+          -->
+          <div class="ed__gfx ed__gfx--bleed ed__fade">
+            <div class="net" data-net data-in style="--i:1">
+              <canvas data-net-canvas></canvas>
+              <div class="net__tags" data-net-tags aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="logos" data-in style="--i:3" aria-label="Publishers using Blink CMS">
+          <div class="marquee" data-marquee>
+            <div class="marquee-track">
+              <span class="display">Daily Thanthi</span>
+              <span class="display">The Hans India</span>
+              <span class="display">LiveLaw</span>
+              <span class="display">The Federal</span>
+              <span class="display">Madhyamam</span>
+              <span class="display">TV5 Telugu</span>
+              <span class="display">Deccan Chronicle</span>
+              <span class="display">The Asian Age</span>
+            </div>
+          </div>
+          <div class="marquee logos--rev" data-marquee>
+            <div class="marquee-track">
+              <span class="display">MediaOne</span>
+              <span class="display">Maalaimalar</span>
+              <span class="display">Bhaskar Hindi</span>
+              <span class="display">The Assam Tribune</span>
+              <span class="display">Millennium Post</span>
+              <span class="display">Medical Dialogues</span>
+              <span class="display">Tupaki</span>
+              <span class="display">BOOM</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 03 · EVERY SCREEN ═══════════════════════════════════════ -->
+    <!-- ═══ 02 · THE PROBLEM ════════════════════════════════════════ -->
     <!--
-      Four separate SVGs, not one drawing, so a phone can leave the monitor
-      and the tablet out without a hole in the middle of the row. Each is
-      sized off one shared `--dev-h` capped by both the window's height and
-      its width; `height` plus `width: auto` on a viewBox'd SVG gives the
-      intrinsic ratio, so the row's total width follows on its own.
+      Two columns, not three. Each question plays its own scene on the
+      monitor; the monitor auto-advances every 6s while it is on screen and
+      stops the moment anyone points at it or picks a question. The scenes are
+      inline SVG so they animate with CSS and GSAP rather than a canvas loop
+      per scene.
     -->
-    <section id="every-screen" class="ed ed--b" data-label="EVERY SCREEN">
-      <div class="shell">
+    <section id="problem" class="ed ed--a" data-label="THE PROBLEM">
+      <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">03 — EVERY SCREEN</span>
-            <h2 class="display ed__h2" data-in style="--i:1">Every stage of <span class="head-lilac">the
-                story.</span></h2>
-            <p class="ed__sup" data-in style="--i:2">Publish once. Live on every screen.</p>
-          </div>
-
-          <div class="devices" data-in style="--i:3" aria-hidden="true">
-            <svg class="dev--monitor" viewBox="0 0 300 224" fill="none">
-              <rect x="0.6" y="0.6" width="298.8" height="178.8" rx="10" stroke="rgba(255,255,255,.14)" />
-              <rect x="10" y="10" width="280" height="160" rx="4" fill="rgba(97,24,234,.1)" />
-              <rect x="24" y="26" width="104" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
-              <rect x="24" y="44" width="170" height="7" rx="3.5" fill="currentColor" fill-opacity=".26" />
-              <rect x="24" y="70" width="120" height="84" rx="4" fill="rgba(255,255,255,.07)" />
-              <rect x="156" y="70" width="120" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="156" y="86" width="98" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="156" y="102" width="112" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="156" y="118" width="74" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="156" y="140" width="56" height="14" rx="7" fill="currentColor" fill-opacity=".3" />
-              <path d="M150 180v26" stroke="rgba(255,255,255,.14)" />
-              <path d="M112 212h76" stroke="rgba(255,255,255,.14)" stroke-width="5" stroke-linecap="round" />
-            </svg>
-
-            <svg class="dev--laptop" viewBox="0 0 320 212" fill="none">
-              <rect x="22.6" y="0.6" width="274.8" height="178.8" rx="10" stroke="rgba(255,255,255,.14)" />
-              <rect x="32" y="10" width="256" height="160" rx="4" fill="rgba(97,24,234,.1)" />
-              <rect x="46" y="26" width="92" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
-              <rect x="46" y="48" width="148" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="46" y="64" width="128" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="46" y="88" width="228" height="60" rx="4" fill="rgba(255,255,255,.07)" />
-              <path d="M2 186h316l-14 20H16Z" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)" />
-            </svg>
-
-            <svg class="dev--tablet" viewBox="0 0 160 220" fill="none">
-              <rect x="0.6" y="0.6" width="158.8" height="218.8" rx="14" stroke="rgba(255,255,255,.14)" />
-              <rect x="9" y="9" width="142" height="202" rx="8" fill="rgba(97,24,234,.1)" />
-              <rect x="22" y="26" width="62" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
-              <rect x="22" y="46" width="116" height="62" rx="4" fill="rgba(255,255,255,.07)" />
-              <rect x="22" y="122" width="116" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="22" y="138" width="96" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="22" y="154" width="108" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
-              <rect x="22" y="176" width="48" height="13" rx="6.5" fill="currentColor" fill-opacity=".3" />
-            </svg>
-
-            <svg class="dev--phone" viewBox="0 0 108 212" fill="none">
-              <rect x="0.6" y="0.6" width="106.8" height="210.8" rx="16" stroke="rgba(255,255,255,.14)" />
-              <rect x="8" y="8" width="92" height="196" rx="10" fill="rgba(97,24,234,.1)" />
-              <rect x="42" y="14" width="24" height="4" rx="2" fill="rgba(255,255,255,.2)" />
-              <rect x="19" y="32" width="44" height="6" rx="3" fill="currentColor" fill-opacity=".5" />
-              <rect x="19" y="50" width="70" height="44" rx="4" fill="rgba(255,255,255,.07)" />
-              <rect x="19" y="106" width="70" height="6" rx="3" fill="rgba(255,255,255,.16)" />
-              <rect x="19" y="120" width="56" height="6" rx="3" fill="rgba(255,255,255,.16)" />
-              <rect x="19" y="134" width="64" height="6" rx="3" fill="rgba(255,255,255,.16)" />
-              <rect x="19" y="156" width="40" height="12" rx="6" fill="currentColor" fill-opacity=".3" />
-              <rect x="34" y="188" width="40" height="4" rx="2" fill="rgba(255,255,255,.2)" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 04 · OUR PLATFORM ═══════════════════════════════════════ -->
-    <section id="platform" class="ed ed--b" data-label="OUR PLATFORM">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">04 — OUR PLATFORM</span>
-            <h2 class="display ed__h2" data-in style="--i:1">One platform. <span class="head-lilac">Six
-                desks.</span></h2>
-          </div>
-
-          <div data-in style="--i:2" class="w-100">
-            <div class="rail" style="--cols:3" data-rail aria-label="The six modules">
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-mic" />
-                </svg>
-                <h3 class="display card__title">The Reporter</h3>
-                <p class="card__desc mt-2">Stringer app, assignments, offline filing</p>
-              </article>
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-pen" />
-                </svg>
-                <h3 class="display card__title">The AI Editor</h3>
-                <p class="card__desc mt-2">Auto-tagging, suggestions, full AI drafts</p>
-              </article>
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-globe" />
-                </svg>
-                <h3 class="display card__title">The Edition</h3>
-                <p class="card__desc mt-2">Web, AMP, PWA, Android, iOS</p>
-              </article>
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-lock" />
-                </svg>
-                <h3 class="display card__title">The Subscriber</h3>
-                <p class="card__desc mt-2">Time, dynamic and hard paywalls</p>
-              </article>
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-newspaper" />
-                </svg>
-                <h3 class="display card__title">The E-Paper</h3>
-                <p class="card__desc mt-2">Hosting, clip and share, editions</p>
-              </article>
-              <article class="card">
-                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
-                  <use href="#px-chart" />
-                </svg>
-                <h3 class="display card__title">The Analyst</h3>
-                <p class="card__desc mt-2">Real-time analytics, GA4, AI-SEO score</p>
-              </article>
+          <div class="ed__col">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">02 — THE PROBLEM</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Why newsrooms <span class="head-lilac">leave
+                  WordPress.</span></h2>
             </div>
-            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
+
+            <div class="qlist" role="tablist" aria-label="Why newsrooms leave WordPress" data-in style="--i:2">
+              <button class="qlist__q" type="button" role="tab" aria-selected="true" aria-controls="monitor"
+                data-scene="spike" data-cap="Auto-scales on AWS. Zero downtime at 43K concurrent readers."><i>01</i>Will
+                it hold on results night?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
+                data-scene="vendors" data-cap="One platform. CMS, apps, paywall, ads and analytics together."><i>02</i>How
+                many vendors is that?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
+                data-scene="rank" data-cap="Google News setup and AI-SEO scoring on every story."><i>03</i>What happens
+                to our rankings?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
+                data-scene="bill" data-cap="No. You pay for features, not traffic."><i>04</i>Does the bill grow with
+                traffic?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
+                data-scene="night" data-cap="The extended tech team behind 66+ newsrooms. No ticket queues."><i>05</i>Who
+                fixes it at 2 a.m.?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="monitor"
+                data-scene="speed" data-cap="396% faster. 1.5s on a Tamil daily at 20× traffic."><i>06</i>How fast do
+                pages have to be?</button>
+            </div>
+
+            <a class="mono ed__link ed__link--overflow" href="#faq">All six, in the F.A.Q <span
+                aria-hidden="true">→</span></a>
+          </div>
+
+          <div class="ed__gfx">
+            <div class="glass monitor" id="monitor" role="tabpanel" data-monitor data-in style="--i:1">
+              <div class="monitor__bar">
+                <span class="meta" style="color:var(--txt)"><span class="sig"
+                    style="margin-right:.6em"></span>RESULTS NIGHT · LIVE</span>
+                <span class="meta">NOIDA · 14:32 IST</span>
+              </div>
+
+              <div class="monitor__stage" data-monitor-stage>
+                <!-- 1 · the traffic graph: WordPress breaks, Blink holds -->
+                <div class="monitor__scene is-on" data-scene="spike">
+                  <svg viewBox="0 0 400 200" fill="none" preserveAspectRatio="none">
+                    <g stroke="rgba(255,255,255,.07)">
+                      <path d="M0 50h400M0 100h400M0 150h400" />
+                    </g>
+                    <path class="mon-line mon-line--wp"
+                      d="M0 170 L60 164 L110 150 L150 120 L175 70 L190 40 L196 96 L200 30 L204 120 L208 44 L214 150 L220 60 L226 160" />
+                    <path class="mon-line mon-line--bl"
+                      d="M0 172 L60 166 L110 152 L150 122 L185 70 L220 44 L260 34 L320 30 L400 28" />
+                    <circle class="mon-break" cx="226" cy="160" r="4" fill="var(--live)" />
+                    <circle class="mon-hold" cx="400" cy="28" r="4" fill="var(--lavender)" />
+                  </svg>
+                  <span class="meta mon-tag mon-tag--wp">WORDPRESS</span>
+                  <span class="meta mon-tag mon-tag--bl">BLINK · 43K HELD</span>
+                </div>
+
+                <!-- 2 · five vendors pull into one core -->
+                <div class="monitor__scene" data-scene="vendors">
+                  <svg viewBox="0 0 400 200" fill="none">
+                    <g class="mon-wires" stroke="var(--wire)">
+                      <path d="M70 40 C140 70 160 90 200 100" />
+                      <path d="M330 40 C260 70 240 90 200 100" />
+                      <path d="M50 160 C130 140 160 115 200 100" />
+                      <path d="M350 160 C270 140 240 115 200 100" />
+                      <path d="M200 18 C200 50 200 70 200 100" />
+                    </g>
+                    <g class="mon-nodes" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="rgba(245,243,255,.55)" text-anchor="middle">
+                      <text x="70" y="36">CMS</text>
+                      <text x="330" y="36">APPS</text>
+                      <text x="50" y="172">PAYWALL</text>
+                      <text x="350" y="172">ADS</text>
+                      <text x="200" y="14">ANALYTICS</text>
+                    </g>
+                    <circle class="mon-core" cx="200" cy="100" r="26" fill="rgba(97,24,234,.3)"
+                      stroke="var(--blink-light)" />
+                    <text class="mon-core-t" x="200" y="104" font-family="var(--font-spacemono), monospace"
+                      font-size="9" fill="#fff" text-anchor="middle">BLINK</text>
+                  </svg>
+                </div>
+
+                <!-- 3 · a story climbs to #1, the AI-SEO ring fills -->
+                <div class="monitor__scene" data-scene="rank">
+                  <svg viewBox="0 0 400 200" fill="none">
+                    <g class="mon-rows">
+                      <rect x="10" y="22" width="230" height="10" rx="5" fill="rgba(255,255,255,.1)" />
+                      <rect x="10" y="52" width="200" height="10" rx="5" fill="rgba(255,255,255,.1)" />
+                      <rect x="10" y="82" width="215" height="10" rx="5" fill="rgba(255,255,255,.1)" />
+                      <rect x="10" y="112" width="190" height="10" rx="5" fill="rgba(255,255,255,.1)" />
+                    </g>
+                    <rect class="mon-climb" x="10" y="112" width="230" height="12" rx="6" fill="var(--blink)" />
+                    <circle cx="330" cy="100" r="42" stroke="rgba(255,255,255,.1)" stroke-width="6" />
+                    <circle class="mon-ring" cx="330" cy="100" r="42" stroke="var(--lavender)" stroke-width="6"
+                      stroke-linecap="round" transform="rotate(-90 330 100)" />
+                    <text class="mon-score" x="330" y="106" font-family="var(--font-tomorrow), sans-serif"
+                      font-size="26" fill="#fff" text-anchor="middle">92</text>
+                    <text x="330" y="160" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="rgba(245,243,255,.5)" text-anchor="middle">AI-SEO SCORE</text>
+                  </svg>
+                </div>
+
+                <!-- 4 · traffic rises, the bill stays flat -->
+                <div class="monitor__scene" data-scene="bill">
+                  <svg viewBox="0 0 400 200" fill="none" preserveAspectRatio="none">
+                    <g stroke="rgba(255,255,255,.07)">
+                      <path d="M0 60h400M0 110h400M0 160h400" />
+                    </g>
+                    <path class="mon-line mon-line--traffic" d="M0 180 C90 176 150 150 210 110 S330 42 400 26" />
+                    <path class="mon-line mon-line--bill" d="M0 150 L400 150" />
+                    <circle class="mon-hold" cx="400" cy="150" r="4" fill="var(--lavender)" />
+                    <text x="8" y="24" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="rgba(245,243,255,.5)">TRAFFIC</text>
+                    <text x="8" y="142" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="var(--lavender)">YOUR BILL</text>
+                  </svg>
+                </div>
+
+                <!-- 5 · 02:00 IST, the alert is answered -->
+                <div class="monitor__scene" data-scene="night">
+                  <svg viewBox="0 0 400 200" fill="none">
+                    <text class="mon-clock" x="200" y="86" font-family="var(--font-tomorrow), sans-serif"
+                      font-size="54" fill="#fff" text-anchor="middle">02:00</text>
+                    <text x="200" y="106" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="rgba(245,243,255,.5)" text-anchor="middle">IST</text>
+                    <rect class="mon-alert" x="60" y="124" width="130" height="30" rx="8"
+                      fill="rgba(229,36,59,.16)" stroke="var(--live)" />
+                    <text x="125" y="143" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="var(--live)" text-anchor="middle">ALERT</text>
+                    <rect class="mon-reply" x="210" y="124" width="140" height="30" rx="8"
+                      fill="rgba(97,24,234,.22)" stroke="var(--blink-light)" />
+                    <text x="280" y="143" font-family="var(--font-spacemono), monospace" font-size="9" fill="#fff"
+                      text-anchor="middle">BLINK TEAM · ON IT</text>
+                  </svg>
+                </div>
+
+                <!-- 6 · the page-load race -->
+                <div class="monitor__scene" data-scene="speed">
+                  <svg viewBox="0 0 400 200" fill="none">
+                    <rect x="10" y="70" width="380" height="16" rx="8" fill="rgba(255,255,255,.07)" />
+                    <rect class="mon-race" x="10" y="70" width="380" height="16" rx="8" fill="var(--blink)" />
+                    <text class="mon-time" x="200" y="140" font-family="var(--font-tomorrow), sans-serif"
+                      font-size="48" fill="#fff" text-anchor="middle">1.5s</text>
+                    <text x="200" y="164" font-family="var(--font-spacemono), monospace" font-size="9"
+                      fill="rgba(245,243,255,.5)" text-anchor="middle">DAILY THANTHI · PAGE LOAD</text>
+                  </svg>
+                </div>
+              </div>
+
+              <p class="monitor__cap" data-monitor-cap>Auto-scales on AWS. Zero downtime at 43K concurrent readers.
+              </p>
+              <span class="monitor__time"><i data-monitor-time></i></span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 05 · THE FLOW ═══════════════════════════════════════════ -->
+    <!-- ═══ 03 · THE PLATFORM ═══════════════════════════════════════ -->
     <!--
-      The pipeline. Sources on the left, the six stages on a rail, the
-      channels it comes out on to the right, and one readout line underneath
-      that follows whichever stage you point at or select.
+      The bento grid. Two large tiles and four small ones filling the whole
+      screen, each with its own looping micro-UI. The animations are CSS
+      keyframes on a paused state and `initBento()` only unpauses the tiles
+      that are actually on screen — six loops running behind eleven sections
+      is the kind of thing that costs 60fps on a phone.
+    -->
+    <section id="platform" class="ed ed--b" data-label="THE PLATFORM">
+      <div class="layer-back" aria-hidden="true">
+        <canvas data-iso></canvas>
+      </div>
 
-      No SVG and no measuring this time. The old version drew its curves into
-      an SVG from the pills' own measured positions and redrew them on every
-      resize; a straight rail behind the chips is a CSS pseudo-element that
-      cannot go out of sync, and below lg the same markup stands up into a
-      vertical stepper with one line of CSS rather than a second layout.
+      <div class="ed__shell">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">03 — THE PLATFORM</span>
+          <h2 class="display ed__h2" data-in style="--i:1">One platform. <span class="head-lilac">Six desks.</span>
+          </h2>
+        </div>
+
+        <div class="bento" data-bento data-in style="--i:2">
+          <article class="glass tile tile--lg glass--hover" data-tile="reporter">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <!-- a phone filing from the district: upload bar, GPS tag -->
+              <svg viewBox="0 0 320 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <rect class="bt-phone" x="124" y="18" width="72" height="140" rx="10"
+                  fill="rgba(255,255,255,.03)" stroke="var(--glass-line)" />
+                <rect x="134" y="30" width="34" height="5" rx="2.5" fill="var(--lavender)" opacity=".6" />
+                <rect x="134" y="44" width="52" height="4" rx="2" fill="rgba(255,255,255,.14)" />
+                <rect x="134" y="54" width="44" height="4" rx="2" fill="rgba(255,255,255,.14)" />
+                <rect x="134" y="68" width="52" height="34" rx="4" fill="rgba(97,24,234,.22)" />
+                <rect x="134" y="112" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.1)" />
+                <rect class="bt-upload" x="134" y="112" width="52" height="5" rx="2.5" fill="var(--blink-light)" />
+                <text x="134" y="132" font-family="var(--font-spacemono), monospace" font-size="7"
+                  fill="rgba(245,243,255,.55)">MADURAI</text>
+                <circle class="bt-gps" cx="190" cy="129" r="3" fill="var(--live)" />
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-mic" />
+            </svg>
+            <h3 class="display ed__h3 tile__title">The Reporter</h3>
+            <p class="tile__desc">Stringer app, assignments, offline filing</p>
+          </article>
+
+          <article class="glass tile tile--lg glass--hover" data-tile="editor">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <svg viewBox="0 0 320 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <rect x="24" y="26" width="200" height="8" rx="4" fill="rgba(255,255,255,.1)" />
+                <rect class="bt-type" x="24" y="26" width="200" height="8" rx="4" fill="var(--lavender)" />
+                <g class="bt-chips">
+                  <rect x="24" y="52" width="60" height="16" rx="8" fill="rgba(97,24,234,.26)"
+                    stroke="var(--glass-line-hi)" />
+                  <rect x="92" y="52" width="48" height="16" rx="8" fill="rgba(97,24,234,.26)"
+                    stroke="var(--glass-line-hi)" />
+                  <rect x="148" y="52" width="66" height="16" rx="8" fill="rgba(97,24,234,.26)"
+                    stroke="var(--glass-line-hi)" />
+                </g>
+                <rect x="24" y="86" width="180" height="4" rx="2" fill="rgba(255,255,255,.08)" />
+                <rect x="24" y="96" width="160" height="4" rx="2" fill="rgba(255,255,255,.08)" />
+                <rect x="24" y="106" width="172" height="4" rx="2" fill="rgba(255,255,255,.08)" />
+                <circle cx="268" cy="86" r="30" stroke="rgba(255,255,255,.1)" stroke-width="5" />
+                <circle class="bt-ring" cx="268" cy="86" r="30" stroke="var(--blink-light)" stroke-width="5"
+                  stroke-linecap="round" transform="rotate(-90 268 86)" />
+                <text x="268" y="91" font-family="var(--font-tomorrow), sans-serif" font-size="18" fill="#fff"
+                  text-anchor="middle">92</text>
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-pen" />
+            </svg>
+            <h3 class="display ed__h3 tile__title">The AI Editor</h3>
+            <p class="tile__desc">Auto-tagging, suggestions, full AI drafts</p>
+          </article>
+
+          <article class="glass tile glass--hover" data-tile="edition">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <svg viewBox="0 0 160 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <rect class="bt-frame" x="40" y="26" width="80" height="104" rx="8"
+                  fill="rgba(255,255,255,.03)" stroke="var(--glass-line)" />
+                <rect x="50" y="38" width="38" height="5" rx="2.5" fill="var(--lavender)" opacity=".6" />
+                <rect x="50" y="52" width="60" height="26" rx="4" fill="rgba(97,24,234,.2)" />
+                <rect x="50" y="86" width="60" height="4" rx="2" fill="rgba(255,255,255,.12)" />
+                <rect x="50" y="96" width="48" height="4" rx="2" fill="rgba(255,255,255,.12)" />
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-globe" />
+            </svg>
+            <span class="meta tile__meta" data-tile-mode>WEB</span>
+            <h3 class="display ed__h3 tile__title">The Edition</h3>
+            <p class="tile__desc">Web, AMP, PWA, Android, iOS</p>
+          </article>
+
+          <article class="glass tile glass--hover" data-tile="subscriber">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <svg viewBox="0 0 160 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <rect x="58" y="70" width="44" height="34" rx="6" fill="rgba(97,24,234,.24)"
+                  stroke="var(--blink-light)" />
+                <path class="bt-shackle" d="M68 70 v-10 a12 12 0 0 1 24 0 v10" stroke="var(--blink-light)"
+                  stroke-width="3" fill="none" />
+                <circle cx="80" cy="87" r="3.5" fill="#fff" />
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-lock" />
+            </svg>
+            <span class="meta tile__meta"><b data-tile-subs>248</b> subscribers</span>
+            <h3 class="display ed__h3 tile__title">The Subscriber</h3>
+            <p class="tile__desc">Time, dynamic and hard paywalls</p>
+          </article>
+
+          <article class="glass tile glass--hover" data-tile="epaper">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <svg viewBox="0 0 160 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <rect x="34" y="34" width="92" height="112" rx="4" fill="rgba(255,255,255,.04)"
+                  stroke="var(--glass-line)" />
+                <rect x="44" y="46" width="48" height="6" rx="3" fill="var(--lavender)" opacity=".55" />
+                <g fill="rgba(255,255,255,.1)">
+                  <rect x="44" y="62" width="72" height="3" rx="1.5" />
+                  <rect x="44" y="70" width="64" height="3" rx="1.5" />
+                  <rect x="44" y="78" width="70" height="3" rx="1.5" />
+                  <rect x="44" y="86" width="56" height="3" rx="1.5" />
+                </g>
+                <rect class="bt-clip" x="44" y="100" width="48" height="30" rx="3"
+                  fill="rgba(97,24,234,.28)" stroke="var(--blink-light)" />
+                <rect class="bt-page" x="80" y="34" width="46" height="112" rx="4" fill="rgba(10,7,24,.96)"
+                  stroke="var(--glass-line)" />
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-newspaper" />
+            </svg>
+            <h3 class="display ed__h3 tile__title">The E-Paper</h3>
+            <p class="tile__desc">Hosting, clip and share, editions</p>
+          </article>
+
+          <article class="glass tile glass--hover" data-tile="analyst">
+            <span class="tile__sheen"></span>
+            <span class="tile__art">
+              <svg viewBox="0 0 160 180" fill="none" preserveAspectRatio="xMidYMid slice">
+                <g stroke="rgba(255,255,255,.07)">
+                  <path d="M20 60h120M20 94h120M20 128h120" />
+                </g>
+                <path class="bt-chart" d="M20 128 L48 110 L72 118 L96 76 L120 86 L140 54" stroke="var(--lavender)"
+                  stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                <circle class="bt-dot" cx="140" cy="54" r="3.5" fill="var(--lavender)" />
+                <text x="20" y="154" font-family="var(--font-spacemono), monospace" font-size="8"
+                  fill="rgba(245,243,255,.5)">GA4 · LIVE</text>
+              </svg>
+            </span>
+            <svg class="px-icon" width="18" height="18" style="color:var(--lavender);position:relative;z-index:1"
+              aria-hidden="true">
+              <use href="#px-chart" />
+            </svg>
+            <h3 class="display ed__h3 tile__title">The Analyst</h3>
+            <p class="tile__desc">Real-time analytics, GA4, AI-SEO score</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 · THE FLOW ═══════════════════════════════════════════ -->
+    <!--
+      The fibre path. One story card travels it as the section scrolls —
+      scrubbed, so it runs backwards when you scroll back up — and the three
+      step cards below light in sync with it. Scrubbed, never pinned: the
+      reader keeps the scroll.
     -->
     <section id="flow" class="ed ed--b" data-label="THE FLOW">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">05 — THE FLOW</span>
-            <h2 class="display ed__h2" data-in style="--i:1">From source to <span class="head-lilac">every
-                screen.</span></h2>
-          </div>
+      <div class="ed__shell">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">04 — THE FLOW</span>
+          <h2 class="display ed__h2" data-in style="--i:1">From source to <span class="head-lilac">every
+              screen.</span></h2>
+        </div>
 
-          <div class="flow" data-flow data-in style="--i:2">
-            <div class="flow__ends">
-              <span class="mono-xs flow__end">Reporters</span>
-              <span class="mono-xs flow__end">Stringers</span>
-              <span class="mono-xs flow__end">Wires</span>
-            </div>
+        <div class="flow" data-flow data-in style="--i:2">
+          <div class="flow__stage" data-flow-stage>
+            <svg data-flow-svg viewBox="0 0 1200 360" preserveAspectRatio="none" fill="none" aria-hidden="true">
+              <!-- the four source streams converging -->
+              <g stroke="var(--wire)" stroke-width="1">
+                <path d="M150 60 C280 60 320 150 400 180" />
+                <path d="M150 140 C280 140 330 165 400 180" />
+                <path d="M150 220 C280 220 330 195 400 180" />
+                <path d="M150 300 C280 300 320 210 400 180" />
+              </g>
+              <!-- the trunk -->
+              <path class="flow__trunk" d="M400 180 H800" stroke="rgba(185,166,255,.22)" stroke-width="2" />
+              <path class="flow__lit" data-flow-lit d="M400 180 H800" stroke="var(--blink-light)" stroke-width="2"
+                stroke-linecap="round" />
+              <!-- the five endpoints -->
+              <g stroke="var(--wire)" stroke-width="1">
+                <path d="M800 180 C880 180 920 60 1050 60" />
+                <path d="M800 180 C880 180 920 120 1050 120" />
+                <path d="M800 180 H1050" />
+                <path d="M800 180 C880 180 920 240 1050 240" />
+                <path d="M800 180 C880 180 920 300 1050 300" />
+              </g>
+              <circle class="flow__card" data-flow-card cx="400" cy="180" r="9" fill="var(--blink)"
+                stroke="var(--lavender)" stroke-width="2" />
+            </svg>
 
-            <div class="flow__rail" role="tablist" aria-label="The six stages">
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="true"
-                aria-controls="flow-read" data-flow-stage data-flow-line="Reporters, stringers, wires and RSS into one queue.">
-                Gather</button>
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
-                aria-controls="flow-read" data-flow-stage data-flow-line="Auto-tagging, story suggestions and full AI drafts.">
-                Create</button>
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
-                aria-controls="flow-read" data-flow-stage data-flow-line="Roles, approval workflows and checkpoints tracking TAT.">
-                Approve</button>
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
-                aria-controls="flow-read" data-flow-stage data-flow-line="One story out to web, AMP, PWA and apps.">
-                Publish</button>
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
-                aria-controls="flow-read" data-flow-stage data-flow-line="Ad inventory and networks, plus three paywall types.">
-                Monetize</button>
-              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
-                aria-controls="flow-read" data-flow-stage data-flow-line="Real-time GA4 and publisher metrics.">
-                Analyze</button>
+            <div class="flow__ends flow__ends--in">
+              <span class="meta flow__end">Reporters</span>
+              <span class="meta flow__end">Stringers</span>
+              <span class="meta flow__end">Wires</span>
+              <span class="meta flow__end">RSS</span>
             </div>
 
             <div class="flow__ends flow__ends--out">
-              <span class="mono-xs flow__end">Web</span>
-              <span class="mono-xs flow__end">App</span>
-              <span class="mono-xs flow__end">Google News</span>
-              <span class="mono-xs flow__end">Social</span>
-              <span class="mono-xs flow__end">Newsletter</span>
+              <span class="meta flow__end" data-flow-out>Web</span>
+              <span class="meta flow__end" data-flow-out>App</span>
+              <span class="meta flow__end" data-flow-out>Google News</span>
+              <span class="meta flow__end" data-flow-out>Social</span>
+              <span class="meta flow__end" data-flow-out>Newsletter</span>
             </div>
+          </div>
 
-            <p class="flow__read" id="flow-read" role="tabpanel" data-flow-read>
-              <b data-flow-name>GATHER</b>
-              <span data-flow-copy>Reporters, stringers, wires and RSS into one queue.</span>
-            </p>
+          <div class="flow__steps">
+            <article class="glass glass--pad flow__step is-on" data-flow-step>
+              <span class="meta" style="color:var(--lavender)">01 — GATHER</span>
+              <p>Monitor and gather from every source.</p>
+            </article>
+            <article class="glass glass--pad flow__step" data-flow-step>
+              <span class="meta" style="color:var(--lavender)">02 — CREATE</span>
+              <p>Write, tag and approve in one editor.</p>
+            </article>
+            <article class="glass glass--pad flow__step" data-flow-step>
+              <span class="meta" style="color:var(--lavender)">03 — PUBLISH &amp; GROW</span>
+              <p>Publish everywhere, monetize, then measure it.</p>
+            </article>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 06 · LIVE ═══════════════════════════════════════════════ -->
+    <!-- ═══ 05 · LIVE ═══════════════════════════════════════════════ -->
+    <!--
+      The back layer is a video the client has not supplied yet. It carries
+      `data-src`, never `src`, loads only in view, and fades in only once it
+      can actually play — so a 404 on the placeholder path is invisible and
+      the drawn fallback behind it carries the section.
+    -->
     <section id="live" class="ed ed--a" data-label="LIVE">
-      <div class="shell">
+      <div class="layer-back ed__fade" aria-hidden="true">
+        <span class="backvid-fallback" data-depth="0.3"></span>
+        <video class="backvid" data-backvid data-src="./assets/video/live-newsroom.mp4" muted loop playsinline
+          preload="none" tabindex="-1"></video>
+        <span class="backvid-tint"></span>
+      </div>
+
+      <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">06 — LIVE</span>
-            <h2 class="display ed__h2" data-in style="--i:1">Reliability on <span class="head-lilac">every
-                deadline.</span></h2>
-            <p class="ed__sup" data-in style="--i:2">Breaking news doesn't wait. Neither do we.</p>
+          <div class="ed__col">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">05 — LIVE</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Reliability on <span class="head-lilac">every
+                  deadline.</span></h2>
+              <p class="ed__sup" data-in style="--i:2">Breaking news doesn't wait. Neither do we.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2" data-in style="--i:3">
+              <span class="chip mono"><i class="chip__dot"></i>Auto-scaling cloud</span>
+              <span class="chip mono"><i class="chip__dot"></i>Real-time desk view</span>
+            </div>
           </div>
 
-          <div class="live-stack" data-in style="--i:3">
-            <!-- The one red thing on the page. -->
-            <div class="card live-card">
-              <span class="mono-xs live-card__top">
-                <span class="live-card__flag"><span class="live-dot"></span>LIVE</span>
-                <span>14:32 IST</span>
-              </span>
-              <span class="display live-card__line">Desk holds at full load</span>
-              <span class="live-card__trace" aria-hidden="true">
-                <i style="--h:46%"></i><i style="--h:68%"></i><i style="--h:57%"></i><i style="--h:79%"></i><i
-                  style="--h:63%"></i><i style="--h:88%"></i><i style="--h:71%"></i><i style="--h:94%"></i>
-              </span>
-            </div>
+          <div class="ed__gfx">
+            <div class="glass live" data-live data-in style="--i:1">
+              <div class="live__top">
+                <span class="meta live__flag"><span class="sig"></span>LIVE</span>
+                <span class="meta">NOIDA · 14:32 IST</span>
+              </div>
 
-            <div class="rail" style="--cols:2" data-rail>
-              <article class="card">
-                <h3 class="display card__title">Auto-scaling cloud</h3>
-                <p class="card__desc mt-2">Zero downtime at 43K readers</p>
-              </article>
-              <article class="card">
-                <h3 class="display card__title">Real-time desk view</h3>
-                <p class="card__desc mt-2">Checkpoints and TAT per desk</p>
-              </article>
+              <span class="display ed__h3">Desk holds at full load</span>
+
+              <div class="live__readout">
+                <span class="figure" data-count-to="43000" data-live-count>43,000</span>
+                <span class="meta">concurrent readers</span>
+              </div>
+
+              <div class="live__nodes">
+                <canvas data-live-nodes></canvas>
+              </div>
+
+              <div class="live__spark">
+                <svg viewBox="0 0 400 60" preserveAspectRatio="none" fill="none" aria-hidden="true">
+                  <path data-live-spark stroke="var(--lavender)" stroke-width="1.5" fill="none"
+                    stroke-linejoin="round" />
+                </svg>
+              </div>
+
+              <div class="live__foot">
+                <span class="meta">LATENCY · STEADY</span>
+                <span class="meta" style="color:var(--txt)">0 DOWNTIME</span>
+              </div>
             </div>
-            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 07 · THE PRESS ══════════════════════════════════════════ -->
-    <section id="press" class="ed ed--a" data-label="THE PRESS">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">07 — THE PRESS</span>
-            <h2 class="display ed__h2" data-in style="--i:1">Trusted <span class="head-lilac">across India.</span></h2>
+    <!-- ═══ 06 · HEAD TO HEAD ═══════════════════════════════════════ -->
+    <!--
+      The WordPress column is NOT filled in. Every value in it is a visible
+      [FROM CLIENT] marker, because there is no source for it in the brief or
+      on the site and this build does not invent claims about another
+      product — least of all unflattering ones. The client is sending PDFs;
+      drop the values into `data-wp` on each row and delete `.todo`.
+    -->
+    <section id="versus" class="ed ed--b" data-label="HEAD TO HEAD">
+      <div class="ed__shell">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">06 — HEAD TO HEAD</span>
+          <h2 class="display ed__h2" data-in style="--i:1">Blink CMS <span class="head-lilac">vs WordPress.</span></h2>
+        </div>
+
+        <div class="vs" data-vs data-in style="--i:2">
+          <div class="vs__side vs__side--blink">
+            <span class="meta" style="color:var(--lavender)">BLINK CMS</span>
+            <div class="vs__core">
+              <span class="display ed__h3">One platform</span>
+              <span class="meta d-block mt-2">CMS · APPS · PAYWALL · ADS · ANALYTICS</span>
+            </div>
           </div>
 
-          <div data-in style="--i:2" class="w-100">
-            <div class="rail" style="--cols:3" data-rail aria-label="Three newsrooms">
-              <article class="card">
-                <h3 class="mono-xs case__name">Daily Thanthi <span style="color:var(--txt-3)">01</span></h3>
-                <div class="case__nums">
-                  <span><b class="display case__num">20×</b><span class="mono-xs case__cap">growth</span></span>
-                  <span><b class="display case__num">1.5s</b><span class="mono-xs case__cap">load time</span></span>
-                  <span><b class="display case__num">83%</b><span class="mono-xs case__cap">search
-                      discovery</span></span>
-                </div>
-              </article>
-              <article class="card">
-                <h3 class="mono-xs case__name">The Hans India <span style="color:var(--txt-3)">02</span></h3>
-                <div class="case__nums">
-                  <span><b class="display case__num">2 MO</b><span class="mono-xs case__cap">record
-                      traffic</span></span>
-                  <span><b class="display case__num">43K</b><span class="mono-xs case__cap">concurrent
-                      users</span></span>
-                  <span><b class="display case__num">ZERO</b><span class="mono-xs case__cap">downtime</span></span>
-                </div>
-              </article>
-              <article class="card">
-                <h3 class="mono-xs case__name">LiveLaw <span style="color:var(--txt-3)">03</span></h3>
-                <div class="case__nums">
-                  <span><b class="display case__num">−30%</b><span class="mono-xs case__cap">bounce rate</span></span>
-                  <span><b class="display case__num">10s</b><span class="mono-xs case__cap">faster pages</span></span>
-                </div>
-              </article>
+          <div class="vs__side vs__side--wp">
+            <span class="meta">A PLUGIN STACK</span>
+            <div class="vs__plugins">
+              <span class="vs__plugin">CMS</span>
+              <span class="vs__plugin">Cache</span>
+              <span class="vs__plugin">SEO</span>
+              <span class="vs__plugin">Paywall</span>
+              <span class="vs__plugin">Ads</span>
+              <span class="vs__plugin">Analytics</span>
+              <span class="vs__plugin">AMP</span>
+              <span class="vs__plugin">Apps</span>
+              <span class="vs__plugin">Backups</span>
             </div>
-            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
+          </div>
+
+          <span class="vs__handle" data-vs-handle><span class="vs__grip" role="separator"
+              aria-label="Drag to compare">⇆</span></span>
+        </div>
+
+        <div class="vstable" data-in style="--i:3">
+          <span class="meta vs-h">&nbsp;</span><span class="meta vs-h">WORDPRESS</span><span
+            class="meta vs-h">BLINK CMS</span>
+          <span class="vs-k">Traffic spikes</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">Auto-scales, zero downtime</span>
+          <span class="vs-k">Vendors to manage</span><span class="vs-wp"><em
+              class="todo">[FROM CLIENT]</em></span><span class="vs-bl">One</span>
+          <span class="vs-k">Google News &amp; SEO</span><span class="vs-wp"><em
+              class="todo">[FROM CLIENT]</em></span><span class="vs-bl">Built in, set up for you</span>
+          <span class="vs-k">Billing</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">By features, not traffic</span>
+          <span class="vs-k">Support</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">Your extended tech team</span>
+          <span class="vs-k">Page speed</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">1.5s on Daily Thanthi</span>
+          <span class="vs-k">Reporter app</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">Included</span>
+          <span class="vs-k">E-paper</span><span class="vs-wp"><em class="todo">[FROM CLIENT]</em></span><span
+            class="vs-bl">Included</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 07 · THE BEATS ══════════════════════════════════════════ -->
+    <!--
+      Five segments, three of which have published numbers. Broadcasters and
+      fact-checking do not, so their metric cells are visible [FROM CLIENT]
+      markers rather than plausible-looking figures. The screenshots are the
+      brief's placeholder paths; `initShots()` hides an <img> whose file 404s
+      so the drawn stand-in behind it shows instead.
+    -->
+    <section id="beats" class="ed ed--a" data-label="THE BEATS">
+      <div class="layer-back" aria-hidden="true">
+        <span class="glyph" data-glyph data-depth="0.3">தமிழ்</span>
+      </div>
+
+      <div class="ed__shell">
+        <div class="ed__grid">
+          <div class="ed__col">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">07 — THE BEATS</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Every beat, <span class="head-lilac">every
+                  language.</span></h2>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Segments" data-beats data-in style="--i:2">
+              <button type="button" role="tab" aria-selected="true" aria-controls="beat-panel" data-beat
+                data-name="Daily Thanthi" data-glyph="தமிழ்" data-shot="./assets/img/case-dailythanthi.webp"
+                data-metrics='[["20×","growth"],["1.5s","load time"],["83%","search discovery"]]'>Regional
+                dailies</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
+                data-name="The Hans India" data-glyph="తెలుగు" data-shot="./assets/img/case-hansindia.webp"
+                data-metrics='[["2 MO","to record traffic"],["43K","concurrent users"],["ZERO","downtime"]]'>National
+                dailies</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
+                data-name="LiveLaw" data-glyph="English" data-shot="./assets/img/case-livelaw.webp"
+                data-metrics='[["−30%","bounce rate"],["10s","faster pages"]]'>Digital &amp; niche</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
+                data-name="MediaOne" data-glyph="മലയാളം" data-shot="./assets/img/case-mediaone.webp"
+                data-metrics='[]'>Broadcasters</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="beat-panel" data-beat
+                data-name="20+ fact-checking sites" data-glyph="हिन्दी"
+                data-shot="./assets/img/case-factcheck.webp"
+                data-metrics='[["20+","sites"]]'>Fact-checking</button>
+            </div>
+
+            <div id="beat-panel" role="tabpanel">
+              <span class="display ed__h3 d-block mb-3" data-beat-name>Daily Thanthi</span>
+              <div class="metrics" data-beat-metrics>
+                <span class="metric"><b>20×</b><span class="meta">growth</span></span>
+                <span class="metric"><b>1.5s</b><span class="meta">load time</span></span>
+                <span class="metric"><b>83%</b><span class="meta">search discovery</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ed__gfx">
+            <div class="shot" data-shot data-in style="--i:1">
+              <div class="shot__frame">
+                <span class="shot__stub" data-stub="screenshot — from client"></span>
+                <img data-beat-shot src="./assets/img/case-dailythanthi.webp" alt="" loading="lazy" width="1600"
+                  height="1000">
+              </div>
+              <span class="chip mono shot__chip" data-depth="1.15" style="left:-4%;top:14%"
+                data-beat-chip>20× growth</span>
+              <span class="chip mono shot__chip" data-depth="1.15" style="right:-2%;bottom:18%"
+                data-beat-chip>1.5s load time</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ═══ 08 · LETTERS ════════════════════════════════════════════ -->
-    <!--
-      One quote at a time in a fixed-height panel, for the same reason the
-      answer panel in 02 is fixed: a taller quote must not make the section
-      taller. Below it the publishers run as one slow row — the 5×4 masthead
-      wall this replaces was two screens tall on its own.
-    -->
-    <section id="letters" class="ed ed--b" data-label="LETTERS">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">08 — LETTERS</span>
-            <h2 class="display ed__h2" data-in style="--i:1">In <span class="head-lilac">their words.</span></h2>
-          </div>
+    <section id="letters" class="ed ed--a" data-label="LETTERS">
+      <div class="layer-back" aria-hidden="true">
+        <span class="bigquote" data-depth="0.3">&ldquo;</span>
+      </div>
 
-          <div data-in style="--i:2" class="w-100" data-quotes>
-            <div class="quote" data-quote-panel>
-              <p class="quote__text" data-quote-text>Our reporters file from the district in Tamil, on their phones,
-                and it reaches the front page.</p>
-              <p class="mono-xs quote__by"><b data-quote-name>Kavitha Iyer</b><span data-quote-org>Daily
-                  Thanthi</span></p>
+      <div class="ed__shell">
+        <div class="ed__grid">
+          <div class="ed__col" data-quotes>
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">08 — LETTERS</span>
+              <h2 class="display ed__h2" data-in style="--i:1">In <span class="head-lilac">their words.</span></h2>
             </div>
 
-            <div class="quote__nav">
+            <div class="quote" data-quote-panel data-in style="--i:2">
+              <p class="quote__text" data-quote-text>Our reporters file from the district in Tamil, on their phones,
+                and it reaches the front page without anyone retyping it.</p>
+              <p class="meta quote__by"><b data-quote-name>Kavitha Iyer</b><span data-quote-role>Managing
+                  editor</span><span data-quote-org>Daily Thanthi</span></p>
+            </div>
+
+            <div class="quote__nav" data-in style="--i:3">
               <button class="quote__arrow" type="button" data-quote-prev aria-label="Previous letter">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M9 2 4 7l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
                 </svg>
               </button>
-              <span class="mono-xs" data-quote-count>01 / 02</span>
+              <span class="meta" data-quote-count>01 / 02</span>
               <button class="quote__arrow" type="button" data-quote-next aria-label="Next letter">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
                 </svg>
               </button>
             </div>
+          </div>
 
-            <div class="marquee logos mt-6" data-marquee aria-label="Publishers using Blink CMS">
-              <div class="marquee-track">
-                <span class="display">Daily Thanthi</span>
-                <span class="display">The Hans India</span>
-                <span class="display">LiveLaw</span>
-                <span class="display">The Federal</span>
-                <span class="display">Madhyamam</span>
-                <span class="display">TV5 Telugu</span>
-                <span class="display">Deccan Chronicle</span>
-                <span class="display">The Asian Age</span>
-                <span class="display">MediaOne</span>
-                <span class="display">Maalaimalar</span>
-                <span class="display">Bhaskar Hindi</span>
-                <span class="display">The Assam Tribune</span>
-                <span class="display">Millennium Post</span>
-                <span class="display">Medical Dialogues</span>
-                <span class="display">Tupaki</span>
-                <span class="display">BOOM</span>
+          <div class="ed__gfx">
+            <div class="deck" data-deck data-in style="--i:1">
+              <div class="deck__card deck__card--2">
+                <span class="shot__stub" data-stub=""></span>
+              </div>
+              <div class="deck__card deck__card--1">
+                <span class="shot__stub" data-stub=""></span>
+              </div>
+              <div class="deck__card deck__card--0">
+                <span class="deck__media">
+                  <span class="shot__stub" data-stub="portrait — from client"></span>
+                  <img data-quote-shot src="./assets/img/testimonial-kavitha-iyer.webp" alt="" loading="lazy"
+                    width="900" height="1200">
+                </span>
+                <span class="backvid-tint"></span>
               </div>
             </div>
           </div>
@@ -940,96 +1202,221 @@
       </div>
     </section>
 
-    <!-- ═══ 09 · THE WIRE ═══════════════════════════════════════════ -->
-    <section id="the-wire" class="ed ed--a" data-label="THE WIRE">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">09 — THE WIRE</span>
-            <h2 class="display ed__h2" data-in style="--i:1">What's <span class="head-lilac">moving.</span></h2>
-          </div>
+    <!-- ═══ 09 · THE RATE CARD ══════════════════════════════════════ -->
+    <!--
+      Prices read from blinkcms.ai/pricing-page on 27 Sep 2026 and carried
+      over from the earlier build. NOTHING HERE CHECKS THAT AGAINST THE LIVE
+      PAGE, so if the rate card moves this section goes stale silently. Re-read
+      it before a release.
+    -->
+    <section id="rates" class="ed ed--b" data-label="THE RATE CARD">
+      <div class="layer-back ed__fade" aria-hidden="true">
+        <svg data-rates-bg viewBox="0 0 1200 400" preserveAspectRatio="none" fill="none">
+          <path data-rates-traffic d="M0 390 C260 380 440 300 620 220 S960 70 1200 30" stroke="rgba(185,166,255,.2)"
+            stroke-width="2" />
+          <path data-rates-flat d="M0 300 H1200" stroke="var(--blink-light)" stroke-width="2" opacity=".55" />
+        </svg>
+      </div>
 
-          <div data-in style="--i:2" class="w-100">
-            <div class="wire">
-              <a class="wire__row" href="/blog/">
-                <span class="mono-xs wire__date">26 SEP 2026</span>
-                <span class="wire__title">How a Tamil daily grew 20×</span>
-                <span class="wire__go" aria-hidden="true">→</span>
-              </a>
-              <a class="wire__row" href="/blog/">
-                <span class="mono-xs wire__date">19 SEP 2026</span>
-                <span class="wire__title">AI story creation in the editor</span>
-                <span class="wire__go" aria-hidden="true">→</span>
-              </a>
-              <a class="wire__row" href="/blog/">
-                <span class="mono-xs wire__date">11 SEP 2026</span>
-                <span class="wire__title">Leaving WordPress without losing SEO</span>
-                <span class="wire__go" aria-hidden="true">→</span>
-              </a>
-              <a class="wire__row" href="/blog/">
-                <span class="mono-xs wire__date">02 SEP 2026</span>
-                <span class="wire__title">Running a live results desk</span>
-                <span class="wire__go" aria-hidden="true">→</span>
-              </a>
-            </div>
-            <a class="mono-xs ed__link ed__link--overflow mt-5" href="/blog/">View all <span
-                aria-hidden="true">→</span></a>
-          </div>
+      <div class="ed__shell">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">09 — THE RATE CARD</span>
+          <h2 class="display ed__h2" data-in style="--i:1">Pay for features, <span class="head-lilac">not
+              traffic.</span></h2>
         </div>
+
+        <div class="rates" data-in style="--i:2">
+          <article class="glass rate">
+            <span class="meta">BASIC</span>
+            <span class="rate__price"><span class="figure figure--sm">$500</span><span class="meta">/ month</span></span>
+            <div class="rate__list">
+              <span>100 GB storage</span>
+              <span>5 TB bandwidth</span>
+              <span>20 users</span>
+              <span>CDN and auto-scaling</span>
+              <span>Google News and AMP</span>
+            </div>
+            <a class="pill pill-white mt-4" href="/contact/">Get started</a>
+          </article>
+
+          <article class="glass rate rate--best">
+            <span class="meta rate__flag">RECOMMENDED</span>
+            <span class="meta">BUSINESS</span>
+            <span class="rate__price"><span class="figure figure--sm">$1,500</span><span class="meta">/
+                month</span></span>
+            <div class="rate__list">
+              <span>400 GB storage</span>
+              <span>15 TB bandwidth</span>
+              <span>50 users</span>
+              <span>Advanced features and reporting</span>
+              <span>Reporter, paywall and e-paper add-ons</span>
+            </div>
+            <a class="pill pill-white mt-4" href="/contact/">Get started</a>
+          </article>
+
+          <article class="glass rate">
+            <span class="meta">CUSTOM SUITE</span>
+            <span class="rate__price"><span class="figure figure--sm">$2,000</span><span class="meta">/ month
+                up</span></span>
+            <div class="rate__list">
+              <span>Scaled to the newsroom</span>
+              <span>Custom modules</span>
+              <span>Custom hosting</span>
+              <span>Apps, e-paper and subscriptions</span>
+              <span>Onboarding quoted separately</span>
+            </div>
+            <a class="pill pill-outline-inv mt-4" href="/contact/">Contact sales</a>
+          </article>
+        </div>
+
+        <span class="meta" data-in style="--i:3" style="text-align:center">PRICES AS PUBLISHED 27 SEP 2026 · TAXES
+          EXTRA</span>
       </div>
     </section>
 
-    <!-- ═══ 10 · QUESTIONS ══════════════════════════════════════════ -->
-    <section id="faq" class="ed ed--a ed--qa" data-label="QUESTIONS">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">10 — QUESTIONS</span>
-            <h2 class="display ed__h2" data-in style="--i:1">Questions, <span class="head-lilac">answered.</span></h2>
-          </div>
+    <!-- ═══ 10 · THE WIRE ═══════════════════════════════════════════ -->
+    <section id="wire" class="ed ed--b" data-label="THE WIRE">
+      <div class="layer-back" aria-hidden="true">
+        <span class="ticker-back display" data-depth="0.3">NEWSROOM TECH · NEWSROOM TECH · NEWSROOM TECH</span>
+      </div>
 
-          <div class="qa" data-qa data-in style="--i:2">
-            <div class="qa__list" role="tablist" aria-label="Frequently asked questions">
-              <button class="qa__q" type="button" role="tab" aria-selected="true" aria-controls="qa-a-2"
-                data-qa-q="The whole newsroom: gather, create, publish, monetize, analyze. One platform, one accountable team."><i>01</i>What
+      <div class="ed__shell">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">10 — THE WIRE</span>
+          <h2 class="display ed__h2" data-in style="--i:1">What's <span class="head-lilac">moving.</span></h2>
+        </div>
+
+        <div class="wire" data-in style="--i:2">
+          <a class="glass post post--lg glass--hover" href="/blog/">
+            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub="image — from client"></span>
+              <img src="./assets/img/post-tamil-daily.webp" alt="" loading="lazy" width="1200" height="800"
+                data-opt-img></span>
+            <span class="post__scrim"></span>
+            <span class="meta post__meta">26 SEP 2026 · CASE STUDY</span>
+            <span class="display post__title">How a Tamil daily grew 20×</span>
+          </a>
+
+          <a class="glass post glass--hover" href="/blog/">
+            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub=""></span>
+              <img src="./assets/img/post-ai-editor.webp" alt="" loading="lazy" width="900" height="600"
+                data-opt-img></span>
+            <span class="post__scrim"></span>
+            <span class="meta post__meta">19 SEP 2026 · PRODUCT</span>
+            <span class="display post__title">AI story creation in the editor</span>
+          </a>
+
+          <a class="glass post glass--hover" href="/blog/">
+            <span class="post__art"><span class="shot__stub" data-depth="0.7" data-stub=""></span>
+              <img src="./assets/img/post-wordpress-seo.webp" alt="" loading="lazy" width="900" height="600"
+                data-opt-img></span>
+            <span class="post__scrim"></span>
+            <span class="meta post__meta">11 SEP 2026 · MIGRATION</span>
+            <span class="display post__title">Leaving WordPress without losing SEO</span>
+          </a>
+        </div>
+
+        <a class="mono ed__link" href="/blog/">View all <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <!-- ═══ 11 · QUESTIONS ══════════════════════════════════════════ -->
+    <!--
+      A chat with the desk. The answer is set SMALLER than the questions on
+      purpose — in the previous build it was larger, and the eye went to the
+      panel first, which made the list read as a caption rather than as the
+      thing you choose from. Tops are aligned: the panel's first line sits on
+      the first question's.
+    -->
+    <section id="faq" class="ed ed--a" data-label="QUESTIONS">
+      <div class="layer-back ed__fade" aria-hidden="true">
+        <canvas data-wave></canvas>
+      </div>
+
+      <div class="ed__shell">
+        <div class="ed__grid">
+          <div class="ed__col">
+            <div class="ed__head">
+              <span class="mono ed__label" data-in style="--i:0">11 — QUESTIONS</span>
+              <h2 class="display ed__h2" data-in style="--i:1">Questions, <span class="head-lilac">answered.</span>
+              </h2>
+            </div>
+
+            <div class="qlist" role="tablist" aria-label="Frequently asked questions" data-chat-list data-in
+              style="--i:2">
+              <button class="qlist__q" type="button" role="tab" aria-selected="true" aria-controls="chat"
+                data-a="The whole newsroom: gather, create, publish, monetize, analyze. One platform, one accountable team."><i>01</i>What
                 does Blink CMS do?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
-                data-qa-q="Technical SEO, schema, Google News feeds and AMP are built in. Our webmasters set it up."><i>02</i>Can
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="Yes. Technical SEO, schema, Google News feeds and AMP are built in, and our webmasters set it up."><i>02</i>Can
                 we migrate without losing SEO?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
-                data-qa-q="Yes. Auto-scaling on AWS with a CDN. Measured at 43K concurrent readers, zero downtime."><i>03</i>Will
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="Yes. Traffic auto-scales on AWS with a CDN. Measured at 43K concurrent readers, zero downtime."><i>03</i>Will
                 the site survive a spike?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
-                data-qa-q="No. Billing is by features — storage, bandwidth and seats, never by how many people read you."><i>04</i>Do
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="No. Billing is by features — storage, bandwidth and seats, never by how many people read you."><i>04</i>Do
                 you charge more as traffic grows?</button>
-              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
-                data-qa-q="Write to sales@blinkcms.ai or call +91 88858 58900. Most newsrooms start on the Demo plan."><i>05</i>How
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="Yes. Reporters and stringers file from the app, with assignments, workflows and a payments module."><i>05</i>Do
+                you have a reporter app?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="Yes. Election and cricket modules already ship, and there is a headless API to build on."><i>06</i>Can
+                you build custom modules?</button>
+              <button class="qlist__q" type="button" role="tab" aria-selected="false" aria-controls="chat"
+                data-a="Write to sales@blinkcms.ai or call +91 88858 58900. Most newsrooms start on the Demo plan."><i>07</i>How
                 do we get a demo?</button>
             </div>
 
-            <div class="qa__side">
-              <div class="card qa__panel" id="qa-a-2" role="tabpanel" data-qa-panel>
-                <span class="mono-xs qa__count" data-qa-count>01 / 05</span>
-                <p class="qa__a" data-qa-a>The whole newsroom: gather, create, publish, monetize, analyze. One
-                  platform, one accountable team.</p>
+            <a class="mono ed__link ed__link--overflow" href="/faq/">View all FAQs <span
+                aria-hidden="true">→</span></a>
+          </div>
+
+          <div class="ed__gfx">
+            <div class="glass chat" id="chat" role="tabpanel" data-chat data-in style="--i:1">
+              <div class="chat__head">
+                <span class="chat__avatar">BD</span>
+                <span class="meta">THE BLINK DESK · USUALLY REPLIES IN MINUTES</span>
               </div>
-              <a class="mono-xs ed__link" href="/faq/">View all FAQs <span aria-hidden="true">→</span></a>
+              <span class="chat__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <p class="chat__bubble" data-chat-answer>The whole newsroom: gather, create, publish, monetize, analyze.
+                One platform, one accountable team.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 11 · FRONT PAGE ═════════════════════════════════════════ -->
+    <!-- ═══ 12 · FRONT PAGE ═════════════════════════════════════════ -->
+    <!--
+      The globe comes back at the bottom, rising, so the page closes on the
+      thing it opened with. It is the same scene module as the hero's, mounted
+      a second time on its own canvas — and both pause when they scroll away,
+      so there is never more than one WebGL loop actually running.
+    -->
     <section id="cta" class="ed ed--b ed--cta" data-label="FRONT PAGE">
-      <div class="shell">
-        <div class="ed__grid">
-          <div class="ed__head">
-            <span class="mono-xs ed__eyebrow" data-in style="--i:0">11 — FRONT PAGE</span>
-            <h2 class="display ed__h2" data-in style="--i:1">A newsroom that works <span class="head-lilac">as hard as
-                you do.</span></h2>
-            <p class="ed__sup" data-in style="--i:2">The tech team behind 150+ newsrooms.</p>
-            <div data-in style="--i:3"><a href="/contact/" class="pill pill-white">Book a demo</a></div>
+      <div class="layer-back ed__fade" aria-hidden="true">
+        <span class="backvid-fallback" data-depth="0.3"></span>
+        <video class="backvid" data-backvid data-src="./assets/video/cta-press.mp4" muted loop playsinline
+          preload="none" tabindex="-1"></video>
+        <span class="backvid-tint"></span>
+
+        <!-- Inside the back layer, not beside it. The globe is twice the
+             section's width and rises off the bottom edge; `.layer-back` is
+             the only thing on the page that clips, and clipping a decorative
+             back layer is not the same as using overflow to fake a fit. -->
+        <div class="cta-globe">
+          <canvas data-scene="globe-cta"></canvas>
+        </div>
+      </div>
+
+      <div class="ed__shell" style="position:relative;z-index:2">
+        <div class="ed__head">
+          <span class="mono ed__label" data-in style="--i:0">12 — FRONT PAGE</span>
+          <h2 class="display ed__h2" data-in style="--i:1">A newsroom that works <span class="head-lilac">as hard as
+              you do.</span></h2>
+          <p class="ed__sup" data-in style="--i:2">Ready to transform your newsroom?</p>
+          <div class="cta-buttons" data-in style="--i:3">
+            <a href="/contact/" class="pill pill-white">Book a demo</a>
+            <button class="pill pill-outline-inv" data-open-video><span class="play-tri"></span>Watch video</button>
           </div>
         </div>
       </div>
@@ -1039,50 +1426,85 @@
 
   <!-- ═══ footer ══════════════════════════════════════════════════ -->
   <footer class="ed-footer" id="contact" data-label="BACK PAGE">
-    <div class="shell">
-      <span class="display ed-footer__word" aria-hidden="true">BLINKCMS</span>
+    <div class="ed-footer__shell">
+      <div class="news">
+        <div>
+          <span class="display ed__h3 d-block">The Blink Brief</span>
+          <span class="meta d-block mt-2">WHAT MOVED IN NEWSROOM TECH, ONCE A MONTH</span>
+        </div>
+        <form class="news__form" data-news novalidate>
+          <label class="visually-hidden" for="news-email">Email address</label>
+          <input id="news-email" type="email" name="email" placeholder="you@newsroom.com" autocomplete="email"
+            required>
+          <button class="pill pill-white" type="submit">Subscribe</button>
+        </form>
+      </div>
 
       <div class="ed-footer__cols">
         <div class="ed-footer__col">
-          <h3 class="mono-xs">PRODUCT</h3>
+          <h3 class="meta">PRODUCT</h3>
           <a href="/platform/">Platform</a>
           <a href="/pricing/">Pricing</a>
           <a href="/faq/">FAQ</a>
         </div>
         <div class="ed-footer__col">
-          <h3 class="mono-xs">MODULES</h3>
+          <h3 class="meta">MODULES</h3>
           <a href="/platform/">The Reporter</a>
           <a href="/platform/">The AI Editor</a>
           <a href="/platform/">The Edition</a>
           <a href="/platform/">The Subscriber</a>
         </div>
         <div class="ed-footer__col">
-          <h3 class="mono-xs">NEWSROOMS</h3>
+          <h3 class="meta">NEWSROOMS</h3>
           <a href="/case-studies/daily-thanthi/">Daily Thanthi</a>
           <a href="/case-studies/the-hans-india/">The Hans India</a>
           <a href="/case-studies/livelaw/">LiveLaw</a>
           <a href="/case-studies/">All case studies</a>
         </div>
         <div class="ed-footer__col">
-          <h3 class="mono-xs">COMPANY</h3>
+          <h3 class="meta">COMPANY</h3>
           <a href="/about/">About Us</a>
           <a href="/blog/">Blog</a>
           <a href="/contact/">Book a demo</a>
         </div>
       </div>
 
-      <!-- email and city live here rather than in a fifth column: four
-           columns plus a wordmark is already most of a phone screen, and the
-           footer has a height budget of its own. -->
-      <div class="mono-xs ed-footer__base">
+      <div class="meta ed-footer__base">
         <span><a href="mailto:sales@blinkcms.ai">sales@blinkcms.ai</a> · Noida, India</span>
-        <span class="d-flex flex-wrap gap-5">
+        <span class="social">
+          <a href="/contact/" aria-label="X">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <a href="/contact/" aria-label="LinkedIn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
+            </svg>
+          </a>
+          <a href="/contact/" aria-label="Facebook">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.52-.14-2.71-.14-2.72 0-4.79 1.66-4.79 4.93V9.5H7v4h3V22h4v-8.5z" />
+            </svg>
+          </a>
+          <a href="/contact/" aria-label="YouTube">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
+        </span>
+        <span class="d-flex flex-wrap gap-4">
           <span>© 2026 Blink CMS</span>
           <a href="/privacy/">Privacy</a>
           <a href="/terms/">Terms</a>
           <a href="/cookies/">Cookies</a>
         </span>
       </div>
+
+      <span class="display wordmark" data-wordmark aria-hidden="true">BLINKCMS</span>
     </div>
   </footer>
 
@@ -1125,6 +1547,19 @@
 
     topojson-client stays: the hero's globe decodes the land outlines with it.
   -->
+
+  <!--
+    GSAP and ScrollTrigger drive the scrubbed graphics: the dot map assembling
+    in 01, the story card travelling the fibre in 04, the live counter, the
+    comparison divider, the rate-card lines and every parallax layer. They
+    scrub and they reverse; they never pin and never take the scroll away.
+
+    topojson-client decodes the land outlines the globe and the map share.
+    Three.js is an ES module imported lazily with the globe, so the 700 kB of
+    WebGL never blocks first paint.
+  -->
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="vendor/topojson-client.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
@@ -1133,11 +1568,10 @@
     here would be blocked by the very failure it exists to catch.
 
     js/main.js sets window.__blinkBooted as its first statement. If that has
-    not happened shortly after load, the module never ran — the preloader
-    would sit over the page indefinitely, and every `[data-in]` element would
-    stay at the opacity 0 the inline script in <head> armed — so fall back to
-    the rules in that same <style> block. The page then reads as static
-    markup: all copy present, nothing animated, no globe.
+    not happened shortly after load, the module never ran — and every
+    `[data-in]` element is sitting at the opacity 0 the inline script in
+    <head> armed — so fall back to the rules in that same <style> block. The
+    page then reads as static markup: all copy present, nothing animated.
   -->
   <script>
     window.addEventListener('load', function () {
@@ -1147,7 +1581,7 @@
 
         var onDisk = location.protocol === 'file:'
         var why = onDisk
-          ? 'The page is open from disk. Browsers block ES modules on file://, so the hero globe and every reveal cannot run. Serve the folder over http instead.'
+          ? 'The page is open from disk. Browsers block ES modules on file://, so the globe and every scene cannot run. Serve the folder over http instead.'
           : 'js/main.js did not run. Check the script path and any Content-Security-Policy.'
         if (window.console && console.warn) console.warn('Blink CMS: falling back to static markup. ' + why)
 

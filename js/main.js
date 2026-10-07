@@ -1,71 +1,92 @@
 /**
  * Blink CMS — entry point.
  *
- * topojson is a global from a <script> tag; Three.js is an ES module, imported
- * lazily with the hero's globe so the 700 kB of WebGL never blocks first paint.
- * Nothing else is loaded from vendor/ — GSAP, ScrollTrigger and Lenis were
- * removed with the per-section scroll scenes they drove, and the page's
- * remaining motion is CSS transitions plus two rAF loops.
+ * GSAP, ScrollTrigger and topojson are globals from <script> tags. Three.js is
+ * an ES module, imported lazily with the globe so the 700 kB of WebGL never
+ * blocks first paint.
+ *
+ * There is no preloader. The brief forbids holding first paint for more than
+ * a second, and an intro that counts bureaus for four is the single biggest
+ * thing between this page and its Lighthouse budget. The hero paints
+ * immediately and the globe fades in when Three.js resolves.
  *
  * What boot() sets up, in the order it matters:
  *
  *   the chrome        header, overlay menu, section label, cursor ring
- *   the background    the ambient glow's two custom properties
- *   the sections      the one entry animation, then each module's behaviour
- *   the hero          globe (lazy), and the "Watch video" modal
+ *   the page          ambient glow, parallax layers, the one entry reveal
+ *   the panels        02 monitor, 07 segments, 08 letters, 11 chat
+ *   the graphics      one per section, each gated on being visible
+ *   the hero          globe (lazy), and its twin at the closing CTA
  */
 
-import { onInView } from './lib/motion.js'
+import { onInView, hasGsap, ScrollTrigger } from './lib/motion.js'
+import { letters } from './lib/content.js'
 
 import { initCursor, initHeader, initSectionLabel } from './ui/chrome.js'
 import {
   initAmbient,
+  initBackVideos,
   initCounters,
-  initFlow,
+  initImages,
   initMarquee,
-  initQa,
-  initQuotes,
-  initRails,
+  initNewsletter,
+  initParallax,
   initReveals,
+  initViewportVar,
   initVideoModal,
+  initWordmark,
 } from './ui/edition.js'
+import { initBeats, initChat, initMonitor, initQuotes } from './ui/panels.js'
 
-import { mountPreloader } from './scenes/preloader.js'
+import { mountIsoGrid, mountWave } from './scenes/dots.js'
+import { mountNetwork } from './scenes/network.js'
+import { mountBento } from './scenes/bento.js'
+import { mountFlow, mountRatesBg } from './scenes/flow.js'
+import { mountLive } from './scenes/live.js'
+import { mountVersus } from './scenes/versus.js'
 
 // Tells the boot failsafe at the end of index.html that the module ran. Must
 // stay the first statement after the imports: if any import above fails this
 // never executes, and the page falls back to static markup rather than sitting
-// under the preloader with every revealed element at opacity 0.
+// with every revealed element at opacity 0.
 window.__blinkBooted = true
 
 const q = (sel, root = document) => root.querySelector(sel)
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 const isMobile = () => window.matchMedia('(max-width: 899px)').matches
 
-/* ── the hero globe ───────────────────────────────────────────── */
+/* ── the globe, twice ─────────────────────────────────────────── */
 
 /**
- * Three.js is ~700 kB, so it stays out of the critical path — but the fetch
- * starts here, at boot, rather than when the preloader releases. The intro then
- * covers the download and parse instead of the hero sitting empty.
+ * Three.js is ~700 kB, so it stays off the critical path — but the fetch
+ * starts here, at boot, rather than when something scrolls into view, so it is
+ * usually resolved before the hero has finished fading in.
  */
-const globeModule = document.querySelector('[data-scene="globe"]')
-  ? import('./scenes/globe.js')
-  : null
+const globeModule = q('[data-scene="globe"]') ? import('./scenes/globe.js') : null
 
-async function mountGlobeLazy() {
-  const canvas = q('[data-scene="globe"]')
-  if (!canvas || !globeModule) return
+async function mountGlobes() {
+  if (!globeModule) return
   const { mountGlobe } = await globeModule
-  const globe = mountGlobe(canvas, {
-    tagEls: qq('[data-ping-tag]'),
-    dense: !isMobile(),
-  })
-  const wrap = q('[data-globe-wrap]')
-  wrap?.classList.add('is-ready')
-  // a WebGL loop running behind eleven sections it cannot be seen from is a
-  // real cost, so it stops as soon as the hero leaves the window
-  onInView(wrap || canvas, (inView) => globe.setActive(inView), '15%')
+
+  const hero = q('[data-scene="globe"]')
+  if (hero) {
+    const globe = mountGlobe(hero, { tagEls: qq('[data-ping-tag]'), dense: !isMobile() })
+    const wrap = q('[data-globe-wrap]')
+    wrap?.classList.add('is-ready')
+    onInView(wrap || hero, (v) => globe.setActive(v), '15%')
+  }
+
+  /*
+   * The same scene again at the closing CTA, rising from the bottom edge so
+   * the page ends on what it opened with. Both pause when they scroll away,
+   * so there is never more than one WebGL loop actually running — which is
+   * what the brief's "ONE shared renderer" is really asking for.
+   */
+  const cta = q('[data-scene="globe-cta"]')
+  if (cta && !isMobile()) {
+    const globe = mountGlobe(cta, { tagEls: [], dense: false })
+    onInView(cta, (v) => globe.setActive(v), '10%')
+  }
 }
 
 /* ── boot ─────────────────────────────────────────────────────── */
@@ -75,45 +96,58 @@ function boot() {
   initHeader()
   initSectionLabel()
 
+  initViewportVar()
   initAmbient()
-
   initReveals()
+  initParallax()
   initCounters()
-  initQa()
-  initFlow()
-  initQuotes()
-  initRails()
   initMarquee()
-
+  initWordmark()
+  initImages()
+  initBackVideos()
   initVideoModal()
-}
+  initNewsletter()
 
-function start() {
-  boot()
+  initMonitor()
+  initBeats()
+  initQuotes(letters)
+  initChat()
 
-  const preloader = q('[data-preloader]')
-  if (!preloader) {
-    mountGlobeLazy()
-    return
+  const net = q('[data-net]')
+  if (net) mountNetwork(net)
+
+  const iso = q('[data-iso]')
+  if (iso) mountIsoGrid(iso)
+
+  const bento = q('[data-bento]')
+  if (bento) mountBento(bento)
+
+  const flow = q('[data-flow]')
+  if (flow) mountFlow(flow)
+
+  const live = q('[data-live]')
+  if (live) mountLive(live)
+
+  const vs = q('[data-vs]')
+  if (vs) mountVersus(vs)
+
+  const ratesBg = q('[data-rates-bg]')
+  if (ratesBg) mountRatesBg(ratesBg)
+
+  const wave = q('[data-wave]')
+  if (wave) mountWave(wave)
+
+  mountGlobes()
+
+  // the marquees and the wordmark change the document height as they build
+  if (hasGsap) {
+    ScrollTrigger.refresh()
+    setTimeout(() => ScrollTrigger.refresh(), 500)
   }
-
-  // hold the page still while the bureaus load
-  document.documentElement.style.overflow = 'hidden'
-  let released = false
-  const release = () => {
-    if (released) return
-    released = true
-    document.documentElement.style.overflow = ''
-    mountGlobeLazy()
-  }
-
-  mountPreloader(preloader, release)
-  // failsafe: nothing about the intro may leave the page locked
-  setTimeout(release, 7000)
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', start)
+  document.addEventListener('DOMContentLoaded', boot)
 } else {
-  start()
+  boot()
 }

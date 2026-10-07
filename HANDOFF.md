@@ -14,7 +14,80 @@ is still open.
 
 ---
 
-## 0 · The redesign — "one page, one edition" (7 Oct 2026)
+## 0a · The second redesign — "one continuous world" (7 Oct 2026)
+
+The first redesign (§0b below) fixed the consistency problem and created a new
+one: **one background, one card, one motion — and small content floating in
+large dark screens.** The client's note was blunt about it. This pass keeps the
+consistency and fills the screens.
+
+Twelve sections, each with its own signature animated graphic, all built from
+one shared visual DNA so the page still reads as one world.
+
+```
+00 hero        unchanged except its background      07 the beats    segment tabs + device frame
+01 the network dot-matrix map of India + logos      08 letters      portrait + card deck
+02 the problem 6 questions, 6 mini scenes           09 the rate card 3 tiers, real prices
+03 the platform bento grid, 6 micro-UIs             10 the wire     1 large + 2 small posts
+04 the flow    fibre path, scrubbed story card      11 questions    chat with the desk
+05 live        counter, nodes, sparkline, video     12 front page   globe returns, rising
+06 head to head draggable split + table             footer          newsletter, 4 cols, wordmark
+```
+
+### The decisions that were the client's, and what they chose
+
+- **66+ newsrooms, everywhere.** The brief offered 150+ or 66+; the answer was
+  66+, applied throughout — the headline, the stat card, the meta description
+  and the 02 and 11 answers. **Nothing on the page says 150+ any more.**
+- **Real prices in 09**, carried over from the earlier build and read from
+  blinkcms.ai/pricing-page on 27 Sep 2026: Basic $500, Business $1,500
+  (recommended), Custom Suite from $2,000. **Nothing checks these against the
+  live page, so they go stale silently** — re-read before a release.
+- **The hero button stays white.** The brief offered a purple one "if the
+  client approves" and left the choice open; white was kept because the hero's
+  only sanctioned change is its background, and white-on-near-black is the
+  highest-contrast CTA on the page.
+- **06's WordPress column is not filled in.** Every cell is a visible
+  `[FROM CLIENT]` marker. There is no source for those values in the brief or
+  on the site, and this build does not invent claims about another product —
+  least of all unflattering ones. The client is sending PDFs; see §7.
+
+### What came back, and why
+
+- **GSAP and ScrollTrigger**, removed in the first pass, are back: the brief
+  asks for scroll-linked graphics and there are now eleven of them. They
+  **scrub and never pin**. Lenis was offered and declined — it owns the scroll
+  position, and native scroll with `scroll-behavior: smooth` does the job.
+- **The rate card**, dropped in the first pass, is section 09 again.
+
+### What went, and is not coming back
+
+- **The preloader.** The brief forbids holding first paint for more than a
+  second. `js/scenes/preloader.js` is deleted and `main.js` paints the hero
+  immediately. This also closes the open item the first pass left behind.
+- **Scroll-snap.** Parallax and snap fight each other, and the brief rules out
+  mandatory snap anyway.
+
+### Where the graphics are drawn
+
+WebGL is the hero globe and nothing else — mounted twice (hero and 12), both
+pausing off-screen, so there is never more than one loop running. Everything
+else is canvas 2D (`scenes/dots.js`) or inline SVG animated with CSS. A second
+WebGL context to draw a flat map would cost a shader compile and a chunk of
+memory on exactly the phones this traffic is on.
+
+### Verified
+
+Nine viewports, including phone landscape. No section taller than its window,
+no overflow in either axis, no horizontal page scroll, every section revealed,
+footer 52–88% of the window, content block 86% of each section at 1440×900.
+The full interaction sweep ran at each size. Details in `README.md`.
+
+**Not verified:** Lighthouse and `prefers-reduced-motion` — see §7.
+
+---
+
+## 0b · The first redesign — "one page, one edition" (7 Oct 2026)
 
 The client liked the hero and nothing after it. The complaint, in their words:
 everything below felt like separate websites — the background switched between
@@ -907,48 +980,51 @@ section animates delivery, structure or arrival.
 ---
 ## 7 · Open items
 
-### Open after the redesign (7 Oct 2026) — these are current, not historical
+### Open after the second redesign (7 Oct 2026) — current, not historical
 
-**1 · 66+ newsrooms contradicts 150+ newsrooms, on the same page.**
-The redesign brief specifies section 01's four figures as 66+ · 43K · 20+ ·
-396%, with labels taken from the old page. The old page said 150+ and 400% for
-the first and last of those. Asked which to use, the client chose the brief's
-numbers on 7 Oct.
+**1 · 06's WordPress column is empty, on purpose.** Eight rows, eight visible
+`[FROM CLIENT]` markers. The client offered PDFs with the real content; when
+they arrive, replace the `<em class="todo">` in each `.vs-wp` cell and delete
+nothing else. Keep them factual and non-disparaging — the table sits under a
+headline naming another product, which is exactly where an unsourced claim
+becomes a problem.
 
-So the page now reads **"66+ newsrooms powered"** in section 01 and **"The tech
-team behind 150+ newsrooms"** in section 11 — and 150+ is also in the `<title>`
-meta description and in several of the F.A.Q answers. One of the two is wrong,
-or 66+ counts something that is not newsrooms and needs a different label.
-**Nothing in the build can resolve this; it needs the client.** It is the first
-thing a reader who is paying attention will notice.
+**2 · Two of 07's five segments have no numbers.** Broadcasters (MediaOne) and
+Fact-checking render `[METRICS FROM CLIENT]` instead of figures, because the
+brief gives metrics for only three of the five. Their `data-metrics` attributes
+on the tab buttons in `index.html` are where the real ones go — same
+`[["20×","growth"], …]` shape as the other three.
 
-**2 · The preloader.** The brief proposed removing the counter and marked it
-"confirm with client". The answer was *keep it as it is, decide later*, so it
-is untouched — the bureau count, the sample wire feed and the language list all
-still run, and the page is still scroll-locked for their duration with a
-7-second failsafe.
+**3 · Every image and video is a placeholder path.** Listed in `README.md`
+under "Assets". The page is built so their absence is invisible and dropping
+them in is the only step. Nothing else needs changing.
 
-Worth knowing when that decision comes back: it is the single biggest thing
-standing between this page and the brief's "Lighthouse mobile ≥ 85" target,
-because it holds first paint behind a canvas render and a timer. `js/main.js`
-already handles its absence — delete the `.preloader` block from `index.html`
-and `start()` calls `mountGlobeLazy()` directly.
+**4 · The rate card goes stale silently.** $500 / $1,500 / $2,000 were read
+from blinkcms.ai/pricing-page on 27 Sep 2026 and nothing in the build checks
+them. Re-read before any release.
 
-**3 · Lighthouse has not been run.** No headless Chrome in the build
-environment. The structural work is done — three of the four vendor libraries
-are gone, there is no video, no photography and one image on the page — but the
-number is unmeasured and the brief asks for ≥ 85 on mobile.
+**5 · Lighthouse has not been run.** No headless Chrome in the environment.
+The brief asks for ≥75 on mobile, LCP <2.5s and CLS <0.05. The structural work
+is done — no preloader, no photography shipped, one WebGL context, every loop
+gated on visibility, images carrying width/height — but the number is
+unmeasured.
 
-**4 · Three sections carry about 50 words, not 40.** The brief's text rules cap
-a section at roughly 40 visible words; 02 (51), 04 (49) and 10 (49) are over.
-In each case it is the brief's own section map that puts them there — six
-questions, six cards, five F.A.Q entries. Below 1024px wide or 680px tall the
-lists trim to four and the card descriptors drop, which brings all three under
-the cap. Shortening them further on desktop means dropping an item, which is a
-content decision.
+**6 · `prefers-reduced-motion` was read, not emulated.** The rules are in the
+stylesheet and the guards are in `lib/motion.js` and `scenes/dots.js`, and
+`onScrub()` draws the finished state rather than nothing. Worth ten minutes in
+a browser with the OS setting on.
 
-**5 · The rate card is no longer on the homepage.** It is not in the new
-section map. If pricing was meant to stay, its markup is at commit `38ef807`.
+**7 · Two headlines run to three lines on layout A.** "Why newsrooms leave
+WordPress." and "Reliability on every deadline." sit in a 5-of-12 column, and
+there is no size at which they hold two lines at every width. `text-wrap` is
+`wrap` rather than `balance` there so they break greedily, which reads better
+than three stubby balanced lines. Shortening the copy is the only other fix.
+
+### Open from the first redesign, now resolved
+
+- The preloader is gone (brief forbids >1s). 
+- 150+ vs 66+ is resolved: 66+ everywhere.
+- The rate card is back on the homepage as section 09.
 
 ### The 12-essentials audit — all three sections landed
 

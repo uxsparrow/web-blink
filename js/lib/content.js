@@ -4,7 +4,7 @@
  * These are the values the scenes need at runtime.
  */
 
-/** Bureau cities — shared by the preloader map, the globe and the footer map. */
+/** Bureau cities, shared by the globe. */
 export const bureaus = [
   { city: 'NOIDA', label: 'NOIDA / DELHI', lat: 28.5355, lon: 77.391, hq: true },
   { city: 'CHENNAI', label: 'CHENNAI', lat: 13.0827, lon: 80.2707, hq: false },
@@ -15,18 +15,6 @@ export const bureaus = [
   { city: 'BHOPAL', label: 'BHOPAL', lat: 23.2599, lon: 77.4126, hq: false },
 ]
 
-/** Sample wire lines typed into the preloader. Clearly sample text. */
-export const wireFeed = [
-  { time: '14:32', bureau: 'CHENNAI', text: 'ELECTION COUNT BEGINS' },
-  { time: '14:33', bureau: 'MUMBAI', text: 'MONSOON ALERT ISSUED' },
-  { time: '14:33', bureau: 'DELHI', text: 'MARKETS OPEN HIGHER' },
-  { time: '14:34', bureau: 'HYDERABAD', text: 'CIVIC POLL DATES ANNOUNCED' },
-  { time: '14:35', bureau: 'GUWAHATI', text: 'RIVER LEVELS UNDER WATCH' },
-  { time: '14:36', bureau: 'BHOPAL', text: 'BUDGET SESSION EXTENDED' },
-  { time: '14:36', bureau: 'KOLKATA', text: 'PORT TRAFFIC RESUMES' },
-  { time: '14:37', bureau: 'BENGALURU', text: 'TECH HIRING NUMBERS FILED' },
-  { time: '14:38', bureau: 'JAIPUR', text: 'HEAT ADVISORY EXTENDED' },
-]
 
 /**
  * Pings on the globe, all arcing back to the Noida desk. Sample markers, not
@@ -83,13 +71,19 @@ export const START_LON = 78
  */
 export const letters = [
   {
-    text: 'Our reporters file from the district in Tamil, on their phones, and it reaches the front page.',
+    text:
+      'Our reporters file from the district in Tamil, on their phones, and it reaches the front page without anyone retyping it.',
     name: 'Kavitha Iyer',
+    role: 'Managing editor',
     org: 'Daily Thanthi',
+    shot: './assets/img/testimonial-kavitha-iyer.webp',
   },
   {
-    text: 'Election night, we watched the traffic climb and did nothing at all. Exactly what we were paying for.',
+    text:
+      'Election night, we watched the traffic climb and did nothing at all, which is exactly what we were paying for.',
     name: 'Sanjay Bhat',
+    role: 'Product lead',
     org: 'The Federal',
+    shot: './assets/img/testimonial-sanjay-bhat.webp',
   },
 ]

@@ -85,9 +85,11 @@ export const START_LON = 78
  * team and EVO India's team, from the same `/case-study/` set. They are in
  * HANDOFF §6d and can replace the two samples without any other change.
  *
- * `shot` cycles the two placeholder newsroom frames, because there are only
- * two. They are frames and never faces on purpose: a stock photograph of a
- * plausible-looking person beside a named quote reads as that person.
+ * `shot` is one frame per letter now. They are frames and never faces on
+ * purpose: a stock photograph of a plausible-looking person beside a named
+ * quote reads as that person. ⚠ letters_3 and letters_4 are byte-identical
+ * copies of letters_2 at the moment, so three of the four show the same
+ * picture — see the note beside them in assets/media.js.
  */
 export const letters = [
   {
@@ -114,7 +116,7 @@ export const letters = [
     name: 'Advocate P V Dinesh',
     role: 'Co-founder',
     org: 'LiveLaw',
-    shot: 'letters_1',
+    shot: 'letters_3',
     source: 'blinkcms.ai /case-study/ — LiveLaw, verbatim',
   },
   {
@@ -125,7 +127,7 @@ export const letters = [
     name: 'Editorial head',
     role: '',
     org: 'Tax Scan',
-    shot: 'letters_2',
+    shot: 'letters_4',
     source: 'blinkcms.ai /case-study/ — Tax Scan, verbatim',
   },
 ]

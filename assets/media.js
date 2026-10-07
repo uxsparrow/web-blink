@@ -100,6 +100,27 @@ export const images = {
     seed: 'blink-newsroom-press',
     credit: 'Lorem Picsum #121 (Unsplash) — placeholder',
   },
+  /*
+   * ⚠ letters-3.jpg and letters-4.jpg are currently byte-identical copies of
+   * letters-2.jpg — same 78,730 bytes, same MD5 e666b960…. The third and
+   * fourth letters therefore show the same picture as the second until two
+   * distinct files are dropped in at these paths. Nothing else has to change
+   * when they are.
+   */
+  letters_3: {
+    src: 'assets/images/letters-3.jpg',
+    w: 900,
+    h: 1200,
+    seed: 'blink-newsroom-3',
+    credit: 'placeholder — currently a duplicate of letters-2.jpg',
+  },
+  letters_4: {
+    src: 'assets/images/letters-4.jpg',
+    w: 900,
+    h: 1200,
+    seed: 'blink-newsroom-4',
+    credit: 'placeholder — currently a duplicate of letters-2.jpg',
+  },
 
   /* 10 · THE WIRE */
   wire_1: {

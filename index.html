@@ -7,7 +7,7 @@
   <title>Blink CMS — The engine behind modern newsrooms.</title>
   <meta name="description"
     content="Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform. The extended tech team behind 150+ newsrooms.">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#07060B">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Blink CMS — The engine behind modern newsrooms.">
   <meta property="og:description"
@@ -17,34 +17,37 @@
   <link rel="modulepreload" href="vendor/three.module.min.js">
   <link rel="modulepreload" href="vendor/three.core.min.js">
   <link rel="preload" href="data/countries-110m.json" as="fetch" crossorigin>
-  <!--
-    Two separate failure modes, both of which would otherwise leave the
-    preloader covering the page forever:
 
-    1. Scripting disabled  -> <noscript> below.
+  <!--
+    Arms the entry animation. `[data-in]` only starts at opacity 0 under
+    `html.js`, so a reader with scripting off gets the page at rest instead of
+    a column of invisible blocks. Classic script, in <head>, before first
+    paint: a module would be too late and would be blocked by the very
+    failures the failsafe at the end of <body> exists to catch.
+  -->
+  <script>
+    document.documentElement.classList.add('js')
+  </script>
+
+  <!--
+    Two separate failure modes, both of which would otherwise leave the page
+    unreadable:
+
+    1. Scripting disabled  -> <noscript> below. `html.js` is never set, so the
+       entry animation never arms and only the preloader needs dropping.
     2. Scripting enabled but js/main.js never runs. This is NOT covered by
-       <noscript>. It happens when the page is opened from disk (ES modules
-       are blocked on the file:// origin), behind a CSP that forbids modules,
-       or after an integration moves the files and the path 404s. The inline
+       <noscript>: `html.js` IS set by the inline script above, so every
+       `[data-in]` element is sitting at opacity 0 with nothing coming to
+       reveal it. It happens when the page is opened from disk (ES modules are
+       blocked on the file:// origin), behind a CSP that forbids modules, or
+       after an integration moves the files and the path 404s. The inline
        script at the end of <body> detects it and sets .boot-failed.
 
-    Both land on the same rules: drop the preloader, and open anything whose
-    open state is normally JavaScript's job.
+    Both land on the same rules: drop the preloader, show the globe's wrapper,
+    and put every revealed element at rest.
   -->
   <style>
     .boot-failed .preloader {
-      display: none;
-    }
-
-    .boot-failed .faq-panel {
-      grid-template-rows: 1fr;
-    }
-
-    .boot-failed [data-tab-panel] {
-      display: block !important;
-    }
-
-    .boot-failed .tab-btn {
       display: none;
     }
 
@@ -52,9 +55,10 @@
       opacity: 1;
     }
 
-    /* the six module cards in 05 are revealed by the platform scene */
-    .boot-failed .platform-card {
-      opacity: 1;
+    .boot-failed [data-in],
+    .boot-failed .line-inner {
+      opacity: 1 !important;
+      transform: none !important;
     }
   </style>
 
@@ -64,23 +68,7 @@
         display: none;
       }
 
-      .faq-panel {
-        grid-template-rows: 1fr;
-      }
-
-      [data-tab-panel] {
-        display: block !important;
-      }
-
-      .tab-btn {
-        display: none;
-      }
-
       [data-globe-wrap] {
-        opacity: 1;
-      }
-
-      .platform-card {
         opacity: 1;
       }
     </style>
@@ -88,6 +76,23 @@
 </head>
 
 <body>
+
+  <!--
+    The background. The whole of it.
+
+    Two blurred radial gradients and a dot grid on one fixed layer at
+    z-index -1, so every section scrolls over the same light and no section
+    carries a background, a band, an image or a transition shape of its own.
+    initAmbient() writes `--glow` (strongest at the hero and at the closing
+    CTA, softer in between) and `--drift` (at most 10% of the viewport across
+    the entire page). With no JavaScript it rests at the hero's setting, which
+    is the one the page opens on anyway.
+  -->
+  <div class="ambient" data-ambient aria-hidden="true">
+    <div class="ambient__a"></div>
+    <div class="ambient__b"></div>
+    <div class="ambient__grid"></div>
+  </div>
 
   <svg class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
     <symbol id="px-mic" viewBox="0 0 20 20" fill="currentColor">
@@ -113,44 +118,6 @@
       <circle cx="8.75" cy="18.75" r="0.90" />
       <circle cx="11.25" cy="18.75" r="0.90" />
       <circle cx="13.75" cy="18.75" r="0.90" />
-    </symbol>
-    <symbol id="px-camera" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="6.25" cy="1.25" r="0.90" />
-      <circle cx="8.75" cy="1.25" r="0.90" />
-      <circle cx="1.25" cy="3.75" r="0.90" />
-      <circle cx="3.75" cy="3.75" r="0.90" />
-      <circle cx="6.25" cy="3.75" r="0.90" />
-      <circle cx="8.75" cy="3.75" r="0.90" />
-      <circle cx="11.25" cy="3.75" r="0.90" />
-      <circle cx="13.75" cy="3.75" r="0.90" />
-      <circle cx="16.25" cy="3.75" r="0.90" />
-      <circle cx="18.75" cy="3.75" r="0.90" />
-      <circle cx="1.25" cy="6.25" r="0.90" />
-      <circle cx="18.75" cy="6.25" r="0.90" />
-      <circle cx="1.25" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="8.75" r="0.90" />
-      <circle cx="11.25" cy="8.75" r="0.90" />
-      <circle cx="18.75" cy="8.75" r="0.90" />
-      <circle cx="1.25" cy="11.25" r="0.90" />
-      <circle cx="6.25" cy="11.25" r="0.90" />
-      <circle cx="13.75" cy="11.25" r="0.90" />
-      <circle cx="18.75" cy="11.25" r="0.90" />
-      <circle cx="1.25" cy="13.75" r="0.90" />
-      <circle cx="6.25" cy="13.75" r="0.90" />
-      <circle cx="13.75" cy="13.75" r="0.90" />
-      <circle cx="18.75" cy="13.75" r="0.90" />
-      <circle cx="1.25" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="11.25" cy="16.25" r="0.90" />
-      <circle cx="18.75" cy="16.25" r="0.90" />
-      <circle cx="1.25" cy="18.75" r="0.90" />
-      <circle cx="3.75" cy="18.75" r="0.90" />
-      <circle cx="6.25" cy="18.75" r="0.90" />
-      <circle cx="8.75" cy="18.75" r="0.90" />
-      <circle cx="11.25" cy="18.75" r="0.90" />
-      <circle cx="13.75" cy="18.75" r="0.90" />
-      <circle cx="16.25" cy="18.75" r="0.90" />
-      <circle cx="18.75" cy="18.75" r="0.90" />
     </symbol>
     <symbol id="px-pen" viewBox="0 0 20 20" fill="currentColor">
       <circle cx="16.25" cy="1.25" r="0.90" />
@@ -215,40 +182,6 @@
       <circle cx="13.75" cy="18.75" r="0.90" />
       <circle cx="16.25" cy="18.75" r="0.90" />
       <circle cx="18.75" cy="18.75" r="0.90" />
-    </symbol>
-    <symbol id="px-phone" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="3.75" cy="1.25" r="0.90" />
-      <circle cx="6.25" cy="1.25" r="0.90" />
-      <circle cx="8.75" cy="1.25" r="0.90" />
-      <circle cx="11.25" cy="1.25" r="0.90" />
-      <circle cx="13.75" cy="1.25" r="0.90" />
-      <circle cx="16.25" cy="1.25" r="0.90" />
-      <circle cx="3.75" cy="3.75" r="0.90" />
-      <circle cx="16.25" cy="3.75" r="0.90" />
-      <circle cx="3.75" cy="6.25" r="0.90" />
-      <circle cx="8.75" cy="6.25" r="0.90" />
-      <circle cx="11.25" cy="6.25" r="0.90" />
-      <circle cx="16.25" cy="6.25" r="0.90" />
-      <circle cx="3.75" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="8.75" r="0.90" />
-      <circle cx="11.25" cy="8.75" r="0.90" />
-      <circle cx="16.25" cy="8.75" r="0.90" />
-      <circle cx="3.75" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="11.25" r="0.90" />
-      <circle cx="11.25" cy="11.25" r="0.90" />
-      <circle cx="16.25" cy="11.25" r="0.90" />
-      <circle cx="3.75" cy="13.75" r="0.90" />
-      <circle cx="16.25" cy="13.75" r="0.90" />
-      <circle cx="3.75" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="11.25" cy="16.25" r="0.90" />
-      <circle cx="16.25" cy="16.25" r="0.90" />
-      <circle cx="3.75" cy="18.75" r="0.90" />
-      <circle cx="6.25" cy="18.75" r="0.90" />
-      <circle cx="8.75" cy="18.75" r="0.90" />
-      <circle cx="11.25" cy="18.75" r="0.90" />
-      <circle cx="13.75" cy="18.75" r="0.90" />
-      <circle cx="16.25" cy="18.75" r="0.90" />
     </symbol>
     <symbol id="px-chart" viewBox="0 0 20 20" fill="currentColor">
       <circle cx="1.25" cy="1.25" r="0.90" />
@@ -357,129 +290,6 @@
       <circle cx="11.25" cy="18.75" r="0.90" />
       <circle cx="13.75" cy="18.75" r="0.90" />
     </symbol>
-    <symbol id="px-bolt" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="11.25" cy="1.25" r="0.90" />
-      <circle cx="13.75" cy="1.25" r="0.90" />
-      <circle cx="16.25" cy="1.25" r="0.90" />
-      <circle cx="8.75" cy="3.75" r="0.90" />
-      <circle cx="11.25" cy="3.75" r="0.90" />
-      <circle cx="13.75" cy="3.75" r="0.90" />
-      <circle cx="6.25" cy="6.25" r="0.90" />
-      <circle cx="8.75" cy="6.25" r="0.90" />
-      <circle cx="11.25" cy="6.25" r="0.90" />
-      <circle cx="3.75" cy="8.75" r="0.90" />
-      <circle cx="6.25" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="8.75" r="0.90" />
-      <circle cx="11.25" cy="8.75" r="0.90" />
-      <circle cx="13.75" cy="8.75" r="0.90" />
-      <circle cx="16.25" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="11.25" r="0.90" />
-      <circle cx="11.25" cy="11.25" r="0.90" />
-      <circle cx="13.75" cy="11.25" r="0.90" />
-      <circle cx="6.25" cy="13.75" r="0.90" />
-      <circle cx="8.75" cy="13.75" r="0.90" />
-      <circle cx="11.25" cy="13.75" r="0.90" />
-      <circle cx="3.75" cy="16.25" r="0.90" />
-      <circle cx="6.25" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="1.25" cy="18.75" r="0.90" />
-      <circle cx="3.75" cy="18.75" r="0.90" />
-    </symbol>
-    <symbol id="px-shield" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="1.25" cy="1.25" r="0.90" />
-      <circle cx="3.75" cy="1.25" r="0.90" />
-      <circle cx="6.25" cy="1.25" r="0.90" />
-      <circle cx="8.75" cy="1.25" r="0.90" />
-      <circle cx="11.25" cy="1.25" r="0.90" />
-      <circle cx="13.75" cy="1.25" r="0.90" />
-      <circle cx="16.25" cy="1.25" r="0.90" />
-      <circle cx="18.75" cy="1.25" r="0.90" />
-      <circle cx="1.25" cy="3.75" r="0.90" />
-      <circle cx="18.75" cy="3.75" r="0.90" />
-      <circle cx="1.25" cy="6.25" r="0.90" />
-      <circle cx="6.25" cy="6.25" r="0.90" />
-      <circle cx="13.75" cy="6.25" r="0.90" />
-      <circle cx="18.75" cy="6.25" r="0.90" />
-      <circle cx="1.25" cy="8.75" r="0.90" />
-      <circle cx="18.75" cy="8.75" r="0.90" />
-      <circle cx="1.25" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="11.25" r="0.90" />
-      <circle cx="11.25" cy="11.25" r="0.90" />
-      <circle cx="18.75" cy="11.25" r="0.90" />
-      <circle cx="3.75" cy="13.75" r="0.90" />
-      <circle cx="8.75" cy="13.75" r="0.90" />
-      <circle cx="11.25" cy="13.75" r="0.90" />
-      <circle cx="16.25" cy="13.75" r="0.90" />
-      <circle cx="6.25" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="11.25" cy="16.25" r="0.90" />
-      <circle cx="13.75" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="18.75" r="0.90" />
-      <circle cx="11.25" cy="18.75" r="0.90" />
-    </symbol>
-    <symbol id="px-ticker" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="1.25" cy="3.75" r="0.90" />
-      <circle cx="3.75" cy="3.75" r="0.90" />
-      <circle cx="6.25" cy="3.75" r="0.90" />
-      <circle cx="8.75" cy="3.75" r="0.90" />
-      <circle cx="11.25" cy="3.75" r="0.90" />
-      <circle cx="13.75" cy="3.75" r="0.90" />
-      <circle cx="16.25" cy="3.75" r="0.90" />
-      <circle cx="18.75" cy="3.75" r="0.90" />
-      <circle cx="1.25" cy="6.25" r="0.90" />
-      <circle cx="6.25" cy="6.25" r="0.90" />
-      <circle cx="13.75" cy="6.25" r="0.90" />
-      <circle cx="18.75" cy="6.25" r="0.90" />
-      <circle cx="1.25" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="8.75" r="0.90" />
-      <circle cx="11.25" cy="8.75" r="0.90" />
-      <circle cx="18.75" cy="8.75" r="0.90" />
-      <circle cx="1.25" cy="11.25" r="0.90" />
-      <circle cx="3.75" cy="11.25" r="0.90" />
-      <circle cx="6.25" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="11.25" r="0.90" />
-      <circle cx="11.25" cy="11.25" r="0.90" />
-      <circle cx="13.75" cy="11.25" r="0.90" />
-      <circle cx="16.25" cy="11.25" r="0.90" />
-      <circle cx="18.75" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="13.75" r="0.90" />
-      <circle cx="11.25" cy="13.75" r="0.90" />
-      <circle cx="6.25" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="11.25" cy="16.25" r="0.90" />
-      <circle cx="13.75" cy="16.25" r="0.90" />
-    </symbol>
-    <symbol id="px-satellite" viewBox="0 0 20 20" fill="currentColor">
-      <circle cx="13.75" cy="1.25" r="0.90" />
-      <circle cx="16.25" cy="1.25" r="0.90" />
-      <circle cx="11.25" cy="3.75" r="0.90" />
-      <circle cx="13.75" cy="3.75" r="0.90" />
-      <circle cx="6.25" cy="6.25" r="0.90" />
-      <circle cx="8.75" cy="6.25" r="0.90" />
-      <circle cx="11.25" cy="6.25" r="0.90" />
-      <circle cx="3.75" cy="8.75" r="0.90" />
-      <circle cx="6.25" cy="8.75" r="0.90" />
-      <circle cx="8.75" cy="8.75" r="0.90" />
-      <circle cx="11.25" cy="8.75" r="0.90" />
-      <circle cx="6.25" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="11.25" r="0.90" />
-      <circle cx="11.25" cy="11.25" r="0.90" />
-      <circle cx="16.25" cy="11.25" r="0.90" />
-      <circle cx="8.75" cy="13.75" r="0.90" />
-      <circle cx="13.75" cy="13.75" r="0.90" />
-      <circle cx="6.25" cy="16.25" r="0.90" />
-      <circle cx="8.75" cy="16.25" r="0.90" />
-      <circle cx="11.25" cy="16.25" r="0.90" />
-      <circle cx="13.75" cy="16.25" r="0.90" />
-      <circle cx="16.25" cy="16.25" r="0.90" />
-      <circle cx="3.75" cy="18.75" r="0.90" />
-      <circle cx="6.25" cy="18.75" r="0.90" />
-      <circle cx="8.75" cy="18.75" r="0.90" />
-      <circle cx="11.25" cy="18.75" r="0.90" />
-      <circle cx="13.75" cy="18.75" r="0.90" />
-      <circle cx="16.25" cy="18.75" r="0.90" />
-      <circle cx="18.75" cy="18.75" r="0.90" />
-    </symbol>
     <symbol id="reg-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="0.8">
       <circle cx="8" cy="8" r="4.48" />
       <line x1="8" y1="0" x2="8" y2="16" />
@@ -488,6 +298,9 @@
   </svg>
 
   <!-- ═══ custom cursor ═══════════════════════════════════════════ -->
+  <!-- Lavender, not red: red is the LIVE dot in 06 and nothing else. The
+       second "finder" frame it used to swap to belonged to the grayscale
+       halftone photos, which this page no longer has. -->
   <div class="cursor-root pe-none position-fixed start-0 top-0 z-cursor" data-cursor-root aria-hidden="true" hidden>
     <svg class="cursor-ring" width="46" height="46" viewBox="0 0 46 46">
       <circle cx="23" cy="23" r="16" fill="none" stroke="currentColor" stroke-opacity=".28" stroke-width="1" />
@@ -497,22 +310,10 @@
       </g>
       <circle cx="23" cy="23" r="2.6" fill="currentColor" />
     </svg>
-    <svg class="cursor-finder" width="76" height="62" viewBox="0 0 76 62">
-      <path d="M2 16 L2 2 L16 2" fill="none" stroke="#fff" stroke-width="1.6" />
-      <path d="M60 2 L74 2 L74 16" fill="none" stroke="#fff" stroke-width="1.6" />
-      <path d="M74 46 L74 60 L60 60" fill="none" stroke="#fff" stroke-width="1.6" />
-      <path d="M16 60 L2 60 L2 46" fill="none" stroke="#fff" stroke-width="1.6" />
-      <circle cx="38" cy="31" r="1.6" fill="#fff" />
-      <circle cx="15" cy="31" r="2.4" fill="#E10600">
-        <animate attributeName="opacity" values="1;0.15;1" dur="1.2s" repeatCount="indefinite" />
-      </circle>
-      <text x="23" y="34.5" fill="#fff" font-size="8" letter-spacing="1.2"
-        style="font-family:var(--font-spacemono),monospace">REC</text>
-    </svg>
   </div>
 
   <!-- ═══ 00 · PRELOADER ══════════════════════════════════════════ -->
-  <div class="preloader position-fixed inset-0 z-loader overflow-hidden" data-preloader data-nav="dark">
+  <div class="preloader position-fixed inset-0 z-loader overflow-hidden" data-preloader>
     <canvas class="position-absolute inset-0 h-100 w-100" data-preloader-canvas></canvas>
 
     <div class="loader-col loader-col--left">
@@ -566,7 +367,7 @@
             </svg>
             <span data-menu-label>MENU</span>
           </button>
-          <a href="#on-air" class="pill pill-mono pill-ink" data-demo-pill>BOOK A DEMO</a>
+          <a href="#cta" class="pill pill-mono pill-white">BOOK A DEMO</a>
         </div>
       </div>
     </div>
@@ -620,7 +421,7 @@
   </div>
 
   <!-- section label -->
-  <div class="section-label pe-none position-fixed z-label d-none d-lg-flex align-items-center gap-2 is-dark"
+  <div class="section-label pe-none position-fixed z-label d-none d-lg-flex align-items-center gap-2"
     data-section-label aria-hidden="true">
     <span class="section-label__rule"></span>
     <span class="mono-xs" data-section-label-text>FRONT PAGE</span>
@@ -629,7 +430,7 @@
   <main id="top">
 
     <!-- ═══ 01 · HERO ═══════════════════════════════════════════════ -->
-    <section id="hero" class="hero position-relative" data-nav="dark" data-label="FRONT PAGE">
+    <section id="hero" class="hero position-relative" data-label="FRONT PAGE">
       <div class="position-sticky top-0 h-svh overflow-hidden">
         <div class="hero-globe z-1" data-globe-wrap>
           <div class="position-absolute inset-0" data-globe-dim>
@@ -653,7 +454,7 @@
               <span class="mono" style="color:rgba(255,255,255,.62)">ONE PLATFORM</span>
             </div>
 
-            <h1 class="display hero-head head-lilac" data-reveal data-reveal-start="top 96%">
+            <h1 class="display hero-head head-lilac">
               <span class="line-mask"><span class="line-inner">THE ENGINE BEHIND</span></span>
               <span class="line-mask"><span class="line-inner">MODERN NEWSROOMS</span></span>
             </h1>
@@ -663,7 +464,7 @@
             </p>
 
             <div class="mt-9 d-flex flex-wrap align-items-center gap-3">
-              <a href="#on-air" class="pill pill-white">Book a demo</a>
+              <a href="#cta" class="pill pill-white">Book a demo</a>
               <button class="pill pill-outline-inv" data-open-video><span class="play-tri"></span>Watch video</button>
             </div>
 
@@ -677,1897 +478,611 @@
           <div class="scroll-cue__line"></div>
         </div>
 
-        <div class="pe-none position-absolute inset-0 z-2 hero-sky" data-hero-sky></div>
       </div>
     </section>
 
-    <!-- ═══ 02 · FRONT PAGE ═════════════════════════════════════════ -->
-    <section id="front-page" class="tex-halftone position-relative" data-nav="light" data-label="FRONT PAGE"
-      style="background:#fff">
+    <!--
+      ═══ 01 — 11 ══════════════════════════════════════════════════════════
+
+      One template, eleven times:
+
+        <section class="ed ed--a|b">          one window tall, content centred
+          <div class="shell">
+            <div class="ed__grid">
+              <div class="ed__head">        eyebrow → headline → support
+              <div>                        ONE module
+          [optional] a single link
+
+      `data-in` marks what the entry animation moves and `--i` is its place in
+      the 80ms stagger; `data-label` feeds the fixed label down the left edge.
+      There is no `data-nav` any more — the chrome used it to invert over light
+      sections, and there are no light sections.
+
+      `.shell` rather than a new 1280px container on purpose. The brief asks
+      for both a 1280px container and the same left edge everywhere, and the
+      hero — which may not change — sits in `.shell`'s 1560px. The left edge
+      is the one a reader can see going from section to section, so the
+      sections share the hero's container and the text inside is capped in
+      `ch` instead.
+    -->
+
+    <!-- ═══ 01 · THE DESK ═══════════════════════════════════════════ -->
+    <section id="desk" class="ed ed--a" data-label="THE DESK">
       <div class="shell">
-        <div class="hair-b hair-t d-flex align-items-center justify-content-between gap-4 py-3">
-          <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-          <span class="mono-xs text-center" style="color:rgba(17,17,17,.55)">THE BLINK TIMES · VOL. 150+ · NEWSROOM
-            EDITION</span>
-          <span class="mono-xs d-none d-sm-block" style="color:rgba(17,17,17,.38)">NOIDA, 26 SEP 2026 — 14:32 IST</span>
-        </div>
-      </div>
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">01 — THE DESK</span>
+            <h2 class="display ed__h2" data-in style="--i:1">We build newsrooms.<br>We own <span
+                class="head-lilac">the uptime.</span></h2>
+            <p class="ed__sup" data-in style="--i:2">One platform. One accountable team.</p>
+          </div>
 
-      <div class="shell row gx-0 gy-14 pb-vh-7 pt-vh-7">
-        <div class="col-12 col-lg-7 front-main">
-          <div class="sticky-col sticky-col--high">
-            <figure class="halftone-media front-thumb position-relative mb-9" data-cursor="media">
-              <div
-                class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center gap-3 screen-bg">
-                <div class="screen-wall">
-                  <span style="background:var(--breaking);animation:flick 1.4s ease-in-out 0s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 1.8s ease-in-out .09s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 2.2s ease-in-out .18s infinite"></span>
-                  <span style="background:var(--blink);animation:flick 2.6s ease-in-out .27s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 3s ease-in-out .36s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out .45s infinite"></span>
-                  <span style="background:var(--blink);animation:flick 1.8s ease-in-out .54s infinite"></span>
-                  <span style="background:var(--breaking);animation:flick 2.2s ease-in-out .63s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 2.6s ease-in-out .72s infinite"></span>
-                  <span style="background:var(--blink);animation:flick 3s ease-in-out .81s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out .9s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 1.8s ease-in-out .99s infinite"></span>
-                  <span style="background:var(--blink);animation:flick 2.2s ease-in-out 1.08s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 2.6s ease-in-out 1.17s infinite"></span>
-                  <span style="background:var(--breaking);animation:flick 3s ease-in-out 1.26s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 1.4s ease-in-out 1.35s infinite"></span>
-                  <span style="background:var(--blink);animation:flick 1.8s ease-in-out 1.44s infinite"></span>
-                  <span style="background:rgba(255,255,255,.25);animation:flick 2.2s ease-in-out 1.53s infinite"></span>
-                </div>
-                <span class="mono-xs" style="color:rgba(255,255,255,.5)">
-                  <img src="./assets/images/news.jpg" alt="news" width="100%" />
-                </span>
-              </div>
-              <figcaption class="mono-xs front-caption" style="color:rgba(17,17,17,.4)">FIG. 01 · THE DESK AT NIGHT
-              </figcaption>
-            </figure>
-
-            <h2 class="display front-head mt-12" data-reveal>
-              <span class="line-mask"><span class="line-inner head-grey">WE BUILD</span></span>
-              <span class="line-mask"><span class="line-inner head-grey">NEWSROOMS.</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">WE OWN</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">THE UPTIME.</span></span>
-            </h2>
+          <div class="stats" data-in style="--i:3">
+            <div class="card">
+              <span class="display stat__figure" data-count-to="66" data-suffix="+">66+</span>
+              <span class="mono-xs stat__label">newsrooms powered</span>
+            </div>
+            <div class="card">
+              <span class="display stat__figure" data-count-to="43" data-suffix="K">43K</span>
+              <span class="mono-xs stat__label">concurrent readers</span>
+            </div>
+            <div class="card">
+              <span class="display stat__figure" data-count-to="20" data-suffix="+">20+</span>
+              <span class="mono-xs stat__label">fact-checking sites</span>
+            </div>
+            <div class="card">
+              <span class="display stat__figure" data-count-to="396" data-suffix="%">396%</span>
+              <span class="mono-xs stat__label">faster page loads</span>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="col-12 col-lg-5 hair-l front-aside">
-          <div class="sticky-col sticky-col--high">
+    <!-- ═══ 02 · THE QUESTION ═══════════════════════════════════════ -->
+    <!--
+      The question list and its answer panel. Deliberately not an accordion:
+      an accordion changes the section's height as it opens, and a section
+      that changes height cannot be promised to fit the window. The panel is a
+      fixed box whose contents cross-fade in 300ms, so choosing an answer
+      moves nothing on screen. Section 10 uses the same component.
+    -->
+    <section id="why-leave" class="ed ed--a ed--qa" data-label="THE QUESTION">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">02 — THE QUESTION</span>
+            <h2 class="display ed__h2" data-in style="--i:1">Why newsrooms <span class="head-lilac">leave
+                WordPress</span></h2>
+          </div>
 
-            <div class="hair-b d-flex align-items-center justify-content-between gap-3 pb-2">
-              <span class="mono-xs d-flex align-items-center gap-2" style="color:rgba(17,17,17,.45)">
-                <svg class="reg-mark" width="12" height="12" aria-hidden="true">
-                  <use href="#reg-mark" />
+          <div class="qa" data-qa data-in style="--i:2">
+            <div class="qa__list" role="tablist" aria-label="Why newsrooms leave WordPress">
+              <button class="qa__q" type="button" role="tab" aria-selected="true" aria-controls="qa-a-1"
+                data-qa-q="Auto-scales on AWS. Zero downtime at 43K concurrent readers."><i>01</i>Will it hold on
+                results night?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
+                data-qa-q="One. CMS, apps, paywall, ads and analytics together."><i>02</i>How many vendors is
+                that?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
+                data-qa-q="Google News setup and AI-SEO scoring on every story."><i>03</i>What happens to our
+                rankings?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
+                data-qa-q="No. You pay for features, not traffic."><i>04</i>Does the bill grow with traffic?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
+                data-qa-q="The extended tech team behind 150+ newsrooms. No ticket queues."><i>05</i>Who fixes it at 2
+                a.m.?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-1"
+                data-qa-q="396% faster. 1.5s on a Tamil daily at 20× its old traffic."><i>06</i>How fast do pages have
+                to be?</button>
+            </div>
+
+            <!-- the link sits beside the panel, never inside it: the panel is
+                 a fixed box sized for the longest answer, and anything else in
+                 it eats the room that answer needs -->
+            <div class="qa__side">
+              <div class="card qa__panel" id="qa-a-1" role="tabpanel" data-qa-panel>
+                <span class="mono-xs qa__count" data-qa-count>01 / 06</span>
+                <p class="qa__a" data-qa-a>Auto-scales on AWS. Zero downtime at 43K concurrent readers.</p>
+              </div>
+              <!-- only on screen in the states that trim the list above -->
+              <a class="mono-xs ed__link ed__link--overflow" href="#faq">Read the F.A.Q <span
+                  aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 03 · EVERY SCREEN ═══════════════════════════════════════ -->
+    <!--
+      Four separate SVGs, not one drawing, so a phone can leave the monitor
+      and the tablet out without a hole in the middle of the row. Each is
+      sized off one shared `--dev-h` capped by both the window's height and
+      its width; `height` plus `width: auto` on a viewBox'd SVG gives the
+      intrinsic ratio, so the row's total width follows on its own.
+    -->
+    <section id="every-screen" class="ed ed--b" data-label="EVERY SCREEN">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">03 — EVERY SCREEN</span>
+            <h2 class="display ed__h2" data-in style="--i:1">Every stage of <span class="head-lilac">the
+                story.</span></h2>
+            <p class="ed__sup" data-in style="--i:2">Publish once. Live on every screen.</p>
+          </div>
+
+          <div class="devices" data-in style="--i:3" aria-hidden="true">
+            <svg class="dev--monitor" viewBox="0 0 300 224" fill="none">
+              <rect x="0.6" y="0.6" width="298.8" height="178.8" rx="10" stroke="rgba(255,255,255,.14)" />
+              <rect x="10" y="10" width="280" height="160" rx="4" fill="rgba(97,24,234,.1)" />
+              <rect x="24" y="26" width="104" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
+              <rect x="24" y="44" width="170" height="7" rx="3.5" fill="currentColor" fill-opacity=".26" />
+              <rect x="24" y="70" width="120" height="84" rx="4" fill="rgba(255,255,255,.07)" />
+              <rect x="156" y="70" width="120" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="156" y="86" width="98" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="156" y="102" width="112" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="156" y="118" width="74" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="156" y="140" width="56" height="14" rx="7" fill="currentColor" fill-opacity=".3" />
+              <path d="M150 180v26" stroke="rgba(255,255,255,.14)" />
+              <path d="M112 212h76" stroke="rgba(255,255,255,.14)" stroke-width="5" stroke-linecap="round" />
+            </svg>
+
+            <svg class="dev--laptop" viewBox="0 0 320 212" fill="none">
+              <rect x="22.6" y="0.6" width="274.8" height="178.8" rx="10" stroke="rgba(255,255,255,.14)" />
+              <rect x="32" y="10" width="256" height="160" rx="4" fill="rgba(97,24,234,.1)" />
+              <rect x="46" y="26" width="92" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
+              <rect x="46" y="48" width="148" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="46" y="64" width="128" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="46" y="88" width="228" height="60" rx="4" fill="rgba(255,255,255,.07)" />
+              <path d="M2 186h316l-14 20H16Z" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)" />
+            </svg>
+
+            <svg class="dev--tablet" viewBox="0 0 160 220" fill="none">
+              <rect x="0.6" y="0.6" width="158.8" height="218.8" rx="14" stroke="rgba(255,255,255,.14)" />
+              <rect x="9" y="9" width="142" height="202" rx="8" fill="rgba(97,24,234,.1)" />
+              <rect x="22" y="26" width="62" height="7" rx="3.5" fill="currentColor" fill-opacity=".5" />
+              <rect x="22" y="46" width="116" height="62" rx="4" fill="rgba(255,255,255,.07)" />
+              <rect x="22" y="122" width="116" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="22" y="138" width="96" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="22" y="154" width="108" height="7" rx="3.5" fill="rgba(255,255,255,.16)" />
+              <rect x="22" y="176" width="48" height="13" rx="6.5" fill="currentColor" fill-opacity=".3" />
+            </svg>
+
+            <svg class="dev--phone" viewBox="0 0 108 212" fill="none">
+              <rect x="0.6" y="0.6" width="106.8" height="210.8" rx="16" stroke="rgba(255,255,255,.14)" />
+              <rect x="8" y="8" width="92" height="196" rx="10" fill="rgba(97,24,234,.1)" />
+              <rect x="42" y="14" width="24" height="4" rx="2" fill="rgba(255,255,255,.2)" />
+              <rect x="19" y="32" width="44" height="6" rx="3" fill="currentColor" fill-opacity=".5" />
+              <rect x="19" y="50" width="70" height="44" rx="4" fill="rgba(255,255,255,.07)" />
+              <rect x="19" y="106" width="70" height="6" rx="3" fill="rgba(255,255,255,.16)" />
+              <rect x="19" y="120" width="56" height="6" rx="3" fill="rgba(255,255,255,.16)" />
+              <rect x="19" y="134" width="64" height="6" rx="3" fill="rgba(255,255,255,.16)" />
+              <rect x="19" y="156" width="40" height="12" rx="6" fill="currentColor" fill-opacity=".3" />
+              <rect x="34" y="188" width="40" height="4" rx="2" fill="rgba(255,255,255,.2)" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 · OUR PLATFORM ═══════════════════════════════════════ -->
+    <section id="platform" class="ed ed--b" data-label="OUR PLATFORM">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">04 — OUR PLATFORM</span>
+            <h2 class="display ed__h2" data-in style="--i:1">One platform. <span class="head-lilac">Six
+                desks.</span></h2>
+          </div>
+
+          <div data-in style="--i:2" class="w-100">
+            <div class="rail" style="--cols:3" data-rail aria-label="The six modules">
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-mic" />
                 </svg>
-                THE BRIEF
-              </span>
-              <span class="mono-xs" style="color:rgba(17,17,17,.3)">P. 01</span>
+                <h3 class="display card__title">The Reporter</h3>
+                <p class="card__desc mt-2">Stringer app, assignments, offline filing</p>
+              </article>
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-pen" />
+                </svg>
+                <h3 class="display card__title">The AI Editor</h3>
+                <p class="card__desc mt-2">Auto-tagging, suggestions, full AI drafts</p>
+              </article>
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-globe" />
+                </svg>
+                <h3 class="display card__title">The Edition</h3>
+                <p class="card__desc mt-2">Web, AMP, PWA, Android, iOS</p>
+              </article>
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-lock" />
+                </svg>
+                <h3 class="display card__title">The Subscriber</h3>
+                <p class="card__desc mt-2">Time, dynamic and hard paywalls</p>
+              </article>
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-newspaper" />
+                </svg>
+                <h3 class="display card__title">The E-Paper</h3>
+                <p class="card__desc mt-2">Hosting, clip and share, editions</p>
+              </article>
+              <article class="card">
+                <svg class="px-icon mb-3" width="18" height="18" style="color:var(--blink-lift)" aria-hidden="true">
+                  <use href="#px-chart" />
+                </svg>
+                <h3 class="display card__title">The Analyst</h3>
+                <p class="card__desc mt-2">Real-time analytics, GA4, AI-SEO score</p>
+              </article>
+            </div>
+            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 05 · THE FLOW ═══════════════════════════════════════════ -->
+    <!--
+      The pipeline. Sources on the left, the six stages on a rail, the
+      channels it comes out on to the right, and one readout line underneath
+      that follows whichever stage you point at or select.
+
+      No SVG and no measuring this time. The old version drew its curves into
+      an SVG from the pills' own measured positions and redrew them on every
+      resize; a straight rail behind the chips is a CSS pseudo-element that
+      cannot go out of sync, and below lg the same markup stands up into a
+      vertical stepper with one line of CSS rather than a second layout.
+    -->
+    <section id="flow" class="ed ed--b" data-label="THE FLOW">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">05 — THE FLOW</span>
+            <h2 class="display ed__h2" data-in style="--i:1">From source to <span class="head-lilac">every
+                screen.</span></h2>
+          </div>
+
+          <div class="flow" data-flow data-in style="--i:2">
+            <div class="flow__ends">
+              <span class="mono-xs flow__end">Reporters</span>
+              <span class="mono-xs flow__end">Stringers</span>
+              <span class="mono-xs flow__end">Wires</span>
             </div>
 
-            <p class="body-copy dropcap mt-5" style="max-width:38ch">
-              One platform, one accountable team. No plugin patchwork, no vendor ping-pong, just your extended tech team
-              from first draft to final click.
+            <div class="flow__rail" role="tablist" aria-label="The six stages">
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="true"
+                aria-controls="flow-read" data-flow-stage data-flow-line="Reporters, stringers, wires and RSS into one queue.">
+                Gather</button>
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
+                aria-controls="flow-read" data-flow-stage data-flow-line="Auto-tagging, story suggestions and full AI drafts.">
+                Create</button>
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
+                aria-controls="flow-read" data-flow-stage data-flow-line="Roles, approval workflows and checkpoints tracking TAT.">
+                Approve</button>
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
+                aria-controls="flow-read" data-flow-stage data-flow-line="One story out to web, AMP, PWA and apps.">
+                Publish</button>
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
+                aria-controls="flow-read" data-flow-stage data-flow-line="Ad inventory and networks, plus three paywall types.">
+                Monetize</button>
+              <button class="mono-xs flow__stage" type="button" role="tab" aria-selected="false"
+                aria-controls="flow-read" data-flow-stage data-flow-line="Real-time GA4 and publisher metrics.">
+                Analyze</button>
+            </div>
+
+            <div class="flow__ends flow__ends--out">
+              <span class="mono-xs flow__end">Web</span>
+              <span class="mono-xs flow__end">App</span>
+              <span class="mono-xs flow__end">Google News</span>
+              <span class="mono-xs flow__end">Social</span>
+              <span class="mono-xs flow__end">Newsletter</span>
+            </div>
+
+            <p class="flow__read" id="flow-read" role="tabpanel" data-flow-read>
+              <b data-flow-name>GATHER</b>
+              <span data-flow-copy>Reporters, stringers, wires and RSS into one queue.</span>
             </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <a href="#platform" class="pill pill-outline pill-mono mt-7">ABOUT BLINK</a>
+    <!-- ═══ 06 · LIVE ═══════════════════════════════════════════════ -->
+    <section id="live" class="ed ed--a" data-label="LIVE">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">06 — LIVE</span>
+            <h2 class="display ed__h2" data-in style="--i:1">Reliability on <span class="head-lilac">every
+                deadline.</span></h2>
+            <p class="ed__sup" data-in style="--i:2">Breaking news doesn't wait. Neither do we.</p>
+          </div>
 
-            <!-- index box, the way a front page carries its contents -->
-            <nav class="edition-index mt-10">
-              <div class="hair-b d-flex align-items-center justify-content-between pb-2">
-                <span class="mono-xs" style="color:rgba(17,17,17,.45)">IN THIS EDITION</span>
-                <span class="mono-xs" style="color:rgba(17,17,17,.3)">06 SECTIONS</span>
+          <div class="live-stack" data-in style="--i:3">
+            <!-- The one red thing on the page. -->
+            <div class="card live-card">
+              <span class="mono-xs live-card__top">
+                <span class="live-card__flag"><span class="live-dot"></span>LIVE</span>
+                <span>14:32 IST</span>
+              </span>
+              <span class="display live-card__line">Desk holds at full load</span>
+              <span class="live-card__trace" aria-hidden="true">
+                <i style="--h:46%"></i><i style="--h:68%"></i><i style="--h:57%"></i><i style="--h:79%"></i><i
+                  style="--h:63%"></i><i style="--h:88%"></i><i style="--h:71%"></i><i style="--h:94%"></i>
+              </span>
+            </div>
+
+            <div class="rail" style="--cols:2" data-rail>
+              <article class="card">
+                <h3 class="display card__title">Auto-scaling cloud</h3>
+                <p class="card__desc mt-2">Zero downtime at 43K readers</p>
+              </article>
+              <article class="card">
+                <h3 class="display card__title">Real-time desk view</h3>
+                <p class="card__desc mt-2">Checkpoints and TAT per desk</p>
+              </article>
+            </div>
+            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 07 · THE PRESS ══════════════════════════════════════════ -->
+    <section id="press" class="ed ed--a" data-label="THE PRESS">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">07 — THE PRESS</span>
+            <h2 class="display ed__h2" data-in style="--i:1">Trusted <span class="head-lilac">across India.</span></h2>
+          </div>
+
+          <div data-in style="--i:2" class="w-100">
+            <div class="rail" style="--cols:3" data-rail aria-label="Three newsrooms">
+              <article class="card">
+                <h3 class="mono-xs case__name">Daily Thanthi <span style="color:var(--txt-3)">01</span></h3>
+                <div class="case__nums">
+                  <span><b class="display case__num">20×</b><span class="mono-xs case__cap">growth</span></span>
+                  <span><b class="display case__num">1.5s</b><span class="mono-xs case__cap">load time</span></span>
+                  <span><b class="display case__num">83%</b><span class="mono-xs case__cap">search
+                      discovery</span></span>
+                </div>
+              </article>
+              <article class="card">
+                <h3 class="mono-xs case__name">The Hans India <span style="color:var(--txt-3)">02</span></h3>
+                <div class="case__nums">
+                  <span><b class="display case__num">2 MO</b><span class="mono-xs case__cap">record
+                      traffic</span></span>
+                  <span><b class="display case__num">43K</b><span class="mono-xs case__cap">concurrent
+                      users</span></span>
+                  <span><b class="display case__num">ZERO</b><span class="mono-xs case__cap">downtime</span></span>
+                </div>
+              </article>
+              <article class="card">
+                <h3 class="mono-xs case__name">LiveLaw <span style="color:var(--txt-3)">03</span></h3>
+                <div class="case__nums">
+                  <span><b class="display case__num">−30%</b><span class="mono-xs case__cap">bounce rate</span></span>
+                  <span><b class="display case__num">10s</b><span class="mono-xs case__cap">faster pages</span></span>
+                </div>
+              </article>
+            </div>
+            <div class="rail__dots" data-rail-dots aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 08 · LETTERS ════════════════════════════════════════════ -->
+    <!--
+      One quote at a time in a fixed-height panel, for the same reason the
+      answer panel in 02 is fixed: a taller quote must not make the section
+      taller. Below it the publishers run as one slow row — the 5×4 masthead
+      wall this replaces was two screens tall on its own.
+    -->
+    <section id="letters" class="ed ed--b" data-label="LETTERS">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">08 — LETTERS</span>
+            <h2 class="display ed__h2" data-in style="--i:1">In <span class="head-lilac">their words.</span></h2>
+          </div>
+
+          <div data-in style="--i:2" class="w-100" data-quotes>
+            <div class="quote" data-quote-panel>
+              <p class="quote__text" data-quote-text>Our reporters file from the district in Tamil, on their phones,
+                and it reaches the front page.</p>
+              <p class="mono-xs quote__by"><b data-quote-name>Kavitha Iyer</b><span data-quote-org>Daily
+                  Thanthi</span></p>
+            </div>
+
+            <div class="quote__nav">
+              <button class="quote__arrow" type="button" data-quote-prev aria-label="Previous letter">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M9 2 4 7l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </button>
+              <span class="mono-xs" data-quote-count>01 / 02</span>
+              <button class="quote__arrow" type="button" data-quote-next aria-label="Next letter">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="marquee logos mt-6" data-marquee aria-label="Publishers using Blink CMS">
+              <div class="marquee-track">
+                <span class="display">Daily Thanthi</span>
+                <span class="display">The Hans India</span>
+                <span class="display">LiveLaw</span>
+                <span class="display">The Federal</span>
+                <span class="display">Madhyamam</span>
+                <span class="display">TV5 Telugu</span>
+                <span class="display">Deccan Chronicle</span>
+                <span class="display">The Asian Age</span>
+                <span class="display">MediaOne</span>
+                <span class="display">Maalaimalar</span>
+                <span class="display">Bhaskar Hindi</span>
+                <span class="display">The Assam Tribune</span>
+                <span class="display">Millennium Post</span>
+                <span class="display">Medical Dialogues</span>
+                <span class="display">Tupaki</span>
+                <span class="display">BOOM</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-              <a href="#desk" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">01</span>
-                <span class="display t-sm flex-grow-1">THE DESK</span>
-                <span class="mono-xs edition-row__go">→</span>
+    <!-- ═══ 09 · THE WIRE ═══════════════════════════════════════════ -->
+    <section id="the-wire" class="ed ed--a" data-label="THE WIRE">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">09 — THE WIRE</span>
+            <h2 class="display ed__h2" data-in style="--i:1">What's <span class="head-lilac">moving.</span></h2>
+          </div>
+
+          <div data-in style="--i:2" class="w-100">
+            <div class="wire">
+              <a class="wire__row" href="/blog/">
+                <span class="mono-xs wire__date">26 SEP 2026</span>
+                <span class="wire__title">How a Tamil daily grew 20×</span>
+                <span class="wire__go" aria-hidden="true">→</span>
               </a>
-              <a href="#platform" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">02</span>
-                <span class="display t-sm flex-grow-1">OUR PLATFORM</span>
-                <span class="mono-xs edition-row__go">→</span>
+              <a class="wire__row" href="/blog/">
+                <span class="mono-xs wire__date">19 SEP 2026</span>
+                <span class="wire__title">AI story creation in the editor</span>
+                <span class="wire__go" aria-hidden="true">→</span>
               </a>
-              <a href="#live" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">03</span>
-                <span class="display t-sm flex-grow-1">LIVE</span>
-                <span class="mono-xs edition-row__go">→</span>
+              <a class="wire__row" href="/blog/">
+                <span class="mono-xs wire__date">11 SEP 2026</span>
+                <span class="wire__title">Leaving WordPress without losing SEO</span>
+                <span class="wire__go" aria-hidden="true">→</span>
               </a>
-              <a href="#press" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">04</span>
-                <span class="display t-sm flex-grow-1">THE PRESS</span>
-                <span class="mono-xs edition-row__go">→</span>
+              <a class="wire__row" href="/blog/">
+                <span class="mono-xs wire__date">02 SEP 2026</span>
+                <span class="wire__title">Running a live results desk</span>
+                <span class="wire__go" aria-hidden="true">→</span>
               </a>
-              <a href="#letters" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">05</span>
-                <span class="display t-sm flex-grow-1">LETTERS</span>
-                <span class="mono-xs edition-row__go">→</span>
-              </a>
-              <a href="#the-wire" class="edition-row hair-b d-flex align-items-baseline gap-4 py-3">
-                <span class="mono-xs edition-row__num">06</span>
-                <span class="display t-sm flex-grow-1">THE WIRE</span>
-                <span class="mono-xs edition-row__go">→</span>
-              </a>
-            </nav>
-
-            <div class="d-flex align-items-center gap-3 mt-6">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono-xs" style="color:rgba(17,17,17,.34)">BY THE BLINK DESK · NOIDA</span>
             </div>
-
+            <a class="mono-xs ed__link ed__link--overflow mt-5" href="/blog/">View all <span
+                aria-hidden="true">→</span></a>
           </div>
-        </div>
-      </div>
-
-      <div class="shell front-stats">
-        <div class="hair-t d-flex align-items-center gap-3 pt-5">
-          <span class="live-dot"></span>
-          <span class="mono-xs" style="color:rgba(17,17,17,.45)">FROM MILLIONS OF STORIES, CLARITY EMERGES</span>
-        </div>
-
-        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
-          <span class="display t-stat" data-count-to="150" data-suffix="+">0+</span>
-          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">newsrooms powered</span>
-        </div>
-        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
-          <span class="display t-stat" data-count-to="43" data-suffix="K">0K</span>
-          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">concurrent readers, zero
-            downtime</span>
-        </div>
-        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
-          <span class="display t-stat" data-count-to="20" data-suffix="+">0+</span>
-          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">fact-checking sites</span>
-        </div>
-        <div class="hair-b d-flex flex-column align-items-baseline justify-content-between gap-1 py-2 flex-sm-row">
-          <span class="display t-stat" data-count-to="400" data-suffix="%">0%</span>
-          <span class="mono pb-3 pb-sm-6 text-end" style="color:rgba(17,17,17,.5)">faster page loads</span>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 03 · WHY NEWSROOMS LEAVE ════════════════════════════════ -->
-    <section id="why-leave" class="tex-halftone position-relative" data-nav="light" data-label="EDITORIAL"
-      style="background:var(--newsprint)">
-      <div class="shell sec-pad">
-
-        <div class="row g-8 align-items-end">
-          <div class="col-12 col-lg-7">
-            <div class="mb-6 d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.5)">EDITORIAL · WHY NEWSROOMS MOVE</span>
-            </div>
-            <h2 class="display leave-head" data-reveal>
-              <span class="line-mask"><span class="line-inner head-grey">WHY NEWSROOMS</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">LEAVE WORDPRESS</span></span>
-            </h2>
+    <!-- ═══ 10 · QUESTIONS ══════════════════════════════════════════ -->
+    <section id="faq" class="ed ed--a ed--qa" data-label="QUESTIONS">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">10 — QUESTIONS</span>
+            <h2 class="display ed__h2" data-in style="--i:1">Questions, <span class="head-lilac">answered.</span></h2>
           </div>
-          <div class="col-12 col-lg-5 front-aside">
-            <p class="body-copy" style="color:rgba(17,17,17,.6)">Six things publishers raise when they move, and what
-              Blink does about each one.</p>
-            <div class="hair-t mt-6 d-flex align-items-center gap-2 pt-4">
-              <svg class="reg-mark" width="13" height="13" aria-hidden="true" style="color:rgba(17,17,17,.3)">
-                <use href="#reg-mark" />
-              </svg>
-              <span class="mono-xs" style="color:rgba(17,17,17,.34)">SIX ENTRIES · ANSWERS AS SUPPLIED</span>
+
+          <div class="qa" data-qa data-in style="--i:2">
+            <div class="qa__list" role="tablist" aria-label="Frequently asked questions">
+              <button class="qa__q" type="button" role="tab" aria-selected="true" aria-controls="qa-a-2"
+                data-qa-q="The whole newsroom: gather, create, publish, monetize, analyze. One platform, one accountable team."><i>01</i>What
+                does Blink CMS do?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
+                data-qa-q="Technical SEO, schema, Google News feeds and AMP are built in. Our webmasters set it up."><i>02</i>Can
+                we migrate without losing SEO?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
+                data-qa-q="Yes. Auto-scaling on AWS with a CDN. Measured at 43K concurrent readers, zero downtime."><i>03</i>Will
+                the site survive a spike?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
+                data-qa-q="No. Billing is by features — storage, bandwidth and seats, never by how many people read you."><i>04</i>Do
+                you charge more as traffic grows?</button>
+              <button class="qa__q" type="button" role="tab" aria-selected="false" aria-controls="qa-a-2"
+                data-qa-q="Write to sales@blinkcms.ai or call +91 88858 58900. Most newsrooms start on the Demo plan."><i>05</i>How
+                do we get a demo?</button>
             </div>
-          </div>
-        </div>
 
-
-        <ol class="leaves list-unstyled mt-vh-7" data-leaves>
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#111111">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">01</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">WILL IT HOLD ON RESULTS NIGHT?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">Traffic spikes scale automatically on AWS. Zero downtime at 43K
-                concurrent readers.</p>
-              <span class="mono-xs leave-row__tag">AUTO-SCALING CLOUD</span>
-            </div>
-          </li>
-
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#6118EA">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">02</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">HOW MANY VENDORS IS THAT?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">CMS, apps, paywall, ads and analytics under one roof. One platform,
-                not five vendors.</p>
-              <span class="mono-xs leave-row__tag">ONE PLATFORM</span>
-            </div>
-          </li>
-
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#E10600">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">03</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">WHAT HAPPENS TO OUR RANKINGS?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">Google News setup, monitoring and fixes handled for you, with an
-                H-SEO score on every story.</p>
-              <span class="mono-xs leave-row__tag">SEO YOU CAN TRUST</span>
-            </div>
-          </li>
-
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#111111">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">04</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">DOES THE BILL GROW WITH THE TRAFFIC?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">No. Billing is by features.</p>
-              <span class="mono-xs leave-row__tag">PAY FOR FEATURES, NOT TRAFFIC</span>
-            </div>
-          </li>
-
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#6118EA">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">05</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">WHO FIXES IT AT 2 A.M.?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">The extended tech team behind 150+ newsrooms. No ticket queues, no
-                runaround.</p>
-              <span class="mono-xs leave-row__tag">WEBMASTER SUPPORT</span>
-            </div>
-          </li>
-
-          <li class="leave-row row g-4 align-items-start py-6" data-leave style="--accent:#E10600">
-            <span class="leave-row__rail" aria-hidden="true"></span>
-            <span class="mono-xs col-12 col-sm-1 leave-row__num">06</span>
-            <h3 class="display col-12 col-sm-5 leave-row__q">HOW FAST DO PAGES HAVE TO BE?</h3>
-            <div class="col-12 col-sm-6 leave-row__a">
-              <p class="body-copy leave-row__copy">400% faster page loads, and 1.5s on a Tamil daily running 20× the
-                traffic it used to.</p>
-              <span class="mono-xs leave-row__tag">FASTER PAGES</span>
-            </div>
-          </li>
-        </ol>
-
-        <div class="hair-t mt-6 d-flex flex-wrap align-items-center justify-content-between gap-4 pt-5">
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">MIGRATIONS RUN BY THE SAME TEAM THAT RUNS THE
-            PLATFORM</span>
-          <a href="#faq" class="pill pill-outline pill-mono">READ THE F.A.Q</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 04 · THE DESK ═══════════════════════════════════════════ -->
-    <section id="desk" class="tex-halftone position-relative" data-nav="light" data-label="THE DESK"
-      style="background:#fff">
-      <div class="pin-stage">
-        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="desk"></canvas>
-        <div class="shell pe-none position-absolute inset-x-0 z-2 d-flex flex-column gap-2" style="top:76px">
-          <div class="d-flex align-items-end justify-content-between gap-6">
-            <div class="d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.62)">CREATE · THE HEADLINE IS WRITTEN</span>
-            </div>
-            <div class="mono-xs d-none d-sm-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)">
-              ONE STORY · EVERY SCREEN
-              <svg class="reg-mark" width="13" height="13" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
+            <div class="qa__side">
+              <div class="card qa__panel" id="qa-a-2" role="tabpanel" data-qa-panel>
+                <span class="mono-xs qa__count" data-qa-count>01 / 05</span>
+                <p class="qa__a" data-qa-a>The whole newsroom: gather, create, publish, monetize, analyze. One
+                  platform, one accountable team.</p>
+              </div>
+              <a class="mono-xs ed__link" href="/faq/">View all FAQs <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══ 05 · OUR PLATFORM ═══════════════════════════════════════ -->
-    <section id="platform" class="position-relative" data-nav="light" data-label="THE DESK" style="background:#fff">
-      <div class="pin-stage">
-        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="platform"></canvas>
-
-        <div class="display t-giant platform-word pe-none" data-platform-word aria-hidden="true">OUR PLATFORM</div>
-
-        <div class="shell position-relative z-2 platform-head">
-          <div class="d-flex align-items-end justify-content-between gap-6">
-            <div class="d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.55)">OUR PLATFORM</span>
-            </div>
-            <p class="mono-xs mw-30ch text-end" style="color:rgba(17,17,17,.45)">Everything your newsroom needs. Under
-              one platform.</p>
+    <!-- ═══ 11 · FRONT PAGE ═════════════════════════════════════════ -->
+    <section id="cta" class="ed ed--b ed--cta" data-label="FRONT PAGE">
+      <div class="shell">
+        <div class="ed__grid">
+          <div class="ed__head">
+            <span class="mono-xs ed__eyebrow" data-in style="--i:0">11 — FRONT PAGE</span>
+            <h2 class="display ed__h2" data-in style="--i:1">A newsroom that works <span class="head-lilac">as hard as
+                you do.</span></h2>
+            <p class="ed__sup" data-in style="--i:2">The tech team behind 150+ newsrooms.</p>
+            <div data-in style="--i:3"><a href="/contact/" class="pill pill-white">Book a demo</a></div>
           </div>
         </div>
-
-        <div class="shell platform-cards row row-cols-2 row-cols-lg-3 g-3 z-2">
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#111111">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">01</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-mic" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE REPORTER</h3>
-              <p class="platform-card__body">Stringer app, assignments, offline filing, payments.</p>
-            </div>
-          </div>
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#6118EA">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">02</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-pen" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE AI EDITOR</h3>
-              <p class="platform-card__body">Auto-tagging, story suggestions, full AI drafts.</p>
-            </div>
-          </div>
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#E10600">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">03</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-phone" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE EDITION</h3>
-              <p class="platform-card__body">Web, AMP, PWA, Android &amp; iOS.</p>
-            </div>
-          </div>
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#111111">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">04</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-lock" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE SUBSCRIBER</h3>
-              <p class="platform-card__body">Time, dynamic &amp; hard paywalls, coupons, gift plans.</p>
-            </div>
-          </div>
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#6118EA">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">05</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-newspaper" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE E-PAPER</h3>
-              <p class="platform-card__body">Hosting, clip &amp; share, edition management.</p>
-            </div>
-          </div>
-          <div class="col">
-            <div class="platform-card d-flex flex-column" data-platform-card style="--accent:#E10600">
-              <span class="platform-card__band" aria-hidden="true"></span>
-              <span class="platform-card__sweep" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm platform-card__num">06</span>
-                <span class="platform-card__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-chart" />
-                  </svg>
-                </span>
-              </div>
-              <h3 class="display t-sm platform-card__title">THE ANALYST</h3>
-              <p class="platform-card__body">Real-time analytics, GA4, H-SEO score.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="shell pe-none position-absolute inset-x-0 bottom-5 z-2 d-flex justify-content-between">
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">DELIVERY LINE · EDITION LIVE</span>
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">WEB · AMP · PWA · APP</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 06 · HOW IT WORKS ═══════════════════════════════════════ -->
-    <section id="how-it-works" class="tex-halftone position-relative" data-nav="light" data-label="THE DESK"
-      style="background:#fff">
-      <div class="shell sec-pad">
-
-        <div class="row g-8 align-items-end">
-          <div class="col-12 col-lg-7">
-            <div class="mb-6 d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.5)">HOW IT WORKS</span>
-            </div>
-            <h2 class="display steps-head" data-reveal>
-              <span class="line-mask"><span class="line-inner head-grey">HOW A STORY</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">GETS OUT</span></span>
-            </h2>
-          </div>
-          <div class="col-12 col-lg-5 front-aside">
-            <p class="body-copy" style="color:rgba(17,17,17,.6)">Everything a story passes through, from the moment it
-              reaches the
-              desk to the moment it reaches a reader. Three of those stages are modules you'll
-              recognise.</p>
-          </div>
-        </div>
-        <!-- The journey end to end: what comes in, the six stages it passes
-             through, and where it goes out. The curves are drawn by
-             setupPipeline() from the pills' measured positions, so they stay
-             exact at any width. Below lg it becomes a plain vertical list. -->
-        <div class="pipe mt-vh-7" data-pipe>
-          <svg class="pipe__wires" aria-hidden="true" data-pipe-wires preserveAspectRatio="none"></svg>
-
-          <div class="pipe__col pipe__col--in">
-            <span class="mono-xs pipe__coltitle">NEWSROOM INPUTS</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Reporters</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Stringers</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-in>Wires &amp; alerts</span>
-          </div>
-
-          <div class="pipe__spine">
-            <span class="pipe__rail" aria-hidden="true"></span>
-            <span class="pipe__pulse" aria-hidden="true"></span>
-            <span class="pipe__ink" aria-hidden="true"></span>
-            <ol class="pipe__stages list-unstyled" style="--n:6">
-              <li class="pipe__stage" data-pipe-stage style="--i:0">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Gather</span>
-                <span class="pipe__desc">Reporters, stringers, agency feeds, RSS and reader contributions, all into one queue.</span>
-              </li>
-              <li class="pipe__stage" data-pipe-stage style="--i:1">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Create</span>
-                <span class="pipe__desc">The editor: auto-tagging, story suggestions, full AI drafts, schema built in.</span>
-              </li>
-              <li class="pipe__stage" data-pipe-stage style="--i:2">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Approve</span>
-                <span class="pipe__desc">Roles and permissions, approval workflows, and story checkpoints that track TAT.</span>
-              </li>
-              <li class="pipe__stage" data-pipe-stage style="--i:3">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Publish</span>
-                <span class="pipe__desc">One story out to web, AMP, PWA, Android and iOS.</span>
-              </li>
-              <li class="pipe__stage" data-pipe-stage style="--i:4">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Monetize</span>
-                <span class="pipe__desc">Ad inventory and networks, plus time, dynamic and hard paywalls.</span>
-              </li>
-              <li class="pipe__stage" data-pipe-stage style="--i:5">
-                <span class="pipe__stem" aria-hidden="true"></span>
-                <span class="pipe__node" aria-hidden="true"></span>
-                <span class="pipe__pill">Analyze</span>
-                <span class="pipe__desc">Real-time analytics, GA4 and publisher metrics on every story.</span>
-              </li>
-            </ol>
-          </div>
-
-          <div class="pipe__col pipe__col--out">
-            <span class="mono-xs pipe__coltitle">AUDIENCE CHANNELS</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot"
-                aria-hidden="true"></i>Website</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Mobile
-              app</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Google
-              News</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot" aria-hidden="true"></i>Social
-              &amp; push</span>
-            <span class="pipe__pill pipe__pill--edge" data-pipe-out><i class="pipe__dot"
-                aria-hidden="true"></i>Newsletter</span>
-          </div>
-        </div>
-
-          <!-- Follows the stage the scroll has reached, and switches to
-               whatever you point at. The same copy also sits inside each
-               stage as `.pipe__desc`, which is what a phone shows and what
-               is there with no JavaScript. -->
-          <div class="pipe-readout" data-pipe-readout>
-            <span class="mono-xs pipe-readout__num" data-pipe-readout-num>01 / 06</span>
-            <span class="display pipe-readout__name" data-pipe-readout-name>GATHER</span>
-            <p class="body-copy pipe-readout__copy" data-pipe-readout-copy>Reporters, stringers, agency feeds, RSS and reader contributions, all into one queue.</p>
-          </div>
-        <!-- <ol class="steps row row-cols-1 row-cols-md-3 g-6 list-unstyled mt-vh-7" data-steps>
-          <li class="col step" data-step style="--accent:#111111">
-            <div class="step__body">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="step__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-mic" />
-                  </svg>
-                </span>
-                <span class="mono-xs step__num">01 / 03</span>
-              </div>
-              <h3 class="display step__title">FILE IT</h3>
-              <p class="body-copy step__copy">A reporter files from the field. Assignments, offline filing and payments
-                sit in the same app.</p>
-              <a href="/platform/#the-reporter" class="mono-xs step__module">THE REPORTER <span
-                  aria-hidden="true">→</span></a>
-            </div>
-          </li>
-
-          <li class="col step" data-step style="--accent:#6118EA">
-            <div class="step__body">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="step__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-pen" />
-                  </svg>
-                </span>
-                <span class="mono-xs step__num">02 / 03</span>
-              </div>
-              <h3 class="display step__title">EDIT IT</h3>
-              <p class="body-copy step__copy">Auto-tagging, story suggestions and full AI drafts, inside the editor the
-                desk
-                already works in.</p>
-              <a href="/platform/#the-ai-editor" class="mono-xs step__module">THE AI EDITOR <span
-                  aria-hidden="true">→</span></a>
-            </div>
-          </li>
-
-          <li class="col step" data-step style="--accent:#E10600">
-            <div class="step__body">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="step__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-phone" />
-                  </svg>
-                </span>
-                <span class="mono-xs step__num">03 / 03</span>
-              </div>
-              <h3 class="display step__title">PUBLISH IT</h3>
-              <p class="body-copy step__copy">One story, published to web, AMP, PWA, Android and iOS off the same
-                desk.</p>
-              <a href="/platform/#the-edition" class="mono-xs step__module">THE EDITION <span
-                  aria-hidden="true">→</span></a>
-            </div>
-          </li>
-        </ol> -->
-
-        <div class="hair-t mt-12 d-flex flex-wrap align-items-center justify-content-between gap-3 pt-5">
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">ONE PLATFORM · NO HAND-OFFS BETWEEN VENDORS</span>
-          <span class="mono-xs" style="color:rgba(17,17,17,.4)">GATHER → CREATE → APPROVE → PUBLISH → MONETIZE →
-            ANALYZE</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 07 · LIVE ═══════════════════════════════════════════════ -->
-    <section id="live" class="tex-halftone position-relative" data-nav="light" data-label="LIVE"
-      style="background:#fff">
-      <div class="shell row gx-8 gy-12 sec-pad">
-        <div class="col-12 col-lg-4">
-          <div class="sticky-col">
-            <div class="mono-xs mb-5 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.45)">
-              <span class="live-dot"></span> THE DESK IS LIVE
-            </div>
-            <h2 class="display live-head" data-reveal>
-              <span class="line-mask"><span class="line-inner head-grey">RELIABILITY</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">ON EVERY</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">DEADLINE</span></span>
-            </h2>
-            <p class="body-copy mt-8" style="color:rgba(17,17,17,.6)">Breaking news doesn't wait, and neither does your
-              platform.</p>
-            <div class="hair-t mt-8 d-flex align-items-center gap-2 pt-5">
-              <svg class="reg-mark" width="13" height="13" aria-hidden="true" style="color:rgba(17,17,17,.3)">
-                <use href="#reg-mark" />
-              </svg>
-              <span class="mono-xs" style="color:rgba(17,17,17,.34)">MONITORED ROUND THE CLOCK</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-lg-4 position-relative" data-live-strip>
-          <div class="live-strip">
-            <div class="live-rail"></div>
-
-            <div class="live-tick" style="top:4%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">14:32</span></div>
-            <div class="live-tick" style="top:15.5%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">14:35</span></div>
-            <div class="live-tick" style="top:27%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">14:41</span></div>
-            <div class="live-tick" style="top:38.5%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">14:46</span></div>
-            <div class="live-tick" style="top:50%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">14:52</span></div>
-            <div class="live-tick" style="top:61.5%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">15:04</span></div>
-            <div class="live-tick" style="top:73%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">15:11</span></div>
-            <div class="live-tick" style="top:84.5%"><i></i><span class="mono-xs"
-                style="color:rgba(255,255,255,.45)">15:19</span></div>
-
-            <div class="live-card p-3" style="top:2%" data-live-card>
-              <div class="mb-2 d-flex align-items-center justify-content-between">
-                <span class="mono-xs d-flex align-items-center gap-2" style="color:var(--breaking)"><span
-                    class="live-dot"></span>LIVE</span>
-                <span class="mono-xs" style="color:rgba(17,17,17,.42)" data-live-stamp>14:32</span>
-              </div>
-              <p class="display" style="font-size:17px;line-height:1.04;color:var(--ink)">DESK HOLDS AT FULL LOAD</p>
-              <div class="hair-t mt-2 pt-2">
-                <span class="mono-xs" style="color:rgba(17,17,17,.38)">BY THE BLINK DESK · NOIDA</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-lg-4">
-          <div class="live-entries">
-            <article class="live-entry">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="live-entry__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-bolt" />
-                  </svg>
-                </span>
-                <span class="mono-xs live-entry__num">01 / 03</span>
-              </div>
-              <h3 class="display live-entry__title">AUTO-SCALING CLOUD</h3>
-              <p class="body-copy live-entry__body">Traffic spikes scale automatically on AWS. Zero downtime at 43K
-                concurrent readers.</p>
-            </article>
-            <article class="live-entry">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="live-entry__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-ticker" />
-                  </svg>
-                </span>
-                <span class="mono-xs live-entry__num">02 / 03</span>
-              </div>
-              <h3 class="display live-entry__title">REAL-TIME DESK VISIBILITY</h3>
-              <p class="body-copy live-entry__body">Dashboards, story checkpoints and TAT tracking for every desk.</p>
-            </article>
-            <article class="live-entry">
-              <div class="d-flex align-items-center justify-content-between gap-3">
-                <span class="live-entry__plate d-flex align-items-center justify-content-center">
-                  <svg class="px-icon" width="18" height="18" aria-hidden="true">
-                    <use href="#px-shield" />
-                  </svg>
-                </span>
-                <span class="mono-xs live-entry__num">03 / 03</span>
-              </div>
-              <h3 class="display live-entry__title">WEBMASTER SUPPORT</h3>
-              <p class="body-copy live-entry__body">Monitoring, fixes and Google News setup, handled for you.</p>
-            </article>
-          </div>
-        </div>
-      </div>
-
-      <div class="live-feed">
-        <div class="live-feed__sheet"></div>
-        <div class="live-feed__fade"></div>
-        <span class="mono-xs position-absolute bottom-4 start-50 translate-middle-x"
-          style="color:rgba(255,255,255,.5)">OUT TO EVERY SCREEN</span>
-      </div>
-    </section>
-
-    <!-- ═══ 08 · THE PRESS ══════════════════════════════════════════ -->
-    <section id="press" class="position-relative" data-nav="dark" data-label="THE PRESS" style="background:#0a0810">
-      <div class="pin-stage">
-        <canvas class="position-absolute inset-0 h-100 w-100" data-scene="press"></canvas>
-
-        <div
-          class="pe-none position-absolute inset-0 z-2 d-flex flex-column align-items-center justify-content-center px-4 text-center"
-          data-press-head>
-          <h2 class="display t-xl" style="color:#fff;text-shadow:0 18px 60px rgba(0,0,0,.6)">
-            <span class="line-mask"><span class="line-inner">A NEWSROOM THAT</span></span>
-            <span class="line-mask"><span class="line-inner">WORKS AS HARD</span></span>
-            <span class="line-mask"><span class="line-inner">AS YOU DO</span></span>
-          </h2>
-        </div>
-
-        <div class="press-feature press-feature--l1 z-3 d-none d-md-block" data-press-feature>
-          <div class="mb-2 d-flex align-items-center gap-2">
-            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-globe" />
-            </svg>
-            <span class="mono-xs" style="color:rgba(255,255,255,.4)">01</span>
-          </div>
-          <h3 class="display t-sm mb-1" style="color:#fff">ONE PLATFORM, NOT FIVE VENDORS</h3>
-          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">CMS, apps, paywall, ads and analytics
-            under one roof.</p>
-        </div>
-        <div class="press-feature press-feature--l2 z-3 d-none d-md-block" data-press-feature>
-          <div class="mb-2 d-flex align-items-center gap-2">
-            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-camera" />
-            </svg>
-            <span class="mono-xs" style="color:rgba(255,255,255,.4)">02</span>
-          </div>
-          <h3 class="display t-sm mb-1" style="color:#fff">FULL NEWSROOM VISIBILITY</h3>
-          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Every story tracked from assignment to
-            publish.</p>
-        </div>
-        <div class="press-feature press-feature--r1 z-3 d-none d-md-block" data-press-feature>
-          <div class="mb-2 d-flex align-items-center gap-2">
-            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-satellite" />
-            </svg>
-            <span class="mono-xs" style="color:rgba(255,255,255,.4)">03</span>
-          </div>
-          <h3 class="display t-sm mb-1" style="color:#fff">SEO YOU CAN TRUST</h3>
-          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">H-SEO score, schemas, AMP and Google
-            News built in.</p>
-        </div>
-        <div class="press-feature press-feature--r2 z-3 d-none d-md-block" data-press-feature>
-          <div class="mb-2 d-flex align-items-center gap-2">
-            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-chart" />
-            </svg>
-            <span class="mono-xs" style="color:rgba(255,255,255,.4)">04</span>
-          </div>
-          <h3 class="display t-sm mb-1" style="color:#fff">PAY FOR FEATURES, NOT TRAFFIC</h3>
-          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Grow your audience without growing your
-            bill.</p>
-        </div>
-        <div class="press-feature press-feature--b z-3 d-none d-md-block" data-press-feature>
-          <div class="mb-2 d-flex align-items-center justify-content-center gap-2">
-            <svg class="px-icon" width="20" height="20" aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-bolt" />
-            </svg>
-            <span class="mono-xs" style="color:rgba(255,255,255,.4)">05</span>
-          </div>
-          <h3 class="display t-sm mb-1" style="color:#fff">FASTER PAGES</h3>
-          <p class="mono-xs" style="color:rgba(255,255,255,.55);line-height:1.6">Daily Thanthi loads in 1.5s.</p>
-        </div>
-
-        <div class="press-stack z-3 d-md-none">
-          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
-              aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-globe" />
-            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">ONE PLATFORM, NOT FIVE VENDORS</span></div>
-          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
-              aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-camera" />
-            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">FULL NEWSROOM VISIBILITY</span></div>
-          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
-              aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-satellite" />
-            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">SEO YOU CAN TRUST</span></div>
-          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
-              aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-chart" />
-            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">PAY FOR FEATURES, NOT TRAFFIC</span></div>
-          <div class="d-flex align-items-center gap-2 py-1"><svg class="px-icon" width="14" height="14"
-              aria-hidden="true" style="color:#B9A4FF">
-              <use href="#px-bolt" />
-            </svg><span class="mono-xs" style="color:rgba(255,255,255,.7)">FASTER PAGES</span></div>
-        </div>
-
-        <div class="pe-none position-absolute inset-0 z-4 press-flash" data-press-flash></div>
-      </div>
-    </section>
-
-    <!-- ═══ 09 · LETTERS ════════════════════════════════════════════ -->
-    <section id="letters" class="tex-halftone position-relative overflow-hidden" data-nav="light" data-label="LETTERS"
-      style="background:#fff">
-      <div class="pe-none position-absolute inset-0 z-1">
-        <div class="position-sticky top-0 h-svh w-100">
-          <canvas class="pe-none position-absolute inset-0 h-100 w-100" data-scene="signal"></canvas>
-        </div>
-      </div>
-
-      <div class="shell position-relative z-2 sec-pad">
-        <div class="row g-8 align-items-end">
-          <div class="col-12 col-lg-7">
-            <div class="mb-6 d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.5)">BY THE BLINK DESK · NOIDA</span>
-            </div>
-            <h2 class="display letters-head" data-reveal>
-              <span class="line-mask"><span class="line-inner head-ink">TRUSTED</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">BY NEWSROOMS</span></span>
-              <span class="line-mask"><span class="line-inner head-grey">ACROSS INDIA</span></span>
-            </h2>
-          </div>
-          <div class="col-12 col-lg-5 front-aside">
-            <p class="body-copy" style="color:rgba(17,17,17,.6)">From regional dailies to national networks, publishers
-              stay because we treat their newsroom like our own.</p>
-          </div>
-        </div>
-
-        <div class="mt-vh-7">
-          <article class="result row g-5 align-items-center mt-4 p-5">
-            <div class="col-12 col-sm-2">
-              <div class="halftone-media result__shot d-flex align-items-center justify-content-center"
-                data-cursor="media">
-                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#2b2438,#6118EA)"></div>
-                <span class="display position-relative" style="color:#fff;font-size:22px">DA</span>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <h3 class="display t-md">DAILY THANTHI</h3>
-              <span class="mono-xs" style="color:rgba(17,17,17,.45)">TAMIL DAILY · CASE STUDY 01</span>
-            </div>
-            <div
-              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">20×</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">growth</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">1.5s</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">load time</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">83%</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">search discovery</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="result row g-5 align-items-center mt-4 p-5">
-            <div class="col-12 col-sm-2">
-              <div class="halftone-media result__shot d-flex align-items-center justify-content-center"
-                data-cursor="media">
-                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#1d1d22,#E10600)"></div>
-                <span class="display position-relative" style="color:#fff;font-size:22px">HA</span>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <h3 class="display t-md">THE HANS INDIA</h3>
-              <span class="mono-xs" style="color:rgba(17,17,17,.45)">ENGLISH DAILY · CASE STUDY 02</span>
-            </div>
-            <div
-              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">2 MO</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">to record traffic</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">43K</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">concurrent users</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">ZERO</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">downtime</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="result row g-5 align-items-center mt-4 p-5">
-            <div class="col-12 col-sm-2">
-              <div class="halftone-media result__shot d-flex align-items-center justify-content-center"
-                data-cursor="media">
-                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#232a33,#00AEEF)"></div>
-                <span class="display position-relative" style="color:#fff;font-size:22px">LI</span>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <h3 class="display t-md">LIVELAW</h3>
-              <span class="mono-xs" style="color:rgba(17,17,17,.45)">LEGAL NEWS · CASE STUDY 03</span>
-            </div>
-            <div
-              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">−30%</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">bounce rate</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">10s</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">faster pages</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="result row g-5 align-items-center mt-4 p-5">
-            <div class="col-12 col-sm-2">
-              <div class="halftone-media result__shot d-flex align-items-center justify-content-center"
-                data-cursor="media">
-                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#2b2438,#6118EA)"></div>
-                <span class="display position-relative" style="color:#fff;font-size:22px">FE</span>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <h3 class="display t-md">THE FEDERAL</h3>
-              <span class="mono-xs" style="color:rgba(17,17,17,.45)">DIGITAL-FIRST · CASE STUDY 04</span>
-            </div>
-            <div
-              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">2×</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">traffic in 8 months</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">93ms</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">INP</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="result row g-5 align-items-center mt-4 p-5">
-            <div class="col-12 col-sm-2">
-              <div class="halftone-media result__shot d-flex align-items-center justify-content-center"
-                data-cursor="media">
-                <div class="position-absolute inset-0" style="background:linear-gradient(135deg,#1d1d22,#E10600)"></div>
-                <span class="display position-relative" style="color:#fff;font-size:22px">MA</span>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <h3 class="display t-md">MADHYAMAM</h3>
-              <span class="mono-xs" style="color:rgba(17,17,17,.45)">MALAYALAM DAILY · CASE STUDY 05</span>
-            </div>
-            <div
-              class="col-12 col-sm-6 d-flex flex-wrap align-items-baseline column-gap-8 row-gap-3 justify-content-sm-end">
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">+50%</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">engagement</div>
-              </div>
-              <div class="text-start text-sm-end">
-                <div class="display result__metric">72%</div>
-                <div class="mono-xs" style="color:rgba(17,17,17,.45)">search discovery</div>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <p class="mono-xs mt-6" style="color:rgba(17,17,17,.34)">RESULTS AS SUPPLIED BY BLINK CMS</p>
-
-        <div class="hair-t letters-roll mt-vh-7 pt-8" data-letters>
-          <div class="mb-10 d-flex flex-wrap align-items-end justify-content-between gap-4">
-            <div class="d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.5)">LETTERS TO THE DESK</span>
-            </div>
-            <span class="mono-xs" style="color:rgba(17,17,17,.34)">FOUR OF 150+ NEWSROOMS</span>
-          </div>
-
-          <blockquote class="letter" data-letter style="--accent:#111111">
-            <span class="letter__rule" aria-hidden="true"></span>
-            <div class="row g-6 g-lg-8">
-              <div class="col-12 col-lg-3 letter__slug">
-                <span class="mono-xs letter__num">01 / 04</span>
-                <span class="display letter__masthead">LIVELAW</span>
-                <span class="mono-xs letter__kind">LEGAL NEWS</span>
-              </div>
-              <div class="col-12 col-lg-9">
-                <p class="letter__quote" data-letter-quote><span class="lw">We</span> <span class="lw">moved</span>
-                  <span class="lw">because</span> <span class="lw">the</span>
-                  <span class="lw">site</span> <span class="lw">kept</span> <span class="lw">falling</span> <span
-                    class="lw">over</span>
-                  <span class="lw">on</span> <span class="lw">judgment</span> <span class="lw">days.</span> <span
-                    class="lw">It</span>
-                  <span class="lw">has</span> <span class="lw">not</span> <span class="lw">since.</span> <span
-                    class="lw">The</span>
-                  <span class="lw">desk</span> <span class="lw">files,</span> <span class="lw">the</span> <span
-                    class="lw">story</span>
-                  <span class="lw">is</span> <span class="lw">out,</span> <span class="lw">and</span> <span
-                    class="lw">nobody</span>
-                  <span class="lw">calls</span> <span class="lw">me</span> <span class="lw">about</span> <span
-                    class="lw">the</span>
-                  <span class="lw">server</span> <span class="lw">any</span> <span class="lw">more.</span>
-                </p>
-                <footer class="letter__by d-flex flex-wrap align-items-baseline gap-3">
-                  <span class="display letter__name"><span class="lw">Meera</span> <span
-                      class="lw">Raghavan</span></span>
-                  <span class="mono-xs letter__role"><span class="lw">DIGITAL</span> <span
-                      class="lw">EDITOR</span></span>
-                </footer>
-              </div>
-            </div>
-          </blockquote>
-
-          <blockquote class="letter" data-letter style="--accent:#6118EA">
-            <span class="letter__rule" aria-hidden="true"></span>
-            <div class="row g-6 g-lg-8">
-              <div class="col-12 col-lg-3 letter__slug">
-                <span class="mono-xs letter__num">02 / 04</span>
-                <span class="display letter__masthead">DECCAN CHRONICLE</span>
-                <span class="mono-xs letter__kind">ENGLISH DAILY</span>
-              </div>
-              <div class="col-12 col-lg-9">
-                <p class="letter__quote" data-letter-quote><span class="lw">We</span> <span class="lw">were</span> <span
-                    class="lw">paying</span> <span class="lw">four</span>
-                  <span class="lw">vendors</span> <span class="lw">to</span> <span class="lw">do</span> <span
-                    class="lw">what</span>
-                  <span class="lw">one</span> <span class="lw">platform</span> <span class="lw">now</span> <span
-                    class="lw">does.</span>
-                  <span class="lw">The</span> <span class="lw">saving</span> <span class="lw">matters,</span> <span
-                    class="lw">but</span> <span class="lw">the</span> <span class="lw">real</span> <span
-                    class="lw">difference</span>
-                  <span class="lw">is</span> <span class="lw">that</span> <span class="lw">there</span> <span
-                    class="lw">is</span>
-                  <span class="lw">one</span> <span class="lw">number</span> <span class="lw">to</span> <span
-                    class="lw">call</span>
-                  <span class="lw">when</span> <span class="lw">something</span> <span class="lw">breaks.</span>
-                </p>
-                <footer class="letter__by d-flex flex-wrap align-items-baseline gap-3">
-                  <span class="display letter__name"><span class="lw">Arjun</span> <span class="lw">Menon</span></span>
-                  <span class="mono-xs letter__role"><span class="lw">HEAD</span> <span class="lw">OF</span> <span
-                      class="lw">DIGITAL</span></span>
-                </footer>
-              </div>
-            </div>
-          </blockquote>
-
-          <blockquote class="letter" data-letter style="--accent:#E10600">
-            <span class="letter__rule" aria-hidden="true"></span>
-            <div class="row g-6 g-lg-8">
-              <div class="col-12 col-lg-3 letter__slug">
-                <span class="mono-xs letter__num">03 / 04</span>
-                <span class="display letter__masthead">DAILY THANTHI</span>
-                <span class="mono-xs letter__kind">TAMIL DAILY</span>
-              </div>
-              <div class="col-12 col-lg-9">
-                <p class="letter__quote" data-letter-quote><span class="lw">Our</span> <span class="lw">reporters</span>
-                  <span class="lw">file</span> <span class="lw">from</span> <span class="lw">the</span> <span
-                    class="lw">district</span> <span class="lw">in</span>
-                  <span class="lw">Tamil,</span> <span class="lw">on</span> <span class="lw">their</span> <span
-                    class="lw">phones,</span>
-                  <span class="lw">and</span> <span class="lw">it</span> <span class="lw">reaches</span> <span
-                    class="lw">the</span>
-                  <span class="lw">front</span> <span class="lw">page</span> <span class="lw">without</span> <span
-                    class="lw">anyone</span> <span class="lw">retyping</span> <span class="lw">it.</span> <span
-                    class="lw">That</span>
-                  <span class="lw">is</span> <span class="lw">the</span> <span class="lw">whole</span> <span
-                    class="lw">job,</span>
-                  <span class="lw">and</span> <span class="lw">it</span> <span class="lw">finally</span> <span
-                    class="lw">works.</span>
-                </p>
-                <footer class="letter__by d-flex flex-wrap align-items-baseline gap-3">
-                  <span class="display letter__name"><span class="lw">Kavitha</span> <span class="lw">Iyer</span></span>
-                  <span class="mono-xs letter__role"><span class="lw">MANAGING</span> <span
-                      class="lw">EDITOR</span></span>
-                </footer>
-              </div>
-            </div>
-          </blockquote>
-
-          <blockquote class="letter" data-letter style="--accent:#111111">
-            <span class="letter__rule" aria-hidden="true"></span>
-            <div class="row g-6 g-lg-8">
-              <div class="col-12 col-lg-3 letter__slug">
-                <span class="mono-xs letter__num">04 / 04</span>
-                <span class="display letter__masthead">THE FEDERAL</span>
-                <span class="mono-xs letter__kind">DIGITAL-FIRST</span>
-              </div>
-              <div class="col-12 col-lg-9">
-                <p class="letter__quote" data-letter-quote><span class="lw">Election</span> <span
-                    class="lw">night</span> <span class="lw">used</span> <span class="lw">to</span> <span
-                    class="lw">be</span> <span class="lw">the</span> <span class="lw">night</span>
-                  <span class="lw">we</span> <span class="lw">held</span> <span class="lw">our</span> <span
-                    class="lw">breath.</span>
-                  <span class="lw">Last</span> <span class="lw">time</span> <span class="lw">we</span> <span
-                    class="lw">watched</span>
-                  <span class="lw">the</span> <span class="lw">traffic</span> <span class="lw">climb</span> <span
-                    class="lw">and</span>
-                  <span class="lw">did</span> <span class="lw">nothing</span> <span class="lw">at</span> <span
-                    class="lw">all,</span>
-                  <span class="lw">which</span> <span class="lw">is</span> <span class="lw">exactly</span> <span
-                    class="lw">what</span>
-                  <span class="lw">we</span> <span class="lw">were</span> <span class="lw">paying</span> <span
-                    class="lw">for.</span>
-                </p>
-                <footer class="letter__by d-flex flex-wrap align-items-baseline gap-3">
-                  <span class="display letter__name"><span class="lw">Sanjay</span> <span class="lw">Bhat</span></span>
-                  <span class="mono-xs letter__role"><span class="lw">PRODUCT</span> <span class="lw">LEAD</span></span>
-                </footer>
-              </div>
-            </div>
-          </blockquote>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 10 · THE MASTHEAD WALL ══════════════════════════════════ -->
-    <section id="case-studies" class="position-relative" data-nav="light" data-label="LETTERS" style="background:#fff">
-      <div class="shell pb-vh-10">
-        <div class="hair-b d-flex flex-wrap align-items-end justify-content-between gap-4 pb-4">
-          <span class="mono" style="color:rgba(17,17,17,.5)">OUR PUBLISHERS</span>
-          <div class="d-flex align-items-center gap-1">
-            <button class="mono-xs tab-btn px-3 py-2" data-tab="PUBLISHERS" aria-pressed="true">PUBLISHERS</button>
-            <button class="mono-xs tab-btn px-3 py-2" data-tab="INTEGRATIONS" aria-pressed="false">INTEGRATIONS</button>
-          </div>
-        </div>
-
-        <div data-tab-panel="PUBLISHERS">
-          <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-0 masthead-grid">
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">TV5 TELUGU</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">DAILY THANTHI</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">TUPAKI</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">MAALAIMALAR</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">BHASKAR HINDI</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">MEDIAONE</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">LIVELAW</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">THE ASIAN AGE</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">THE BRIDGE</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">RANI</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">MADHYAMAM</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">MEDICAL DIALOGUES</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">DECCAN CHRONICLE</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">CORE</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">BOOM</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">THE FEDERAL</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">THE HANS INDIA</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">TELUGU GLOBE</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">THE ASSAM TRIBUNE</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">MILLENNIUM POST</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-          </div>
-          <div class="mono-xs mt-4 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)"><span
-              class="live-dot"></span>20 MASTHEADS SHOWN · 150+ NEWSROOMS POWERED</div>
-        </div>
-
-        <div data-tab-panel="INTEGRATIONS" hidden>
-          <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-0 masthead-grid">
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">GOOGLE NEWS</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">AMP</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">GA4</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">GOOGLE MCM / DFP</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">FACEBOOK PIXEL</span><svg
-                class="reg-mark masthead-mark" width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">CHATGPT</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#E10600" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">AWS</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#00AEEF" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">YOUTUBE</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#EC008C" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">FACEBOOK</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#FFC400" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">LINKEDIN</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-            <div
-              class="masthead-cell position-relative d-flex align-items-center justify-content-center px-4 text-center">
-              <span class="masthead-ink" style="background:#6118EA" aria-hidden="true"></span><span
-                class="display masthead-name position-relative z-2">X</span><svg class="reg-mark masthead-mark"
-                width="11" height="11" aria-hidden="true">
-                <use href="#reg-mark" />
-              </svg>
-            </div>
-          </div>
-          <div class="mono-xs mt-4 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.34)"><span
-              class="live-dot"></span>11 INTEGRATIONS · MORE ON REQUEST</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 11 · THE RATE CARD ══════════════════════════════════════ -->
-    <section id="pricing" class="tex-halftone position-relative" data-nav="light" data-label="RATE CARD"
-      style="background:#fff">
-      <div class="shell sec-pad">
-
-        <div class="row g-8 align-items-end">
-          <div class="col-12 col-lg-7">
-            <div class="mb-6 d-flex align-items-center gap-3">
-              <span class="colour-bar" style="width:40px;height:4px"><i></i><i></i><i></i><i></i></span>
-              <span class="mono" style="color:rgba(17,17,17,.5)">THE RATE CARD</span>
-            </div>
-            <h2 class="display rate-head" data-reveal>
-              <span class="line-mask"><span class="line-inner head-grey">BILLED BY</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">FEATURES,</span></span>
-              <span class="line-mask"><span class="line-inner head-ink">NOT TRAFFIC</span></span>
-            </h2>
-          </div>
-          <div class="col-12 col-lg-5 front-aside">
-            <p class="body-copy" style="color:rgba(17,17,17,.6)">A good month should not arrive as a bigger invoice.
-              Four plans, priced on what the newsroom runs rather than on how many people read it.</p>
-            <a href="/pricing/" class="pill pill-outline pill-mono mt-7">SEE THE FULL RATE CARD</a>
-          </div>
-        </div>
-
-        <div class="rates row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mt-vh-7" data-rates>
-          <div class="col">
-            <div class="rate h-100 d-flex flex-column" data-rate style="--accent:#111111">
-              <span class="rate__band" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm rate__num">01</span>
-              </div>
-              <h3 class="display t-sm rate__name">DEMO</h3>
-              <p class="rate__for">For newsrooms looking to streamline growth.</p>
-              <div class="rate__price">
-                <span class="display rate__figure rate__figure--word">Talk to us</span>
-                <span class="mono-xs rate__per">PRICED ON REQUEST</span>
-              </div>
-              <div class="hair-t mt-4 pt-3">
-                <span class="mono-xs rate__scale">20 GB · 1 TB · 10 USERS</span>
-              </div>
-              <a href="/contact/" class="pill pill-outline pill-mono rate__cta">GET STARTED</a>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="rate rate--flag h-100 d-flex flex-column" data-rate style="--accent:#6118EA">
-              <span class="rate__band" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm rate__num">02</span>
-                <span class="mono-xs rate__flag">POPULAR</span>
-              </div>
-              <h3 class="display t-sm rate__name">BASIC</h3>
-              <p class="rate__for">For newsrooms looking to streamline growth.</p>
-              <div class="rate__price">
-                <span class="display rate__unit">$</span><span class="display rate__figure" data-count-to="500">0</span>
-                <span class="mono-xs rate__per">PER MONTH</span>
-              </div>
-              <div class="hair-t mt-4 pt-3">
-                <span class="mono-xs rate__scale">100 GB · 5 TB · 20 USERS</span>
-              </div>
-              <a href="/contact/" class="pill pill-ink pill-mono rate__cta">GET STARTED</a>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="rate rate--flag h-100 d-flex flex-column" data-rate style="--accent:#E10600">
-              <span class="rate__band" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm rate__num">03</span>
-                <span class="mono-xs rate__flag">POPULAR</span>
-              </div>
-              <h3 class="display t-sm rate__name">BUSINESS</h3>
-              <p class="rate__for">Advanced features and reporting.</p>
-              <div class="rate__price">
-                <span class="display rate__unit">$</span><span class="display rate__figure"
-                  data-count-to="1500">0</span>
-                <span class="mono-xs rate__per">PER MONTH</span>
-              </div>
-              <div class="hair-t mt-4 pt-3">
-                <span class="mono-xs rate__scale">400 GB · 15 TB · 50 USERS</span>
-              </div>
-              <a href="/contact/" class="pill pill-ink pill-mono rate__cta">GET STARTED</a>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="rate h-100 d-flex flex-column" data-rate style="--accent:#111111">
-              <span class="rate__band" aria-hidden="true"></span>
-              <div class="d-flex align-items-start justify-content-between gap-3">
-                <span class="mono-sm rate__num">04</span>
-              </div>
-              <h3 class="display t-sm rate__name">CUSTOM SUITE</h3>
-              <p class="rate__for">Enterprise-grade CMS, website, apps and digital channel management, built to what
-                you need.</p>
-              <div class="rate__price">
-                <span class="display rate__figure rate__figure--word">Talk to us</span>
-                <span class="mono-xs rate__per">FROM $2,000 PER MONTH</span>
-              </div>
-              <div class="hair-t mt-4 pt-3">
-                <span class="mono-xs rate__scale">SCALED TO THE NEWSROOM</span>
-              </div>
-              <a href="/contact/" class="pill pill-outline pill-mono rate__cta">TALK TO US</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="hair-t row g-6 mt-10 pt-6">
-          <div class="col-12 col-lg-4">
-            <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">ADD-ONS · FROM BASIC UPWARDS</div>
-            <p class="mono-sm rate-note">Subscription · Reporter Module · E-Paper · Apps (Android &amp; iOS) · AMP Web
-              Stories · RSS Ingestion</p>
-          </div>
-          <div class="col-12 col-lg-4">
-            <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">ONBOARDING</div>
-            <p class="mono-sm rate-note">One time and fixed, set by the data import and the site design. Custom modules
-              and custom hosting come with the Custom Suite.</p>
-          </div>
-          <div class="col-12 col-lg-4">
-            <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">QUOTED SEPARATELY</div>
-            <p class="mono-sm rate-note">Ads management and revenue optimisation run as their own service. HTML and
-              custom template design is done by a third party. Taxes extra.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 12 · THE WIRE ═══════════════════════════════════════════ -->
-    <section id="the-wire" class="position-relative" data-nav="dark" data-label="THE WIRE" style="background:#111111">
-      <div class="wire-sky" aria-hidden="true"></div>
-
-      <div class="shell pb-vh-12">
-        <div class="mb-10 d-flex flex-wrap align-items-end justify-content-between gap-6">
-          <h2 class="display t-lg head-gradient" data-reveal>
-            <span class="line-mask"><span class="line-inner">WHAT'S MOVING</span></span>
-            <span class="line-mask"><span class="line-inner">IN NEWSROOM TECH</span></span>
-          </h2>
-          <a href="#the-wire" class="pill pill-outline-inv pill-mono">VIEW ALL</a>
-        </div>
-
-        <div data-wire-list>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2"
-              style="color:rgba(255,255,255,.4)"><span class="live-dot"></span>26 SEP 2026</span>
-            <span class="col-12 col-sm-7 wire-title">How a Tamil daily grew 20× on Blink CMS</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:var(--breaking)">● NEWS</span>
-          </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">19
-              SEP 2026</span>
-            <span class="col-12 col-sm-7 wire-title">AI story creation, now in the editor</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">PRODUCT</span>
-          </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">11
-              SEP 2026</span>
-            <span class="col-12 col-sm-7 wire-title">Leaving WordPress without losing SEO</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">MIGRATION</span>
-          </a>
-          <a href="#the-wire" class="wire-row row g-4 align-items-center py-6">
-            <span class="mono-xs col-4 col-sm-2 d-flex align-items-center gap-2" style="color:rgba(255,255,255,.4)">02
-              SEP 2026</span>
-            <span class="col-12 col-sm-7 wire-title">Running a live results desk at scale</span>
-            <span class="mono-xs col-8 col-sm-3 text-end" style="color:rgba(255,255,255,.4)">LIVE DESK</span>
-          </a>
-          <div class="wire-row"></div>
-        </div>
-      </div>
-
-      <div class="wire-thumb-wrap pe-none position-fixed start-0 top-0 z-thumb" data-wire-thumb aria-hidden="true">
-        <div class="halftone-media wire-thumb">
-          <div class="position-absolute inset-0" data-wire-thumb-tint></div>
-          <span class="mono-xs wire-thumb__kind" data-wire-thumb-kind></span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 13 · F.A.Q ══════════════════════════════════════════════ -->
-    <section id="faq" class="tex-halftone position-relative" data-nav="light" data-label="CLASSIFIEDS"
-      style="background:#fff">
-      <div class="shell row gx-8 gy-10 sec-pad-lg">
-        <div class="col-12 col-lg-3">
-          <h2 class="display t-lg">F.A.Q</h2>
-          <p class="body-copy mt-5" style="color:rgba(17,17,17,.55)">Straight answers, so your newsroom can move
-            forward.</p>
-        </div>
-
-        <div class="col-12 col-lg-6">
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="true">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">01</span>
-              <span class="flex-grow-1 faq-q">What does Blink CMS do?</span><span class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">It runs the whole newsroom rather than one stage of it: monitoring
-                  trends and agency feeds, gathering from reporters and readers, writing and packaging the story,
-                  publishing it to web, AMP, PWA and apps, earning from it through ads and subscriptions, and reporting
-                  on what it did. One platform and one accountable team, instead of a CMS plus four other vendors.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">02</span>
-              <span class="flex-grow-1 faq-q">Which publishers do you work with?</span><span class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">150+ newsrooms, from national dailies to regional language and
-                  digital-first
-                  publishers — Daily Thanthi, The Hans India, LiveLaw, The Federal, Madhyamam, TV5 Telugu,
-                  The Asian Age and MediaOne among them. The <a href="#case-studies" class="faq-link">full
-                    wall is further up the page</a>.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">03</span>
-              <span class="flex-grow-1 faq-q">Can we migrate from WordPress without losing SEO?</span><span
-                class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">Search is part of the platform rather than a plugin on top of it:
-                  technical SEO on every content page, keywords and tags, schema support including Fact Check and
-                  Reviews,
-                  Google News feeds, custom RSS and AMP. Our webmaster team sets up the Google News
-                  listing and monitors and resolves issues after you move.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">04</span>
-              <span class="flex-grow-1 faq-q">Will the site survive a traffic spike?</span><span
-                class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">Yes. Traffic scales automatically on AWS and every plan ships with a
-                  CDN. Measured
-                  at 43K concurrent readers with zero downtime.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">05</span>
-              <span class="flex-grow-1 faq-q">Do you charge more as traffic grows?</span><span class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">No. Billing is by features. Plans differ by storage, bandwidth and seats
-                  — not by
-                  how many people read you.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">06</span>
-              <span class="flex-grow-1 faq-q">Do you have a reporter / stringer app?</span><span
-                class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">Yes. Reporters and stringers file from the app, with assignments, in-app
-                  notifications, two-way reporting, workflows, and team or bureau structures. A payments
-                  module settles what stringers are owed, and there is a web reporting tool for filing from
-                  a desk. Reader contributions come in through a separate UGC module with its own
-                  registration and verification.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">07</span>
-              <span class="flex-grow-1 faq-q">Can you build custom modules (elections, cricket,
-                classifieds)?</span><span class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">Yes, and two of them already ship: a detailed election module, and a
-                  cricket module
-                  that pulls automated scorecards from live APIs. There is a headless API if you would
-                  rather build on top of the platform yourself, and custom modules and custom hosting come
-                  with the Custom Suite plan.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t" data-faq-item>
-            <button class="d-flex w-100 align-items-start gap-5 py-5 text-start" data-faq-toggle aria-expanded="false">
-              <span class="mono-xs faq-num" style="color:rgba(17,17,17,.34)">08</span>
-              <span class="flex-grow-1 faq-q">How do we get a demo?</span><span class="faq-plus">+</span>
-            </button>
-            <div class="faq-panel" data-faq-panel>
-              <div>
-                <p class="body-copy faq-answer">Write to sales@blinkcms.ai or call +91 88858 58900. The Demo plan is
-                  where most
-                  newsrooms start — 20 GB, 1 TB and 10 users, priced on request.</p>
-              </div>
-            </div>
-          </div>
-          <div class="hair-t"></div>
-        </div>
-
-        <div class="col-12 col-lg-3 front-aside">
-          <div class="sticky-col sticky-col--low">
-            <svg class="reg-mark" width="14" height="14" aria-hidden="true" style="color:rgba(17,17,17,.3)">
-              <use href="#reg-mark" />
-            </svg>
-            <h3 class="display t-sm mt-4">Still have questions?</h3>
-            <a href="#on-air" class="pill pill-outline pill-mono mt-5">EMAIL THE DESK</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ 14 · ON AIR ═════════════════════════════════════════════ -->
-    <section id="on-air" class="position-relative overflow-hidden" data-nav="dark" data-label="CLASSIFIEDS"
-      style="background:#111111">
-      <video class="on-air-video pe-none position-absolute inset-0" data-on-air-video
-        data-src="./assets/videos/video_bg.mp4" muted loop playsinline preload="none" aria-hidden="true"
-        tabindex="-1"></video>
-      <div class="on-air-scrim pe-none position-absolute inset-0" aria-hidden="true"></div>
-
-      <div class="pe-none position-absolute inset-0 d-flex align-items-center justify-content-center"
-        aria-hidden="true">
-        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 0s infinite"></span>
-        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 1.08s infinite"></span>
-        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 2.16s infinite"></span>
-        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 3.24s infinite"></span>
-        <span class="signal-ring" style="animation:signal 5.4s cubic-bezier(.22,1,.36,1) 4.32s infinite"></span>
-      </div>
-
-      <div class="shell position-relative z-2 d-flex flex-column align-items-center sec-pad-xl text-center">
-        <div class="mb-10 d-flex align-items-center gap-3">
-          <span class="on-air-lamp"></span>
-          <span class="mono" style="color:rgba(255,255,255,.6)">ON AIR</span>
-        </div>
-
-        <h2 class="display t-xl" data-reveal>
-          <span class="line-mask"><span class="line-inner text-white">READY TO</span></span>
-          <span class="line-mask"><span class="line-inner text-white">GO LIVE?</span></span>
-        </h2>
-
-        <p class="body-copy mt-8 mx-auto" style="color:rgba(255,255,255,.6);max-width:52ch">
-          The extended tech team behind 150+ newsrooms. No ticket queues. No runaround. Just people who know news.
-        </p>
-
-        <a href="#on-air" class="pill pill-white mt-10">BOOK A DEMO</a>
       </div>
     </section>
 
   </main>
 
-  <!-- ═══ 15 · THE BACK PAGE ══════════════════════════════════════ -->
-  <footer id="contact" class="tex-halftone position-relative" data-nav="light" data-label="BACK PAGE"
-    style="background:#fff">
+  <!-- ═══ footer ══════════════════════════════════════════════════ -->
+  <footer class="ed-footer" id="contact" data-label="BACK PAGE">
     <div class="shell">
-      <div class="hair-b d-flex flex-wrap align-items-center justify-content-between gap-4 py-5">
-        <div class="d-flex align-items-baseline gap-1">
-          <img src="./assets/images/blinkcms-logo.png" width="100px" alt="blinkcms-logo" />
+      <span class="display ed-footer__word" aria-hidden="true">BLINKCMS</span>
+
+      <div class="ed-footer__cols">
+        <div class="ed-footer__col">
+          <h3 class="mono-xs">PRODUCT</h3>
+          <a href="/platform/">Platform</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/faq/">FAQ</a>
         </div>
-        <p class="masthead-serif" style="font-size:clamp(1.2rem,2.4vw,2.1rem)">Every stage of the story.</p>
-        <div class="d-flex align-items-center gap-2">
-          <a href="#contact" aria-label="X"
-            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path
-                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-          </a>
-          <a href="#contact" aria-label="LinkedIn"
-            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path
-                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z" />
-            </svg>
-          </a>
-          <a href="#contact" aria-label="Facebook"
-            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path
-                d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.52-.14-2.71-.14-2.72 0-4.79 1.66-4.79 4.93V9.5H7v4h3V22h4v-8.5z" />
-            </svg>
-          </a>
-          <a href="#contact" aria-label="YouTube"
-            class="social-dot rounded-circle d-flex align-items-center justify-content-center">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-            </svg>
-          </a>
+        <div class="ed-footer__col">
+          <h3 class="mono-xs">MODULES</h3>
+          <a href="/platform/">The Reporter</a>
+          <a href="/platform/">The AI Editor</a>
+          <a href="/platform/">The Edition</a>
+          <a href="/platform/">The Subscriber</a>
+        </div>
+        <div class="ed-footer__col">
+          <h3 class="mono-xs">NEWSROOMS</h3>
+          <a href="/case-studies/daily-thanthi/">Daily Thanthi</a>
+          <a href="/case-studies/the-hans-india/">The Hans India</a>
+          <a href="/case-studies/livelaw/">LiveLaw</a>
+          <a href="/case-studies/">All case studies</a>
+        </div>
+        <div class="ed-footer__col">
+          <h3 class="mono-xs">COMPANY</h3>
+          <a href="/about/">About Us</a>
+          <a href="/blog/">Blog</a>
+          <a href="/contact/">Book a demo</a>
         </div>
       </div>
 
-      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 gx-6 gy-9 py-10">
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">PRODUCT</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/platform/" class="footer-link">Platform</a></li>
-            <li><a href="/pricing/" class="footer-link">Pricing</a></li>
-          </ul>
-        </nav>
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">MODULES</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/platform/#the-reporter" class="footer-link">The Reporter</a></li>
-            <li><a href="/platform/#the-ai-editor" class="footer-link">The AI Editor</a></li>
-            <li><a href="/platform/#the-edition" class="footer-link">The Edition</a></li>
-            <li><a href="/platform/#the-subscriber" class="footer-link">The Subscriber</a></li>
-            <li><a href="/platform/#the-e-paper" class="footer-link">The E-Paper</a></li>
-            <li><a href="/platform/#the-analyst" class="footer-link">The Analyst</a></li>
-          </ul>
-        </nav>
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">CASE STUDIES</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/case-studies/daily-thanthi/" class="footer-link">Daily Thanthi</a></li>
-            <li><a href="/case-studies/the-hans-india/" class="footer-link">The Hans India</a></li>
-            <li><a href="/case-studies/livelaw/" class="footer-link">LiveLaw</a></li>
-            <li><a href="/case-studies/the-federal/" class="footer-link">The Federal</a></li>
-            <li><a href="/case-studies/madhyamam/" class="footer-link">Madhyamam</a></li>
-            <li><a href="/case-studies/" class="footer-link">All case studies</a></li>
-          </ul>
-        </nav>
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">RESOURCES</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/blog/" class="footer-link">Blog</a></li>
-            <li><a href="/reports/" class="footer-link">Reports</a></li>
-            <li><a href="/roundups/" class="footer-link">Roundups</a></li>
-          </ul>
-        </nav>
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">COMPANY</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/about/" class="footer-link">About Us</a></li>
-          </ul>
-        </nav>
-        <nav>
-          <div class="hair-b mb-3 pb-2"><span class="mono-xs" style="color:rgba(17,17,17,.4)">CONTACT</span></div>
-          <ul class="d-flex flex-column gap-2 list-unstyled">
-            <li><a href="/contact/" class="footer-link">Book a demo</a></li>
-            <li><a href="/contact/" class="footer-link">Contact the desk</a></li>
-          </ul>
-        </nav>
+      <!-- email and city live here rather than in a fifth column: four
+           columns plus a wordmark is already most of a phone screen, and the
+           footer has a height budget of its own. -->
+      <div class="mono-xs ed-footer__base">
+        <span><a href="mailto:sales@blinkcms.ai">sales@blinkcms.ai</a> · Noida, India</span>
+        <span class="d-flex flex-wrap gap-5">
+          <span>© 2026 Blink CMS</span>
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+          <a href="/cookies/">Cookies</a>
+        </span>
       </div>
-    </div>
-
-    <div class="ticker d-flex w-100 align-items-stretch overflow-hidden ticker--dark">
-      <div class="mono-xs ticker__tab d-flex flex-shrink-0 align-items-center gap-2 px-3 ticker-pad fw-bold">
-        <span class="live-dot" style="background:#fff"></span>SEGMENTS | MODULES
-      </div>
-      <div class="marquee flex-grow-1" style="--marquee-dur:38s" data-marquee>
-        <div class="marquee-track align-items-center ticker-pad">
-          <span class="mono-xs d-flex align-items-center gap-4">NATIONAL DAILIES<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">REGIONAL &amp; LANGUAGE NEWS<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">DIGITAL-FIRST MEDIA<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">FACT-CHECKERS<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">LEGAL NEWS<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">HEALTH NEWS<span
-              style="color:var(--breaking)">·</span></span>
-          <span class="mono-xs d-flex align-items-center gap-4">SPORTS<span
-              style="color:var(--breaking)">·</span></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="shell row g-6 py-10">
-      <div class="col-12 col-lg-4">
-        <div class="halftone-media footer-photo position-relative" data-cursor="media">
-          <div class="position-absolute inset-0" style="background:linear-gradient(140deg,#1b1b21,#3a3a44 55%,#101014)">
-          </div>
-          <span class="mono-xs footer-photo__note">
-            <img src="./assets/images/contact.jpg" style="width: 100%;height: 100%;object-fit: cover;" alt="contact" />
-          </span>
-        </div>
-      </div>
-
-      <div class="col-12 col-lg-4 hair-l ps-lg-6">
-        <div class="mono-xs mb-3 d-flex align-items-center gap-2" style="color:rgba(17,17,17,.4)">
-          <svg class="reg-mark" width="12" height="12" aria-hidden="true">
-            <use href="#reg-mark" />
-          </svg>HEAD OFFICE
-        </div>
-        <p class="body-copy" style="max-width:34ch;color:rgba(17,17,17,.75)">
-          1st Floor, Rally Infra, H-157, near Noida Electronic City Metro, H Block, Sector 63, Noida, UP 201301
-        </p>
-        <div class="mt-5 d-flex flex-column gap-1">
-          <span class="mono-sm" style="color:var(--breaking)">sales@blinkcms.ai</span>
-          <span class="mono-sm" style="color:var(--breaking)">+91-88858 58900</span>
-        </div>
-        <span class="colour-bar mt-6" style="width:56px;height:5px"><i></i><i></i><i></i><i></i></span>
-      </div>
-
-      <div class="col-12 col-lg-4 hair-l ps-lg-6">
-        <div class="mono-xs mb-3" style="color:rgba(17,17,17,.4)">BUREAUS</div>
-        <div class="footer-map"><canvas class="h-100 w-100" data-scene="map" role="img"
-            aria-label="Bureau map"></canvas></div>
-      </div>
-    </div>
-
-    <div class="shell">
-      <div class="hair-t d-flex flex-wrap align-items-center justify-content-between gap-3 py-4">
-        <span class="mono-xs" style="color:rgba(17,17,17,.45)">© 2026 Blink CMS · Printed digitally in Noida</span>
-        <div class="d-flex gap-5">
-          <a href="/legal/privacy/" class="mono-xs" style="color:rgba(17,17,17,.45)">Privacy Policy</a>
-          <a href="/legal/terms/" class="mono-xs" style="color:rgba(17,17,17,.45)">Terms of Service</a>
-          <a href="/legal/cookies/" class="mono-xs" style="color:rgba(17,17,17,.45)">Cookie Policy</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-wordmark">
-      <div><canvas class="h-100 w-100" data-scene="wordmark" role="img" aria-label="BLINKCMS"></canvas></div>
     </div>
   </footer>
 
@@ -2600,9 +1115,16 @@
     </div>
   </div>
 
-  <script src="vendor/gsap.min.js"></script>
-  <script src="vendor/ScrollTrigger.min.js"></script>
-  <script src="vendor/lenis.min.js"></script>
+  <!--
+    GSAP, ScrollTrigger and Lenis are gone. Nothing left on the page needs
+    them: the entry animation is a CSS transition armed by an
+    IntersectionObserver, the count-up and the ambient drift are a dozen lines
+    of rAF each, and the one drawn line in 05 is a CSS transform. Smooth
+    scrolling is `scroll-behavior: smooth` in the stylesheet, which — unlike
+    Lenis — does not fight the scroll-snap.
+
+    topojson-client stays: the hero's globe decodes the land outlines with it.
+  -->
   <script src="vendor/topojson-client.min.js"></script>
   <script type="module" src="js/main.js"></script>
 
@@ -2611,10 +1133,11 @@
     here would be blocked by the very failure it exists to catch.
 
     js/main.js sets window.__blinkBooted as its first statement. If that has
-    not happened shortly after load, the module never ran and the preloader
-    would sit over the page indefinitely, so fall back to the same rules
-    <noscript> uses. The page then reads as static markup — all copy present,
-    no scroll story.
+    not happened shortly after load, the module never ran — the preloader
+    would sit over the page indefinitely, and every `[data-in]` element would
+    stay at the opacity 0 the inline script in <head> armed — so fall back to
+    the rules in that same <style> block. The page then reads as static
+    markup: all copy present, nothing animated, no globe.
   -->
   <script>
     window.addEventListener('load', function () {
@@ -2624,7 +1147,7 @@
 
         var onDisk = location.protocol === 'file:'
         var why = onDisk
-          ? 'The page is open from disk. Browsers block ES modules on file://, so the scroll story and all the canvas scenes cannot run. Serve the folder over http instead.'
+          ? 'The page is open from disk. Browsers block ES modules on file://, so the hero globe and every reveal cannot run. Serve the folder over http instead.'
           : 'js/main.js did not run. Check the script path and any Content-Security-Policy.'
         if (window.console && console.warn) console.warn('Blink CMS: falling back to static markup. ' + why)
 
@@ -2638,7 +1161,7 @@
         var bar = document.createElement('div')
         bar.setAttribute('role', 'status')
         bar.style.cssText =
-          'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:#e10600;color:#fff;' +
+          'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:#6118EA;color:#fff;' +
           'font:500 13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px 16px;text-align:center'
         bar.textContent =
           'Opened from disk — animations are off. ES modules need http. Serve this folder (e.g. npx serve .) and open the localhost address.'

@@ -1,14 +1,129 @@
 # Handoff — Blink CMS one-page site
 
-Written 26 Sep 2026, updated the same day after section 04 went digital.
-Read this plus `README.md` before changing anything.
+Written 26 Sep 2026. **Rewritten in part on 7 Oct 2026, when the whole page
+below the hero was redesigned — read §0 first, then this line: everything from
+§1 onwards describes the build that the redesign replaced.** It is kept because
+it records why things were done, which is still the fastest way to understand
+what you are looking at in git history, and because §6b (the IA), §6c (where
+the F.A.Q answers came from), §6d (the letters content warning) and §10
+(content rules) all still apply.
+
 `README.md` is the permanent doc (stack, structure, how to run). This file is
 the session context: **what was decided and why**, what's unverified, and what
 is still open.
 
 ---
 
+## 0 · The redesign — "one page, one edition" (7 Oct 2026)
+
+The client liked the hero and nothing after it. The complaint, in their words:
+everything below felt like separate websites — the background switched between
+black, white, cream, maps, purple, gradients and photographs; a serif appeared
+in some sections; every section had its own animation; some ran two or three
+screens; there was too much text.
+
+So every section after the hero was rebuilt to one rule: **one continuous dark
+page where every section fits inside the browser window and carries very little
+text.** Sixteen sections became eleven plus a footer.
+
+### What the page is now
+
+```
+00 hero         (#hero)         unchanged + a purple glow
+01 the desk     (#desk)         4 stat cards
+02 the question (#why-leave)    question list + fixed answer panel
+03 every screen (#every-screen) static device line-up
+04 our platform (#platform)     6 module cards
+05 the flow     (#flow)         pipeline + one readout line
+06 live         (#live)         LIVE status card + 2 cards
+07 the press    (#press)        3 case cards
+08 letters      (#letters)      one quote at a time + logo marquee
+09 the wire     (#the-wire)     4 post rows
+10 questions    (#faq)          the 02 component again
+11 front page   (#cta)          headline + Book a demo
+   footer       (#contact)      wordmark, 4 columns, email + city
+```
+
+### What was removed, and why it is not coming back
+
+- **Four pinned, scroll-scrubbed scenes** (desk, platform, press, hero sky) and
+  every per-section effect with them: the paper plane, the sliding giant
+  background text, the wedge transitions, the gradient wipe to white, the
+  particle burst, the letter-by-letter read-through in 09, the parallax on the
+  hero copy. All of it was the "separate websites" feeling.
+  `js/scenes/desk.js`, `platform.js`, `press.js`, `reader-signal.js`,
+  `halftone-wordmark.js`, `back-page-map.js`, `js/lib/canvas-scene.js`,
+  `article.js` and `fonts.js` are gone with them.
+- **GSAP, ScrollTrigger and Lenis**, which existed to drive those scenes.
+  Nothing left needs an animation library. Lenis also had to go on its own
+  merits: it owns the scroll position and fights `scroll-snap`.
+- **Playfair Display**, from `fonts.css` and from `fonts/`. The brief says no
+  serif anywhere, and leaving the face loadable invites it back.
+- **Four sections**: the front page (02), the masthead wall (10), the rate card
+  (11) and ON AIR (14). The masthead wall became one marquee row in 08; the
+  rate card and ON AIR are not in the new section map. **The rate card's prices
+  are therefore no longer on the homepage** — if the client wanted them there,
+  that is a conversation, not a bug. Its markup is recoverable at `38ef807`.
+- **Every photograph**, the bureau map, the background video and the second
+  (dark-on-light) logo file. `assets/` is one logo now.
+- **The header's light/dark inversion.** One background, nothing to invert
+  against.
+- **Red everywhere except the LIVE dot in 06.** The cursor ring was red; it is
+  lavender now.
+
+### What was kept, deliberately
+
+- **The hero**, exactly: layout, copy, headline gradient, dotted globe,
+  buttons. Two things changed and both were asked for or forced: the purple
+  glow behind it (now part of the one ambient layer), and its height, which
+  dropped from 240svh to 100svh because the extra scroll existed only to drive
+  `.hero-sky`, the gradient wipe into the old white section 02.
+- **The hero's headline roll-up**, as the single exception to "one motion
+  language". It is part of the hero. It is a CSS transition now, not GSAP.
+- **The preloader**, in full. The brief proposed removing the counter and
+  marked it "confirm with client"; the client's answer on 7 Oct was *keep it as
+  it is, decide later*. **This is still open** — see §7.
+- **The custom cursor, the overlay menu, the fixed section label, the video
+  modal and the boot failsafe.**
+
+### The three things to understand before editing
+
+They are documented at length in `README.md` and in the `BLINK · EDITION`
+banner in `css/styles.css`. In short: one screen, one background, one motion.
+The traps underneath them are worth repeating here, because every one of them
+was hit during the build:
+
+1. **`ch` resolves against the element's own font.** `max-width: 24ch` on a
+   wrapper set in 17px body copy is 235px, and the 62px headline inside it went
+   straight through the side. Size a display element in its own units or in px.
+2. **`svh` alone is not enough.** A 360×740 phone has height and no width.
+   Every display-sized clamp needs `min(Xsvh, Yvw)`.
+3. **An implicit `auto` grid column sizes to max-content.** The 8,000px marquee
+   track in 08 dragged its section, headline and quote out to 16,000px, hidden
+   only by `body { overflow-x: hidden }`. `.ed__grid` is
+   `grid-template-columns: minmax(0, 1fr)` because of it.
+4. **A fixed-height panel means the longest item must fit it at every width.**
+   That is the price of not using an accordion, and it is paid in the `min()`
+   caps on `.qa__a` and `.quote__text`.
+
+### Verified
+
+Eight viewports — 1920×960, 1440×900, 1366×657, 1280×720, 1024×768, 820×1180,
+390×844, 360×740 — plus 844×390 phone landscape. At each: no section taller
+than the window, no element wider than its box, no horizontal page scroll,
+footer at 41–60% of the window, no console errors. The interaction sweep (every
+answer in both Q&A panels, both letters, all six pipeline stages) was run at
+each size with the panels re-measured after every click.
+
+**Not verified:** Lighthouse (no headless Chrome available) and
+`prefers-reduced-motion` (read in the rules, not emulated).
+
+---
+
 ## 1 · What this is
+
+> **Historical from here down.** §1–§6e describe the sixteen-section build that
+> §0 replaced. §6b, §6c, §6d and §10 still apply to the current page.
 
 A single-page marketing site for Blink CMS, built to the structure and motion
 system of unitedcarriers.com but told through a news story rather than a
@@ -791,6 +906,49 @@ section animates delivery, structure or arrival.
 
 ---
 ## 7 · Open items
+
+### Open after the redesign (7 Oct 2026) — these are current, not historical
+
+**1 · 66+ newsrooms contradicts 150+ newsrooms, on the same page.**
+The redesign brief specifies section 01's four figures as 66+ · 43K · 20+ ·
+396%, with labels taken from the old page. The old page said 150+ and 400% for
+the first and last of those. Asked which to use, the client chose the brief's
+numbers on 7 Oct.
+
+So the page now reads **"66+ newsrooms powered"** in section 01 and **"The tech
+team behind 150+ newsrooms"** in section 11 — and 150+ is also in the `<title>`
+meta description and in several of the F.A.Q answers. One of the two is wrong,
+or 66+ counts something that is not newsrooms and needs a different label.
+**Nothing in the build can resolve this; it needs the client.** It is the first
+thing a reader who is paying attention will notice.
+
+**2 · The preloader.** The brief proposed removing the counter and marked it
+"confirm with client". The answer was *keep it as it is, decide later*, so it
+is untouched — the bureau count, the sample wire feed and the language list all
+still run, and the page is still scroll-locked for their duration with a
+7-second failsafe.
+
+Worth knowing when that decision comes back: it is the single biggest thing
+standing between this page and the brief's "Lighthouse mobile ≥ 85" target,
+because it holds first paint behind a canvas render and a timer. `js/main.js`
+already handles its absence — delete the `.preloader` block from `index.html`
+and `start()` calls `mountGlobeLazy()` directly.
+
+**3 · Lighthouse has not been run.** No headless Chrome in the build
+environment. The structural work is done — three of the four vendor libraries
+are gone, there is no video, no photography and one image on the page — but the
+number is unmeasured and the brief asks for ≥ 85 on mobile.
+
+**4 · Three sections carry about 50 words, not 40.** The brief's text rules cap
+a section at roughly 40 visible words; 02 (51), 04 (49) and 10 (49) are over.
+In each case it is the brief's own section map that puts them there — six
+questions, six cards, five F.A.Q entries. Below 1024px wide or 680px tall the
+lists trim to four and the card descriptors drop, which brings all three under
+the cap. Shortening them further on desktop means dropping an item, which is a
+content decision.
+
+**5 · The rate card is no longer on the homepage.** It is not in the new
+section map. If pricing was meant to stay, its markup is at commit `38ef807`.
 
 ### The 12-essentials audit — all three sections landed
 

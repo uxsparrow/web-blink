@@ -74,13 +74,22 @@ export const pings = [
 /** Longitude parked in front of the camera when the globe first appears. */
 export const START_LON = 78
 
-/** Timestamps down the live-blog rail; the travelling card reads these. */
-export const liveTicks = ['14:32', '14:35', '14:41', '14:46', '14:52', '15:04', '15:11', '15:19']
 
 /**
- * The story the Desk writes and the Platform rail carries — one headline, split
- * into the lines it breaks on, typed out a character at a time. Every screen in
- * sections 03 and 04 renders this same article.
+ * 08 · LETTERS. The only section whose copy is not in index.html, because a
+ * carousel showing one item at a time has nowhere to put the others: the
+ * first letter is in the markup and reads fine with no scripts, and these are
+ * what the arrows page through.
  */
-export const articleHeadline = ['EVERY STAGE', 'OF THE', 'STORY']
-export const articleDateline = 'NOIDA — 14:32 IST'
+export const letters = [
+  {
+    text: 'Our reporters file from the district in Tamil, on their phones, and it reaches the front page.',
+    name: 'Kavitha Iyer',
+    org: 'Daily Thanthi',
+  },
+  {
+    text: 'Election night, we watched the traffic climb and did nothing at all. Exactly what we were paying for.',
+    name: 'Sanjay Bhat',
+    org: 'The Federal',
+  },
+]

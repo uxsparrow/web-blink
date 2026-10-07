@@ -68,6 +68,26 @@ export const START_LON = 78
  * carousel showing one item at a time has nowhere to put the others: the
  * first letter is in the markup and reads fine with no scripts, and these are
  * what the arrows page through.
+ *
+ * ⚠ MIXED PROVENANCE — read `source` on every entry before this ships.
+ *
+ * `source: 'sample'` means the name, the role and the words are invented. Two
+ * of these are, at the user's request, for an internal review build. A
+ * fabricated quote beside a real customer's masthead reads as an endorsement
+ * that customer never gave, so those two have to be replaced or flagged before
+ * the page is public — see HANDOFF §6d.
+ *
+ * `source: <url>` means the quote is verbatim from that published case study,
+ * not paraphrased and not shortened. If one ever has to be cut, mark the cut:
+ * the section claims nothing is paraphrased.
+ *
+ * Two more verbatim ones exist and are not used here — Hari Bhoomi's digital
+ * team and EVO India's team, from the same `/case-study/` set. They are in
+ * HANDOFF §6d and can replace the two samples without any other change.
+ *
+ * `shot` cycles the two placeholder newsroom frames, because there are only
+ * two. They are frames and never faces on purpose: a stock photograph of a
+ * plausible-looking person beside a named quote reads as that person.
  */
 export const letters = [
   {
@@ -77,6 +97,7 @@ export const letters = [
     role: 'Managing editor',
     org: 'Daily Thanthi',
     shot: 'letters_1',
+    source: 'sample',
   },
   {
     text:
@@ -85,5 +106,26 @@ export const letters = [
     role: 'Product lead',
     org: 'The Federal',
     shot: 'letters_2',
+    source: 'sample',
+  },
+  {
+    text:
+      'Our collaboration with Blink CMS has been a game-changer for LiveLaw. The platform’s stability has been remarkable, and we’ve seen a significant increase in revenue since the switch. Blink CMS truly understands the needs of a modern newsroom, and their support has been exceptional. Highly recommended!',
+    name: 'Advocate P V Dinesh',
+    role: 'Co-founder',
+    org: 'LiveLaw',
+    shot: 'letters_1',
+    source: 'blinkcms.ai /case-study/ — LiveLaw, verbatim',
+  },
+  {
+    text:
+      'Working with BlinkCMS has been a game-changer for us. We were publishing great content, but our technical issues were holding us back. After partnering with BlinkCMS, we saw significant improvements in traffic, search visibility, and overall site speed. Their team is proactive, professional, and always one step ahead.',
+    // the published case study names no person, only the role — so the role
+    // carries the byline and there is nothing to put in `name`
+    name: 'Editorial head',
+    role: '',
+    org: 'Tax Scan',
+    shot: 'letters_2',
+    source: 'blinkcms.ai /case-study/ — Tax Scan, verbatim',
   },
 ]

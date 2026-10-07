@@ -305,37 +305,90 @@ export function initQuotes(letters) {
   const prev = root.querySelector('[data-quote-prev]')
   const next = root.querySelector('[data-quote-next]')
   const shot = document.querySelector('[data-quote-shot]')
-  const deck = qq('[data-deck-img]')
+  const deck = document.querySelector('[data-deck]')
+  const front = deck?.querySelector('.deck__card')
   if (!panel) return
 
   const total = String(letters.length).padStart(2, '0')
   let i = 0
 
-  /** The two cards behind show whichever letters come next. */
+  /*
+   * One card behind the front one per remaining letter, so a deck of three
+   * letters is three cards deep and a deck of four is four. `--k` is the
+   * card's depth and the stylesheet derives the offset, scale, tilt and
+   * opacity from it, which is why adding a fifth letter needs no CSS.
+   */
+  const backs = []
+  // `--t` is the depth normalised across however many cards there are, so the
+  // deck leans the same distance whether it is two deep or five
+  const span = Math.max(1, letters.length - 1)
+  if (deck && front) {
+    for (let k = letters.length - 1; k >= 1; k--) {
+      const card = document.createElement('div')
+      card.className = 'deck__card duo'
+      card.style.setProperty('--k', String(k))
+      card.style.setProperty('--t', (k / span).toFixed(4))
+      const img = document.createElement('img')
+      img.alt = ''
+      img.loading = 'lazy'
+      card.append(img)
+      deck.insertBefore(card, front)
+      backs[k - 1] = img
+    }
+  }
+
+  /** The cards behind show whichever letters come next, in order. */
   const paintDeck = () => {
-    deck.forEach((img, k) => {
+    backs.forEach((img, k) => {
       const L = letters[(i + k + 1) % letters.length]
       if (L?.shot) setImage(img, mediaSrc(L.shot))
     })
   }
 
+  // an empty field is hidden rather than left as a gap in the byline — not
+  // every published case study names a person
+  const put = (el, value) => {
+    if (!el) return
+    el.textContent = value || ''
+    el.hidden = !value
+  }
+
+  /*
+   * A published quote runs two and a half times longer than a one-line one,
+   * and at the same type size that is the difference between a four-line
+   * panel and a twelve-line one — the column lurched every time an arrow was
+   * pressed. Past 180 characters the quote steps down a size, which is what a
+   * letters page does with a long letter anyway.
+   */
+  const LONG = 180
+
+  const render = () => {
+    const L = letters[i]
+    panel.classList.toggle('quote--long', (L.text || '').length > LONG)
+    if (text) text.textContent = L.text
+    put(name, L.name)
+    put(role, L.role)
+    put(org, L.org)
+    if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
+    if (shot && L.shot) setImage(shot, mediaSrc(L.shot))
+    paintDeck()
+  }
+
   const go = (step) => {
     i = (i + step + letters.length) % letters.length
-    const L = letters[i]
-    swap(panel, () => {
-      if (text) text.textContent = L.text
-      if (name) name.textContent = L.name
-      if (role) role.textContent = L.role
-      if (org) org.textContent = L.org
-      if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
-      if (shot && L.shot) setImage(shot, mediaSrc(L.shot))
-      paintDeck()
-    })
+    swap(panel, render)
   }
 
   prev?.addEventListener('click', () => go(-1))
   next?.addEventListener('click', () => go(1))
-  paintDeck()
+
+  /*
+   * Rendered once on load rather than left to the markup. The first letter is
+   * written into index.html so the section reads with no scripts, but the
+   * total beside it cannot be — it said `01 / 02` while there were four
+   * letters to page through, because only an arrow press ever rewrote it.
+   */
+  render()
 }
 
 /* ── 11 · the chat ────────────────────────────────────────────── */

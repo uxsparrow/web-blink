@@ -73,7 +73,7 @@ until there is.
 | **05** | The background photograph is **fixed to the window** and the section scrolls over it — a scroll-driven CSS animation, not a scroll handler, so it does not judder. The card is rebuilt: it had no rule of its own at all, so it was an unpadded block collapsed at the top of its column. It is now a filling flex column like 02's monitor, capped at 70svh so it reads as a panel in front of the scene rather than a full-height slab. The claim has its own line instead of riding in the LIVE flag and colliding with the timestamp; the capacity line is named in a legend above the plot instead of a label sitting on top of it; the AWS label leads the server rack so it cannot be squeezed off the edge. |
 | **06** | Rebuilt. It was the emptiest section on the page — a 900px window held 419px of content and the card had ~190px of nothing in it — because `.ed--top` sizes the grid to its taller column, and here both columns were short. It is an ordinary filling layout-A section now. The two sides are named once at the top instead of as headings over ten repeated glyphs, each row carries its own labelled WP/Blink capsules, and the section finally has a signature graphic: a 5x5 matrix, one column per category and one dot per row in it, built from `compare` so it cannot drift from the table. Rows and copy are unchanged. **No `[FROM CLIENT]` markers remain.** |
 | **07** | Six segments with real metrics, a dummy screenshot with image parallax, floating chips anchored to the frame, and a per-segment background glyph. |
-| **08** | Dummy newsroom image with Ken Burns and parallax; the deck behind shows the next letters. **Never a face** — see §7. |
+| **08** | Four letters now, not two, and the deck behind the portrait is built from `letters.length` so it is always exactly as deep as there are letters to page through. The portrait is down from 86% to 66% of its column. Two of the four quotes are verbatim from published case studies; two are samples — **see §6d, and never a face**. |
 | **09** | Four plans with the client's published limits, features, CTAs and add-ons strip. Features start under the price. |
 | **10** | Dummy images with parallax inside each card and a hover zoom. |
 | **11** | A real exchange: your question as a right-aligned bubble, a 600ms typing indicator, then the desk's answer, two quick actions and a footer link. Auto-height, top-aligned. |
@@ -998,32 +998,40 @@ things where there are now six.
 
 ## 6d · 09 · LETTERS — the read-through, and a content warning
 
-### ⚠ The quotes here are fabricated, and nothing on screen says so
+### ⚠ Two of the four quotes are fabricated, and nothing on screen says which
 
-**The names, roles and quotes in the four letters are invented.** This build is
-for the Blink CMS team to review, and the user asked for sample copy and for
-the on-screen warning to come off, after the concern was raised. That is their
-call for an internal build. **This file is now the only record**, so read the
-next two paragraphs before anything here goes public.
+**The carousel now holds four letters, and their provenance is mixed.** Every
+entry in `letters` (js/lib/content.js) carries a `source` field saying which it
+is. Read it before anything here goes public.
 
-**What is real:** all four mastheads — LiveLaw, Deccan Chronicle, Daily Thanthi
-and The Federal — appear on the publisher wall in 10, so the customer
-relationships are not invented, only the words put in their mouths. That is the
-narrower risk, but it is still the serious one: a fabricated quote against a
-real customer’s name reads as an endorsement that customer never gave.
+| # | Who | `source` |
+|---|---|---|
+| 01 | Kavitha Iyer, Daily Thanthi | `sample` — **name, role and words all invented** |
+| 02 | Sanjay Bhat, The Federal | `sample` — **name, role and words all invented** |
+| 03 | Advocate P V Dinesh, LiveLaw | verbatim, blinkcms.ai `/case-study/` |
+| 04 | Editorial head, Tax Scan | verbatim, blinkcms.ai `/case-study/` |
 
-**Before this ships publicly, one of two things has to happen.** Either real
-quotes replace the sample ones, or the sample flag goes back — it printed
+The two samples are the user's call for an internal review build — they asked
+for sample copy and for the on-screen warning to come off after the concern was
+raised. **This file is now the only record of which two they are.**
+
+**What makes the samples the serious risk:** their mastheads are real. Daily
+Thanthi and The Federal both appear on the publisher wall in 10, so the customer
+relationships are not invented, only the words put in their mouths — and a
+fabricated quote against a real customer's name reads as an endorsement that
+customer never gave.
+
+**Before this ships publicly, one of two things has to happen to 01 and 02.**
+Either real quotes replace them, or the sample flag goes back — it printed
 `[SAMPLE LETTERS — NAMES AND QUOTES ARE PLACEHOLDERS]` in red mono and is in
-git history alongside its `.letters-flag` rule. Do not let this section reach
-production in its current state.
+git history alongside its `.letters-flag` rule. Do not let those two reach
+production as they are.
 
-**There were real quotes here, and they are recoverable.** Four verbatim ones
-— Advocate P V Dinesh (Co-Founder, LiveLaw), the Editorial Head of Tax Scan,
-the Hari Bhoomi digital team and the EVO India team — from the case studies
-published at blinkcms.ai under `/case-study/`. They came out because three of
-those publishers are not among the four the user wants shown. **They live at
-commit `761d3c3`.** The LiveLaw one is usable today as-is.
+**Two more verbatim quotes are sitting ready for exactly that.** The Hari Bhoomi
+digital team and the EVO India team, from the same `/case-study/` set, quoted in
+full at commit `5bab5c4` (the four-quote version of the section) — dropping them
+into `letters` in place of the two samples makes the whole section real and
+needs no other change. All four published quotes also live at commit `761d3c3`.
 ### The read-through
 
 Four equal letters, each a masthead slug beside a quote, and **the quote lights
@@ -1366,9 +1374,12 @@ These cost a lot of time; they are about the tooling, not the site.
 
 ## 10 · Content rules — hold these
 
-- **No invented testimonials, people or quotes.** The four quotes in 09 are
-  verbatim from the case studies published at blinkcms.ai — see §6d. Anything
-  that is not traceable to a published source does not go on this page.
+- **No invented testimonials, people or quotes.** The rule stands, and **08 is
+  currently the one place it is knowingly broken**: two of its four letters are
+  sample copy, at the user's request, for an internal build. Every entry in
+  `letters` carries a `source` field saying which it is, two verbatim
+  replacements are ready, and §6d has the whole picture. Nothing else on the
+  page is untraceable to a published source, and nothing new should be.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - **Every headline is live HTML** — nothing baked into an image.
 - Only facts from the Blink CMS brief. Anything else is a marked placeholder.

@@ -1317,15 +1317,20 @@
             </div>
           </div>
 
+          <!--
+            Only the front card is here. The cards behind it are one per
+            remaining letter, built by `initQuotes()` from `letters.length`,
+            so the deck is always as deep as there are letters to page
+            through — it was three cards nailed into the markup, which said
+            "three" whether there were two letters or five.
+
+            The front one stays in the markup: it carries the lead image with
+            no scripts, and its `[data-pxm]` has to exist before
+            `initMediaParallax()` runs.
+          -->
           <div class="ed__gfx">
             <div class="deck" data-deck data-in style="--i:1">
-              <div class="deck__card deck__card--2 duo">
-                <img data-deck-img="2" alt="" loading="lazy">
-              </div>
-              <div class="deck__card deck__card--1 duo">
-                <img data-deck-img="1" alt="" loading="lazy">
-              </div>
-              <div class="deck__card deck__card--0 duo">
+              <div class="deck__card deck__card--front duo" style="--k:0;--t:0">
                 <span class="pxm deck__media" data-pxm>
                   <img data-quote-shot data-img="letters_1" alt="" loading="lazy">
                 </span>

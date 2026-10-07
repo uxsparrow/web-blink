@@ -4414,6 +4414,12 @@ body {
   line-height: 1.22;
 }
 
+/* set by initQuotes() past 180 characters — see the note there */
+.quote--long .quote__text {
+  font-size: clamp(15px, min(2.4svh, 3.8vw), 24px);
+  line-height: 1.3;
+}
+
 .quote__by {
   display: flex;
   flex-wrap: wrap;
@@ -4461,19 +4467,39 @@ body {
   justify-content: center;
 }
 
+/*
+ * Every card's depth comes from two numbers `initQuotes()` writes on it:
+ * `--k` is its position in the deck, and `--t` is that position normalised to
+ * 0…1 across however many cards there are. Offset, scale and tilt all come
+ * off `--t`, so the deck occupies the same width whether it is two cards deep
+ * or five — a per-card step instead put the fourth card 14px past the right
+ * edge of its column at 1920. Only the fade uses `--k`, because each card
+ * should sit a fixed amount behind the one in front of it.
+ *
+ * This replaces three hand-written `--0/--1/--2` rules, which fixed the deck
+ * at three cards however many letters there were.
+ */
 .deck__card {
+  --k: 0;
+  --t: 0;
   position: absolute;
-  height: 86%;
+  /* 66%, down from 86%: at full height the deck was a wall of picture beside
+     a short quote, and the card now reads as something held in the scene. */
+  height: 66%;
   /* the portrait is the one place a definite height is right — the deck
-     behind it is offset from it — so the ratio gives way instead. 76%, not
-     88%: the two cards behind are translated 14% and 26% right, and at 88%
-     the far one put the whole section into horizontal overflow at 1024. */
-  max-width: 76%;
+     behind it is offset from it — so the ratio gives way instead. 68%, not
+     88%: the whole deck leans 24% right of centre, and a wider card put the
+     section into horizontal overflow at 1024. */
+  max-width: 68%;
   aspect-ratio: 3 / 4;
   border-radius: 16px;
   border: 1px solid var(--glass-line);
   background: #0a0718;
   overflow: hidden;
+  z-index: calc(10 - var(--k));
+  transform: translateX(calc(var(--t) * 24%)) scale(calc(1 - var(--t) * 0.18))
+    rotate(calc(var(--t) * 10deg));
+  opacity: calc(1 - var(--k) * 0.28);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
 }
 
@@ -4489,25 +4515,8 @@ body {
   mix-blend-mode: color;
 }
 
-.deck__card--0 {
-  z-index: 3;
-  transform: translateX(0) scale(1);
-}
-
-.deck__card--1 {
-  z-index: 2;
-  transform: translateX(14%) scale(0.9) rotate(4deg);
-  opacity: 0.6;
-}
-
-.deck__card--2 {
-  z-index: 1;
-  transform: translateX(26%) scale(0.82) rotate(8deg);
-  opacity: 0.35;
-}
-
-/* the Ken Burns drift on the front portrait */
-.deck__card--0 .deck__media {
+/* the Ken Burns drift on the front portrait — only the front card has one */
+.deck__media {
   position: absolute;
   inset: -6%;
   animation: ken 18s ease-in-out infinite alternate;
@@ -6607,14 +6616,24 @@ button:disabled,
     display: none;
   }
 
-  .deck__card--1,
-  .deck__card--2 {
+  /* only the front card below lg — the deck behind it is a desktop device,
+     and at this width it just pushes the portrait off-centre */
+  .deck__card:not(.deck__card--front) {
     display: none;
   }
 
+  /*
+   * Width drives the card once the layout stacks, and the ratio sets the
+   * height. `height: 100%` of a stacked graphic column ran the portrait to
+   * 670px on a 328px screen — most of a phone window spent on one picture.
+   */
   .deck__card {
-    height: 100%;
-    aspect-ratio: 4 / 3;
+    position: relative;
+    height: auto;
+    width: min(100%, 300px);
+    max-width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 100%;
   }
 }
 
@@ -6817,7 +6836,7 @@ button:disabled,
     transform: none !important;
   }
 
-  .deck__card--0 .deck__media,
+  .deck__media,
   .wordmark,
   .rate--best,
   .chat__dots i {

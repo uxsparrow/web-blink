@@ -24,7 +24,55 @@ const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
  * The threshold is low on purpose. A section is a whole window tall, so by
  * the time 10% of it shows the reader is already looking at it.
  */
+/**
+ * Containers whose children each take their own place in the stagger.
+ *
+ * Marking the container rather than every child keeps the markup readable and
+ * keeps lists that are built at runtime — the logo rows, the footer columns —
+ * in the same rhythm as the ones written by hand. The container's own `--i`
+ * is the starting number, so a grid that arrives third in its section starts
+ * counting at three rather than at zero.
+ *
+ * Deliberately NOT here: `.metrics` and `.vs2__rows`, which are rebuilt every
+ * time a tab changes. Those already cross-fade through `swap()`, and a reveal
+ * on top of a cross-fade is two animations arguing about the same element.
+ */
+const STAGGER = [
+  '.stats',
+  '.qlist',
+  '.bento',
+  '.rates',
+  '.addons',
+  '.wire',
+  '.tabs',
+  '.vtabs',
+  '.live__mini',
+  '.cta-buttons',
+  '.logos',
+  '.news',
+  '.ed-footer__cols',
+  '.ed-footer__base',
+]
+
+function expandStagger() {
+  STAGGER.forEach((sel) =>
+    qq(sel).forEach((group) => {
+      const base = Number(group.style.getPropertyValue('--i')) || 0
+      // the container stops being a revealed thing and becomes a plain box;
+      // otherwise its children move 24px inside a parent moving 24px
+      group.removeAttribute('data-in')
+      ;[...group.children].forEach((child, i) => {
+        if (child.hasAttribute('data-in')) return
+        child.setAttribute('data-in', '')
+        child.style.setProperty('--i', String(base + i))
+      })
+    })
+  )
+}
+
 export function initReveals() {
+  expandStagger()
+
   const blocks = qq('#hero, .ed, .ed-footer')
   if (!blocks.length) return
 
@@ -33,12 +81,46 @@ export function initReveals() {
     return
   }
 
+  /*
+   * THE SAFETY NET, and it is not optional.
+   *
+   * Every revealed element on this page starts at `opacity: 0` and waits for
+   * `.is-in`. If the observer never runs, the page is blank — not degraded,
+   * blank. And there is a real case where it never runs: a document that
+   * loads HIDDEN. A background tab, a minimised window, a preview pane that
+   * is not on screen — Chrome does not deliver IntersectionObserver callbacks
+   * for a hidden document at all. (This was found exactly that way: the whole
+   * page measured as unrevealed, and a plain observer on a full-viewport
+   * element reported nothing, because `document.visibilityState` was
+   * `hidden`.)
+   *
+   * So: reveal anything already in the viewport whenever the page becomes
+   * visible, and once more on a timer regardless. The observer still does the
+   * normal work; this only catches the case where it cannot.
+   */
+  const reveal = (el) => {
+    el.classList.add('is-in')
+    io.unobserve(el)
+  }
+
+  const sweep = () => {
+    blocks.forEach((b) => {
+      if (b.classList.contains('is-in')) return
+      const r = b.getBoundingClientRect()
+      if (r.top < window.innerHeight * 0.92 && r.bottom > 0) reveal(b)
+    })
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sweep()
+  })
+  setTimeout(sweep, 2500)
+
   const io = new IntersectionObserver(
     (entries) =>
       entries.forEach((e) => {
         if (!e.isIntersecting) return
-        e.target.classList.add('is-in')
-        io.unobserve(e.target)
+        reveal(e.target)
       }),
     /*
      * threshold 0 with a negative bottom margin, not a percentage of the

@@ -128,6 +128,27 @@ calls `draw(1)` once, so a graphic that would have assembled arrives already
 assembled rather than never arriving.
 
 - **The one entry reveal**: fade in, up 24px, 600ms, staggered 80ms by `--i`.
+  It covers everything — the hero copy, every section's label, headline and
+  support line, and the items *inside* each module. Rather than tagging
+  hundreds of elements by hand, `STAGGER` in `ui/edition.js` lists the
+  containers whose children each take their own place in the sequence
+  (`.stats`, `.bento`, `.rates`, `.wire`, `.qlist`, the footer columns…);
+  `expandStagger()` assigns them at boot, counting on from the container's own
+  `--i`, and removes the container's — otherwise a child would move 24px
+  inside a parent moving 24px.
+
+  The hero is the exception, and deliberately so: its copy rides `.is-loaded`
+  on `<html>`, not the shared `.is-in`, because `.is-in` belongs to an
+  IntersectionObserver and putting hero text back under an observer is exactly
+  what had the title coming back cut.
+
+  **Every revealed element starts at `opacity: 0`, so a reveal that never
+  fires is a blank page.** `initReveals()` therefore carries a safety net: a
+  document that loads *hidden* — a background tab, a minimised window — gets
+  no IntersectionObserver callbacks at all in Chrome, so the reveal also runs
+  on `visibilitychange` and once on a 2.5s timer. This is not theoretical; it
+  was found by measuring the page in a hidden preview pane and finding nothing
+  revealed and a plain observer reporting nothing.
 - **Parallax**: back 0.3, mid 0.7, chips 1.15, capped at ±80px. Content itself
   is never parallaxed.
 - **Ambient loops only in view.** Every canvas loop and every CSS micro-UI is
@@ -137,47 +158,59 @@ assembled rather than never arriving.
   reveal becomes an opacity fade and every scrubbed graphic draws its finished
   state.
 
-## Assets — all dummies, all from one file
+## Assets — local placeholders, all from one file
 
 **Every image and video on the page comes from `assets/media.js`.** Nothing in
 the markup carries a path: the HTML says `data-img="wire_1"` and the script
-resolves it. To ship real assets, set `src` on the entry — that is the whole
-change, in one file.
+resolves it. To ship real assets, change `src` on the entry — that is the
+whole change, in one file.
 
 ```js
-images.wire_1   = { src: 'assets/img/wire-tamil-daily.webp', seed: '…', w: 1400, h: 900 }
+images.wire_1     = { src: 'assets/img/wire-1.jpg', w: 1400, h: 900, … }
 videos.live_video = { src: 'assets/video/live-newsroom.mp4', poster: { … } }
-logos[0]        = { name: 'Daily Thanthi', src: 'assets/logos/daily-thanthi.svg' }
+logos[0]          = { name: 'Daily Thanthi', src: 'assets/logos/daily-thanthi.svg' }
 ```
 
-| Key | Used by |
-|---|---|
-| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | 07, one per segment |
-| `letters_1` · `letters_2` | 08's portrait card and the deck behind it |
-| `wire_1` · `wire_2` · `wire_3` | 10's three post cards |
-| `live_video` · `cta_video` (and their posters) | the 05 and 12 back layers |
-| `logos[]` | 01's two marquees and 12's orbiting chips |
+| Key | File | Used by |
+|---|---|---|
+| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | `assets/img/beats-*.jpg` | 07, one per segment |
+| `letters_1` · `letters_2` | `assets/img/letters-*.jpg` | 08's card and the deck behind it |
+| `wire_1` · `wire_2` · `wire_3` | `assets/img/wire-*.jpg` | 10's three post cards |
+| `live_video` · `cta_video` posters | `assets/img/poster-*.jpg` | the 05 and 12 back layers |
+| `logos[]` | — | 01's marquees and 12's orbit; set as type until SVGs exist |
 
-**⚠ Until those are filled in the page loads dummy pictures from
-picsum.photos** — an external service, and the only one it calls apart from
-the YouTube embed behind "Watch video". It is there so the layout can be
-reviewed with pictures in it. **It is not a state to ship in**; filling in
-every `src` removes the third-party request entirely.
+**The page makes no third-party request for media.** All thirteen pictures are
+in `assets/img/`. The only external call left on the whole site is the YouTube
+embed behind "Watch video", and that is not made until someone presses it.
+
+### ⚠ They are still placeholders
+
+Each was fetched once from Lorem Picsum, which serves photographs from
+Unsplash, and saved locally so the layout could be reviewed without calling
+out to anything. `seed` and `credit` in `media.js` record exactly which
+picture each one is. They are generic stock photographs of nothing in
+particular — **not** Blink CMS screenshots, **not** client newsrooms, **not**
+cleared brand assets. Replace all of them before launch.
 
 **08 is never a face.** Its quotes carry real publisher names and placeholder
 people, so a stock photograph of a plausible-looking person beside one reads
-as that person. Those two seeds are abstract newsroom frames on purpose, and
-when real portraits arrive the names have to be real too.
+as that person. Those two are abstract frames on purpose, and when real
+portraits arrive the names have to be real too.
 
-A missing file is never an error. An image that 404s hides itself and the
-drawn stand-in behind it shows through; a video with no `src` is never
-requested at all and its poster carries the slot with a slow zoom. The same
-purple duotone — `grayscale(1) contrast(1.1) brightness(0.8)` plus `#6118EA`
-at 60% in `color` blend mode — is applied to every picture, dummy or real, so
-a client screenshot and a stand-in sit in the same world.
+**There are no videos.** There was nothing to save: `src` is empty on both and
+the page never requests one, so the poster carries the slot with a slow zoom.
+Drop a file in `assets/video/`, point `src` at it, and it starts playing in
+view with no other change. Supply MP4 + WebM, 1920×1080, 8–12s seamless loop,
+≤3MB.
 
-Supply videos as MP4 + WebM, 1920×1080, 8–12s seamless loop, ≤3MB, with a
-poster. Images AVIF or WebP. Logos white monochrome SVG.
+A missing file is never an error — an image that 404s hides itself and the
+drawn stand-in behind it shows through. The same purple duotone —
+`grayscale(1) contrast(1.1) brightness(0.8)` plus `#6118EA` at 60% in `color`
+blend mode — is applied to every picture, so a client screenshot and a
+stand-in sit in the same world.
+
+The thirteen placeholders are 2.0 MB in total, unoptimised, straight from the
+source. **Do not measure Lighthouse against them** — see "Verification status".
 
 ## Editing content
 
@@ -235,6 +268,34 @@ Verified with no runtime errors at **1920×960, 1440×900, 1366×657, 1280×720,
 The interactive sweep ran at each size before re-measuring: all six monitor
 scenes in 02, all five comparison tabs in 06, all six segments in 07, both
 letters in 08, all seven questions in 11, and all three flow nodes in 04.
+
+**Measure elements, not just sections.** The section-level check above has a
+blind spot: a grid item that overflows inside a `min-height: 0` grid does not
+grow its section, so the section still reports "fits". That is how four rate
+cards in a three-column grid went unnoticed while each one spilled 120px over
+its own box and painted across the card below. Run this too:
+
+```js
+const SKIP = '.marquee,.page-bg,.layer-back,.cta-globe,.rail,.rates,.pxm,' +
+             '.post__art,.vidslot,.deck__card,.tile__art,.hero,svg,.shot';
+document.querySelectorAll('main *, .ed-footer *').forEach((el) => {
+  if (el.closest(SKIP) || el.matches(SKIP)) return;
+  const y = el.scrollHeight - el.clientHeight, x = el.scrollWidth - el.clientWidth;
+  if ((y > 12 || x > 12) && el.clientHeight) console.log(el, 'y' + y, 'x' + x);
+});
+```
+
+Everything in `SKIP` overflows on purpose — a marquee, a bleeding graphic, a
+picture oversized to have somewhere to parallax. Anything else is a bug.
+
+**Neutralise the reveal before measuring**, or every container will report
+about 24px of overflow that is only an un-run `translateY`:
+
+```js
+document.head.insertAdjacentHTML('beforeend',
+  '<style>[data-in],[data-hero-in],.line-inner{opacity:1!important;' +
+  'transform:none!important;transition:none!important}</style>');
+```
 
 Paste this into the console after any edit:
 

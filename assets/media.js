@@ -2,74 +2,160 @@
  * Every image, video and logo on the page, in one place.
  *
  * The point of this file: nothing in the markup hard-codes a path. When the
- * real assets arrive, set `src` on the entry and nothing else changes —
- * no hunting through index.html, no second place to forget.
+ * real assets arrive, change `src` here and nothing else — no hunting through
+ * index.html, no second place to forget.
  *
- * Until then every image falls back to a deterministic dummy from
- * picsum.photos, seeded per key so a given slot always gets the same picture
- * and the layout does not reshuffle between reloads.
+ * ── WHERE THE PICTURES COME FROM ──────────────────────────────────────────
  *
- *   ⚠ picsum.photos is an external service, and it is the only one the page
- *   calls apart from the YouTube embed behind "Watch video". It exists so the
- *   client can see the layout with pictures in it before supplying any. The
- *   moment every `src` below is filled in, the page makes no third-party
- *   requests at all — which is the state it should ship in.
+ * They are all LOCAL, in assets/img/. The page makes no third-party request
+ * for media; the only external call left on the whole site is the YouTube
+ * embed behind "Watch video", and that one is not made until someone presses
+ * it.
  *
- * Videos degrade further: `src` empty means the <video> is never given a
- * source and the poster image carries the slot with a slow zoom. A missing
- * video file is not an error, it is a still.
+ * ⚠ THEY ARE STILL PLACEHOLDERS. Each was fetched once from Lorem Picsum
+ * (picsum.photos), which serves photographs from Unsplash, and saved here so
+ * the layout can be reviewed without calling out to anything. `seed` and
+ * `credit` below record exactly which picture each one is, so any of them can
+ * be traced or re-fetched. They are generic stock photographs of nothing in
+ * particular — NOT Blink CMS screenshots, NOT client newsrooms, and NOT
+ * cleared brand assets. Replace every one of them before launch.
+ *
+ * ⚠ AND THE VIDEOS DO NOT EXIST. There is no video to save, so `src` is
+ * empty on both and the page never requests one: the poster image carries the
+ * slot with a slow zoom. Drop a file in assets/video/, point `src` at it, and
+ * it starts playing in view with no other change.
  */
 
-const DUMMY = 'https://picsum.photos/seed'
-
 /**
- * `src` wins when set. `seed` + `w`/`h` build the stand-in when it is not.
- * `w`/`h` are also written onto the <img> so the box is reserved before the
- * picture lands — this page budgets CLS at under 0.05 and an unsized image is
- * the usual way to blow that.
+ * `src` is the file. `w`/`h` are written onto the <img> so the box is
+ * reserved before the picture lands — this page budgets CLS under 0.05, and
+ * an unsized image is the usual way to blow that.
+ *
+ * `seed` and `credit` are provenance, not plumbing. Delete them when the real
+ * asset replaces the placeholder.
  */
 export const images = {
   /* 07 · THE BEATS — one site screenshot per segment */
-  beats_thanthi: { src: '', seed: 'blink-beats-thanthi', w: 1600, h: 1000 },
-  beats_madhyamam: { src: '', seed: 'blink-beats-madhyamam', w: 1600, h: 1000 },
-  beats_bhaskar: { src: '', seed: 'blink-beats-bhaskar', w: 1600, h: 1000 },
-  beats_hansindia: { src: '', seed: 'blink-beats-hansindia', w: 1600, h: 1000 },
-  beats_livelaw: { src: '', seed: 'blink-beats-livelaw', w: 1600, h: 1000 },
-  beats_federal: { src: '', seed: 'blink-beats-federal', w: 1600, h: 1000 },
+  beats_thanthi: {
+    src: 'assets/img/beats-thanthi.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-thanthi',
+    credit: 'Lorem Picsum #949 (Unsplash) — placeholder',
+  },
+  beats_madhyamam: {
+    src: 'assets/img/beats-madhyamam.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-madhyamam',
+    credit: 'Lorem Picsum #940 (Unsplash) — placeholder',
+  },
+  beats_bhaskar: {
+    src: 'assets/img/beats-bhaskar.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-bhaskar',
+    credit: 'Lorem Picsum #705 (Unsplash) — placeholder',
+  },
+  beats_hansindia: {
+    src: 'assets/img/beats-hansindia.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-hansindia',
+    credit: 'Lorem Picsum #809 (Unsplash) — placeholder',
+  },
+  beats_livelaw: {
+    src: 'assets/img/beats-livelaw.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-livelaw',
+    credit: 'Lorem Picsum #76 (Unsplash) — placeholder',
+  },
+  beats_federal: {
+    src: 'assets/img/beats-federal.jpg',
+    w: 1600,
+    h: 1000,
+    seed: 'blink-beats-federal',
+    credit: 'Lorem Picsum #950 (Unsplash) — placeholder',
+  },
 
   /*
    * 08 · LETTERS — abstract newsroom frames, NOT portraits.
    * A stock photograph of a plausible-looking person beside a named quote
-   * reads as that person. These seeds stay abstract until real, approved
-   * photographs arrive; see HANDOFF §7.
+   * reads as that person. These stay abstract until real, approved
+   * photographs arrive — and when they do, the names have to be real too.
+   * See HANDOFF §7.
    */
-  letters_1: { src: '', seed: 'blink-newsroom-desk', w: 900, h: 1200 },
-  letters_2: { src: '', seed: 'blink-newsroom-press', w: 900, h: 1200 },
+  letters_1: {
+    src: 'assets/img/letters-1.jpg',
+    w: 900,
+    h: 1200,
+    seed: 'blink-newsroom-desk',
+    credit: 'Lorem Picsum #701 (Unsplash) — placeholder',
+  },
+  letters_2: {
+    src: 'assets/img/letters-2.jpg',
+    w: 900,
+    h: 1200,
+    seed: 'blink-newsroom-press',
+    credit: 'Lorem Picsum #121 (Unsplash) — placeholder',
+  },
 
   /* 10 · THE WIRE */
-  wire_1: { src: '', seed: 'blink-wire-tamil-daily', w: 1400, h: 900 },
-  wire_2: { src: '', seed: 'blink-wire-ai-editor', w: 900, h: 700 },
-  wire_3: { src: '', seed: 'blink-wire-wordpress-seo', w: 900, h: 700 },
+  wire_1: {
+    src: 'assets/img/wire-1.jpg',
+    w: 1400,
+    h: 900,
+    seed: 'blink-wire-tamil-daily',
+    credit: 'Lorem Picsum #145 (Unsplash) — placeholder',
+  },
+  wire_2: {
+    src: 'assets/img/wire-2.jpg',
+    w: 900,
+    h: 700,
+    seed: 'blink-wire-ai-editor',
+    credit: 'Lorem Picsum #299 (Unsplash) — placeholder',
+  },
+  wire_3: {
+    src: 'assets/img/wire-3.jpg',
+    w: 900,
+    h: 700,
+    seed: 'blink-wire-wordpress-seo',
+    credit: 'Lorem Picsum #946 (Unsplash) — placeholder',
+  },
 }
 
 /**
  * `src` empty → the poster carries the slot and no video is ever requested.
- * The poster falls back to a dummy like any other image.
+ * There is no video file to ship yet; the posters below are real and local.
  */
 export const videos = {
   live_video: {
     src: '',
-    poster: { src: '', seed: 'blink-live-newsroom', w: 1920, h: 1080 },
+    poster: {
+      src: 'assets/img/poster-live-newsroom.jpg',
+      w: 1920,
+      h: 1080,
+      seed: 'blink-live-newsroom',
+      credit: 'Lorem Picsum #694 (Unsplash) — placeholder',
+    },
   },
   cta_video: {
     src: '',
-    poster: { src: '', seed: 'blink-cta-press', w: 1920, h: 1080 },
+    poster: {
+      src: 'assets/img/poster-cta-press.jpg',
+      w: 1920,
+      h: 1080,
+      seed: 'blink-cta-press',
+      credit: 'Lorem Picsum #290 (Unsplash) — placeholder',
+    },
   },
 }
 
 /**
- * 01's two marquees. `src` takes a white monochrome SVG; until then the
- * publisher's name is set as type, which is what the page shows today.
+ * 01's two marquees, and 12's orbiting chips. `src` takes a white monochrome
+ * SVG; until there is one, the publisher's name is set as type, which is what
+ * the page shows today.
  */
 export const logos = [
   { name: 'Daily Thanthi', src: '' },
@@ -90,11 +176,9 @@ export const logos = [
   { name: 'BOOM', src: '' },
 ]
 
-/** The URL for an image key, real or dummy. */
+/** The file for an image key. */
 export function imageSrc(key) {
-  const m = images[key]
-  if (!m) return ''
-  return m.src || `${DUMMY}/${m.seed}/${m.w}/${m.h}`
+  return images[key]?.src || ''
 }
 
 /** `{ w, h }` for an image key, so the markup can reserve the box. */
@@ -103,15 +187,12 @@ export function imageSize(key) {
   return m ? { w: m.w, h: m.h } : { w: 16, h: 10 }
 }
 
-/** The URL for a video's poster, real or dummy. */
+/** A video's poster — always present, even when the video is not. */
 export function posterSrc(key) {
-  const v = videos[key]
-  if (!v) return ''
-  const p = v.poster
-  return p.src || `${DUMMY}/${p.seed}/${p.w}/${p.h}`
+  return videos[key]?.poster?.src || ''
 }
 
-/** The video file itself, or '' when the client has not supplied one yet. */
+/** The video file itself, or '' when there is not one yet. */
 export function videoSrc(key) {
   return videos[key]?.src || ''
 }

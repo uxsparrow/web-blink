@@ -40,6 +40,7 @@
   -->
   <style>
     .boot-failed [data-in],
+    .boot-failed [data-hero-in],
     .boot-failed .line-inner {
       opacity: 1 !important;
       transform: none !important;
@@ -382,7 +383,7 @@
 
         <div class="shell position-relative z-3 d-flex h-100 flex-column justify-content-center" data-hero-copy>
           <div class="hero-copy">
-            <div class="mb-5 d-flex align-items-center gap-4">
+            <div class="mb-5 d-flex align-items-center gap-4" data-hero-in style="--i:0">
               <span class="colour-bar" style="width:44px;height:4px"><i></i><i></i><i></i><i></i></span>
               <span class="mono" style="color:rgba(255,255,255,.62)">ONE PLATFORM</span>
             </div>
@@ -392,16 +393,17 @@
               <span class="line-mask"><span class="line-inner">MODERN NEWSROOMS</span></span>
             </h1>
 
-            <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66)">
+            <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66); --i:2" data-hero-in>
               Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.
             </p>
 
-            <div class="mt-9 d-flex flex-wrap align-items-center gap-3">
+            <div class="mt-9 d-flex flex-wrap align-items-center gap-3" data-hero-in style="--i:3">
               <a href="#cta" class="pill pill-white">Book a demo</a>
               <button class="pill pill-outline-inv" data-open-video><span class="play-tri"></span>Watch video</button>
             </div>
 
-            <div class="mono-xs mt-10" style="color:rgba(255,255,255,.3)">NOIDA, 26 SEP 2026 — 14:32 IST</div>
+            <div class="mono-xs mt-10" style="color:rgba(255,255,255,.3); --i:4" data-hero-in>NOIDA, 26 SEP 2026 —
+              14:32 IST</div>
           </div>
         </div>
 
@@ -527,7 +529,7 @@
                 data-cap="Daily Thanthi loads in 1.5s."><i>06</i>How fast do pages have to be?</button>
             </div>
 
-            <a class="mono ed__link ed__link--overflow" href="#faq">All six, in the F.A.Q <span
+            <a class="mono ed__link ed__link--overflow" href="#faq" data-in style="--i:3">All six, in the F.A.Q <span
                 aria-hidden="true">→</span></a>
           </div>
 
@@ -1150,10 +1152,14 @@
 
           <div class="ed__gfx ed__gfx--top">
             <div class="glass vs2" id="vs-table" role="tabpanel" data-in style="--i:1">
+              <!-- the short forms are for phone width, where each mark column
+                   is 34px and "WordPress" alone needs 57 -->
               <div class="vs2__head">
                 <span class="meta">Feature</span>
-                <span class="meta">WordPress <span class="vs2__sub">out of the box</span></span>
-                <span class="meta vs2__lit">Blink CMS</span>
+                <span class="meta"><span class="vs2__full">WordPress</span><span
+                    class="vs2__abbr">WP</span> <span class="vs2__sub">out of the box</span></span>
+                <span class="meta vs2__lit"><span class="vs2__full">Blink CMS</span><span
+                    class="vs2__abbr">Blink</span></span>
               </div>
               <div class="vs2__rows" data-vs-rows></div>
               <p class="vs2__note">Both offer SEO tools, AMP, PWA, API integrations and analytics. WordPress is
@@ -1201,7 +1207,7 @@
                 data-metrics='[["2×","traffic in 8 months"],["93ms","INP"],["68%","performance"]]'>Digital</button>
             </div>
 
-            <div id="beat-panel" role="tabpanel">
+            <div id="beat-panel" role="tabpanel" data-in style="--i:3">
               <span class="meta d-block" data-beat-tag>TAMIL</span>
               <span class="display ed__h3 d-block mt-1 mb-3" data-beat-name>Daily Thanthi</span>
               <div class="metrics" data-beat-metrics>
@@ -1441,7 +1447,7 @@
           </a>
         </div>
 
-        <a class="mono ed__link" href="/blog/">View all <span aria-hidden="true">→</span></a>
+        <a class="mono ed__link" href="/blog/" data-in style="--i:3">View all <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
@@ -1490,7 +1496,7 @@
                 data-a="Book a 1-hour demo for your management team."><i>07</i>How do we get a demo?</button>
             </div>
 
-            <a class="mono ed__link ed__link--overflow" href="/faq/">View all FAQs <span
+            <a class="mono ed__link ed__link--overflow" href="/faq/" data-in style="--i:3">View all FAQs <span
                 aria-hidden="true">→</span></a>
           </div>
 
@@ -1566,7 +1572,7 @@
   <!-- ═══ 13 · FOOTER ═════════════════════════════════════════════ -->
   <footer class="ed-footer" id="contact" data-label="BACK PAGE">
     <div class="ed-footer__shell">
-      <div class="news">
+      <div class="news" data-in style="--i:0">
         <div>
           <span class="display ed__h3 d-block">The Blink Brief</span>
           <span class="meta d-block mt-2">WHAT MOVED IN NEWSROOM TECH, ONCE A MONTH</span>
@@ -1579,7 +1585,7 @@
         </form>
       </div>
 
-      <div class="ed-footer__cols">
+      <div class="ed-footer__cols" data-in style="--i:2">
         <div class="ed-footer__col">
           <h3 class="meta">PRODUCT</h3>
           <a href="/platform/">Platform</a>
@@ -1609,7 +1615,7 @@
         </div>
       </div>
 
-      <div class="meta ed-footer__base">
+      <div class="meta ed-footer__base" data-in style="--i:6">
         <span class="social">
           <a href="/contact/" aria-label="Facebook">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -1657,7 +1663,7 @@
       what "scale it to exactly the container width" actually needs. The text
       element is still live text, so it is selectable and readable.
     -->
-    <div class="wordmark" aria-hidden="true">
+    <div class="wordmark" aria-hidden="true" data-in style="--i:8">
       <svg viewBox="0 0 1000 150" preserveAspectRatio="xMidYMax meet" data-wordmark-svg>
         <defs>
           <linearGradient id="wmGrad" x1="0" y1="0" x2="0" y2="1">

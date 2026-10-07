@@ -3880,6 +3880,35 @@ body {
   transition: none;
 }
 
+/*
+ * The rest of the hero copy arrives on the same stagger as every other
+ * section — eyebrow, support, buttons, dateline — so the hero is not the one
+ * place on the page where text simply appears.
+ *
+ * It rides `.is-loaded`, exactly like the headline, and NOT the shared
+ * `[data-in]`/`.is-in` pair. `.is-in` is owned by an IntersectionObserver,
+ * and putting hero text back under an observer is precisely the bug that had
+ * the title coming back cut after a scroll down and up. On load, once, then
+ * `.hero-done` takes the transition off and there is no state left to restore.
+ */
+.js [data-hero-in] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js.is-loaded [data-hero-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+.js.hero-done [data-hero-in] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 /* ══ 01 · THE NETWORK ═════════════════════════════════════════ */
 .net {
   position: relative;
@@ -4433,12 +4462,28 @@ body {
 }
 
 /* ══ 09 · THE RATE CARD ═══════════════════════════════════════ */
+/*
+ * FOUR columns, because there are four plans. It was three, left over from
+ * when there were three tiers, so the fourth card wrapped to a second row,
+ * each row got half the height, and every card's content overflowed its own
+ * box by about 120px and painted over the card below it. Nothing in the
+ * section-level fit check sees that — a grid item overflowing inside a
+ * `min-height: 0` grid does not grow the section — which is why the check in
+ * README now also measures every element against its own box.
+ */
 .rates {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 1.8svh, 20px);
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/* two up on tablets: four columns at 800px wide is 180px a card */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .rates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .rate {
@@ -4641,51 +4686,6 @@ body {
   font-family: var(--font-spacemono), ui-monospace, monospace;
   font-size: 11px;
   flex: none;
-}
-
-.chat__bubble {
-  align-self: flex-start;
-  max-width: 44ch;
-  padding: clamp(10px, 1.8svh, 18px) clamp(12px, 2svh, 20px);
-  border-radius: 16px 16px 16px 4px;
-  background: rgba(97, 24, 234, 0.16);
-  border: 1px solid var(--glass-line);
-  font-size: clamp(14px, 1.8svh, 17px);
-  line-height: 1.4;
-  color: var(--txt);
-  transition: opacity 0.3s;
-}
-
-.chat.is-swapping .chat__bubble,
-.chat.is-swapping .chat__dots {
-  opacity: 0;
-}
-
-.chat__dots {
-  display: flex;
-  gap: 4px;
-  align-self: flex-start;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-line);
-  transition: opacity 0.3s;
-}
-
-.chat__dots i {
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--lavender);
-  animation: typing 1.2s ease-in-out infinite;
-}
-
-.chat__dots i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.chat__dots i:nth-child(3) {
-  animation-delay: 0.3s;
 }
 
 @keyframes typing {
@@ -5802,6 +5802,10 @@ button:disabled,
   letter-spacing: 0.08em;
 }
 
+.vs2__abbr {
+  display: none;
+}
+
 /* the Blink column is lit; the WordPress one is simply not */
 .vs2__lit {
   color: var(--txt);
@@ -6166,6 +6170,12 @@ button:disabled,
     display: block;
   }
 
+  /* four features a card, per the brief, and the "see all" link carries the
+     rest — a 657px window cannot hold five and a price and a button */
+  .rate__list span:nth-child(n + 5) {
+    display: none;
+  }
+
   /*
    * The wordmark is the full container width by design, so on a 1366×657
    * window it is 287px of the footer on its own and everything else has to
@@ -6216,7 +6226,25 @@ button:disabled,
 }
 
 /* ── below lg: one graphic and one module per screen ──────────── */
+/*
+ * This block is LAST on purpose, after every component it overrides. An
+ * earlier attempt put the `.vtabs` row rule up with the top-aligned section
+ * rules, which sit above `.vtabs`'s own definition — same specificity, later
+ * wins, so the column layout stayed and five full-width buttons ate 234px of
+ * a phone screen. Responsive overrides go here, under the thing they change.
+ */
 @media (max-width: 1023.98px) {
+  /* the category tabs wrap into a row once they sit above the table rather
+     than beside it */
+  .vtabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .vtabs button {
+    width: auto;
+  }
+
   /*
    * Stacked, the two rows would otherwise split the section in half and the
    * text would float in the middle of its share — which is the "small content
@@ -6273,12 +6301,30 @@ button:disabled,
     display: none;
   }
 
+  /*
+   * A swipe strip, not a stack. Two plans stacked need 570px of height and a
+   * phone section has about 300 — and hiding half the rate card is not a
+   * price list. One card at a time, all four reachable.
+   */
   .rates {
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    gap: clamp(10px, 1.8svh, 20px);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+    margin-inline: calc(var(--ed-pad) * -1);
+    padding-inline: var(--ed-pad);
   }
 
-  .rates .rate:nth-child(n + 3) {
+  .rates::-webkit-scrollbar {
     display: none;
+  }
+
+  .rates > .rate {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
   }
 
   .flow__steps {
@@ -6301,6 +6347,71 @@ button:disabled,
   .ed-footer__cols {
     gap: 14px;
     padding-block: clamp(14px, 2.6svh, 44px);
+  }
+
+  /* the form's 320px flex basis is wider than a 360px screen's content box */
+  .news__form {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /*
+   * The comparison table at phone width. The feature column takes what is
+   * left and the two marks get 34px each — at `1.6fr / 1fr / 1fr` the ticks
+   * were as wide as the text and every row wrapped to three lines, which put
+   * 170px of rows outside the panel. The note underneath stays: it is what
+   * stops the table reading as the whole story.
+   */
+  .vs2 {
+    padding: clamp(10px, 1.8svh, 20px);
+  }
+
+  .vs2__head,
+  .vs2__row {
+    grid-template-columns: minmax(0, 1fr) 34px 34px;
+    gap: 6px;
+  }
+
+  /* the column headings have to live in those 34px too — at the full label
+     size "WORDPRESS out of the box" wrapped to 95px of header */
+  .vs2__head span:nth-child(2),
+  .vs2__head span:nth-child(3) {
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+  }
+
+  .vs2__full {
+    display: none;
+  }
+
+  .vs2__abbr {
+    display: inline;
+  }
+
+  .vs2__sub {
+    display: none;
+  }
+
+  .vs2__row {
+    padding-block: 4px;
+    font-size: 12px;
+  }
+
+  .vs2__note {
+    font-size: 12px;
+  }
+
+  /* the chat, at its tightest — the longest answer is six lines here */
+  .chat {
+    gap: clamp(6px, 1.2svh, 12px);
+    padding: clamp(10px, 1.8svh, 18px);
+  }
+
+  .chat__ask,
+  .chat__bubble {
+    padding: 8px 12px;
   }
 
   .ed-footer__col a {
@@ -6341,7 +6452,6 @@ button:disabled,
   .bento,
   .flow__stage,
   .live,
-  .vs,
   .shot,
   .deck,
   .rates,
@@ -6358,11 +6468,13 @@ button:disabled,
 /* ── reduced motion ───────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .js [data-in],
+  .js [data-hero-in],
   .js .hero-head .line-inner {
     transform: none;
   }
 
   .js .is-in [data-in],
+  .js.is-loaded [data-hero-in],
   .js.is-loaded .hero-head .line-inner {
     transition: opacity 0.4s;
   }

@@ -1061,12 +1061,17 @@ section animates delivery, structure or arrival.
 
 ### Open after the fix round (7 Oct 2026) — current, not historical
 
-**1 · Every image and video is a dummy.** They come from picsum.photos via
-`assets/media.js`, which means **the page currently calls an external image
-service on every load**. That is deliberate — it lets the layout be reviewed
-with pictures in it — but it is not a state to ship in. Fill in the `src`
-fields in media.js and the page makes no third-party request at all. The keys
-and sizes are listed in `README.md`.
+**1 · Every image is a placeholder, and the videos do not exist.** The
+thirteen pictures are LOCAL now, in `assets/img/`, so the page makes no
+third-party request for media at all. But they are generic stock photographs
+fetched once from Lorem Picsum (Unsplash) — **not** screenshots, **not**
+client newsrooms, **not** cleared brand assets. `seed` and `credit` in
+`assets/media.js` record exactly which picture each one is. Replace all of
+them before launch; the keys are listed in `README.md`.
+
+There was no video to save, so `src` is empty on both and the page never
+requests one — the poster carries the slot with a slow zoom. Drop a file in
+`assets/video/`, point `src` at it, and it plays in view with no other change.
 
 **2 · 08's images must never be a face.** The quotes carry real publisher
 names and placeholder people, so a stock photograph of a plausible-looking
@@ -1087,8 +1092,8 @@ checks them. Re-read before any release.
 The brief asks for ≥75 on mobile, LCP <2.5s and CLS <0.05. The structural work
 is done — no preloader, one WebGL context, every loop gated on visibility,
 every image carrying width/height from media.js — but the number is unmeasured.
-Note that the dummy images are full-size JPEGs from a third party, so **measure
-after the real, optimised assets are in**, not before.
+Note that the thirteen placeholders are 2.0 MB of unoptimised JPEG, so
+**measure after the real, optimised assets are in**, not before.
 
 **6 · `prefers-reduced-motion` was read, not emulated.** The rules are in the
 stylesheet and the guards are in `lib/motion.js`, `scenes/dots.js`,

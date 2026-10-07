@@ -1062,7 +1062,7 @@ section animates delivery, structure or arrival.
 ### Open after the fix round (7 Oct 2026) — current, not historical
 
 **1 · Every image is a placeholder, and the videos do not exist.** The
-thirteen pictures are LOCAL now, in `assets/img/`, so the page makes no
+thirteen pictures are LOCAL now, in `assets/images/`, so the page makes no
 third-party request for media at all. But they are generic stock photographs
 fetched once from Lorem Picsum (Unsplash) — **not** screenshots, **not**
 client newsrooms, **not** cleared brand assets. `seed` and `credit` in

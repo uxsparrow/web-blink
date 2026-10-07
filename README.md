@@ -185,21 +185,21 @@ resolves it. To ship real assets, change `src` on the entry — that is the
 whole change, in one file.
 
 ```js
-images.wire_1     = { src: 'assets/img/wire-1.jpg', w: 1400, h: 900, … }
+images.wire_1     = { src: 'assets/images/wire-1.jpg', w: 1400, h: 900, … }
 videos.live_video = { src: 'assets/video/live-newsroom.mp4', poster: { … } }
 logos[0]          = { name: 'Daily Thanthi', src: 'assets/logos/daily-thanthi.svg' }
 ```
 
 | Key | File | Used by |
 |---|---|---|
-| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | `assets/img/beats-*.jpg` | 07, one per segment |
-| `letters_1` · `letters_2` | `assets/img/letters-*.jpg` | 08's card and the deck behind it |
-| `wire_1` · `wire_2` · `wire_3` | `assets/img/wire-*.jpg` | 10's three post cards |
-| `live_video` · `cta_video` posters | `assets/img/poster-*.jpg` | the 05 and 12 back layers |
+| `beats_thanthi` · `-madhyamam` · `-bhaskar` · `-hansindia` · `-livelaw` · `-federal` | `assets/images/beats-*.jpg` | 07, one per segment |
+| `letters_1` · `letters_2` | `assets/images/letters-*.jpg` | 08's card and the deck behind it |
+| `wire_1` · `wire_2` · `wire_3` | `assets/images/wire-*.jpg` | 10's three post cards |
+| `live_video` · `cta_video` posters | `assets/images/poster-*.jpg` | the 05 and 12 back layers |
 | `logos[]` | — | 01's marquees and 12's orbit; set as type until SVGs exist |
 
 **The page makes no third-party request for media.** All thirteen pictures are
-in `assets/img/`. The only external call left on the whole site is the YouTube
+in `assets/images/`. The only external call left on the whole site is the YouTube
 embed behind "Watch video", and that is not made until someone presses it.
 
 ### ⚠ They are still placeholders

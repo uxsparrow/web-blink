@@ -341,9 +341,12 @@ export function initBackVideos() {
   if (reducedMotion() || small) return
 
   qq('[data-backvid]').forEach((video) => {
-    const file = videoSrc(video.dataset.backvid)
+    const file = videoSrc(video.dataset.backvid) || video.querySelector('source')?.getAttribute('src') || video.getAttribute('src')
     // no file yet: the poster behind it is the slot, and nothing is requested
     if (!file) return
+
+    video.addEventListener('canplay', () => video.classList.add('is-playing'), { once: true })
+    video.addEventListener('playing', () => video.classList.add('is-playing'))
 
     onInView(
       video,
@@ -352,9 +355,11 @@ export function initBackVideos() {
           video.pause()
           return
         }
-        if (!video.getAttribute('src')) {
+        if (!video.getAttribute('src') && !video.querySelector('source')) {
           video.addEventListener('canplay', () => video.classList.add('is-playing'), { once: true })
           video.setAttribute('src', file)
+        } else {
+          video.classList.add('is-playing')
         }
         video.play().catch(() => {
           /* autoplay refused; the poster carries the slot */

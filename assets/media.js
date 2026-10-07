@@ -7,7 +7,7 @@
  *
  * ── WHERE THE PICTURES COME FROM ──────────────────────────────────────────
  *
- * They are all LOCAL, in assets/img/. The page makes no third-party request
+ * They are all LOCAL, in assets/images/. The page makes no third-party request
  * for media; the only external call left on the whole site is the YouTube
  * embed behind "Watch video", and that one is not made until someone presses
  * it.
@@ -37,42 +37,42 @@
 export const images = {
   /* 07 · THE BEATS — one site screenshot per segment */
   beats_thanthi: {
-    src: 'assets/img/beats-thanthi.jpg',
+    src: 'assets/images/beats-thanthi.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-thanthi',
     credit: 'Lorem Picsum #949 (Unsplash) — placeholder',
   },
   beats_madhyamam: {
-    src: 'assets/img/beats-madhyamam.jpg',
+    src: 'assets/images/beats-madhyamam.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-madhyamam',
     credit: 'Lorem Picsum #940 (Unsplash) — placeholder',
   },
   beats_bhaskar: {
-    src: 'assets/img/beats-bhaskar.jpg',
+    src: 'assets/images/beats-bhaskar.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-bhaskar',
     credit: 'Lorem Picsum #705 (Unsplash) — placeholder',
   },
   beats_hansindia: {
-    src: 'assets/img/beats-hansindia.jpg',
+    src: 'assets/images/beats-hansindia.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-hansindia',
     credit: 'Lorem Picsum #809 (Unsplash) — placeholder',
   },
   beats_livelaw: {
-    src: 'assets/img/beats-livelaw.jpg',
+    src: 'assets/images/beats-livelaw.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-livelaw',
     credit: 'Lorem Picsum #76 (Unsplash) — placeholder',
   },
   beats_federal: {
-    src: 'assets/img/beats-federal.jpg',
+    src: 'assets/images/beats-federal.jpg',
     w: 1600,
     h: 1000,
     seed: 'blink-beats-federal',
@@ -87,14 +87,14 @@ export const images = {
    * See HANDOFF §7.
    */
   letters_1: {
-    src: 'assets/img/letters-1.jpg',
+    src: 'assets/images/letters-1.jpg',
     w: 900,
     h: 1200,
     seed: 'blink-newsroom-desk',
     credit: 'Lorem Picsum #701 (Unsplash) — placeholder',
   },
   letters_2: {
-    src: 'assets/img/letters-2.jpg',
+    src: 'assets/images/letters-2.jpg',
     w: 900,
     h: 1200,
     seed: 'blink-newsroom-press',
@@ -103,21 +103,21 @@ export const images = {
 
   /* 10 · THE WIRE */
   wire_1: {
-    src: 'assets/img/wire-1.jpg',
+    src: 'assets/images/wire-1.jpg',
     w: 1400,
     h: 900,
     seed: 'blink-wire-tamil-daily',
     credit: 'Lorem Picsum #145 (Unsplash) — placeholder',
   },
   wire_2: {
-    src: 'assets/img/wire-2.jpg',
+    src: 'assets/images/wire-2.jpg',
     w: 900,
     h: 700,
     seed: 'blink-wire-ai-editor',
     credit: 'Lorem Picsum #299 (Unsplash) — placeholder',
   },
   wire_3: {
-    src: 'assets/img/wire-3.jpg',
+    src: 'assets/images/wire-3.jpg',
     w: 900,
     h: 700,
     seed: 'blink-wire-wordpress-seo',
@@ -133,7 +133,7 @@ export const videos = {
   live_video: {
     src: '',
     poster: {
-      src: 'assets/img/poster-live-newsroom.jpg',
+      src: 'assets/images/poster-live-newsroom.jpg',
       w: 1920,
       h: 1080,
       seed: 'blink-live-newsroom',
@@ -141,9 +141,9 @@ export const videos = {
     },
   },
   cta_video: {
-    src: '',
+    src: 'assets/videos/cta-bg.mp4',
     poster: {
-      src: 'assets/img/poster-cta-press.jpg',
+      src: 'assets/images/poster-cta-press.jpg',
       w: 1920,
       h: 1080,
       seed: 'blink-cta-press',

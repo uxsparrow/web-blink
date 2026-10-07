@@ -152,13 +152,24 @@ assembled rather than never arriving.
 - **Parallax**: back 0.3, mid 0.7, chips 1.15, capped at ±80px. Content itself
   is never parallaxed.
 - **The fixed back layer in 05.** Its picture is held still while the section
-  scrolls over it. `position: fixed` cannot do it — it escapes the layer's
-  `overflow: hidden` and shows over the neighbouring sections, and any
-  `transform`/`filter`/`clip-path` on an ancestor cancels it anyway — and
-  `background-attachment: fixed` is ignored on iOS. So `.vidslot--fixed` is one
-  window tall and `initFixedBg()` writes `--fy` as the negated distance from the
-  window top. It is the one motion that still runs under reduced motion: a
-  background that holds still is the calmer option, not the busier one.
+  scrolls over it. It is a **scroll-driven CSS animation** (`view-timeline-name`
+  on `.layer-back--fixed`, `hold-still` on the slot), because that is evaluated
+  by the compositor on the same frame as the scroll. Driving it from a scroll
+  event instead — which is what `initFixedBg()` does, and all it is now — hands
+  the script a scroll the browser has already painted, so the transform lands a
+  frame late and the picture shudders. The script runs only where scroll-driven
+  animations do not.
+  `position: fixed` is not an option: it escapes the layer's `overflow: hidden`
+  and shows over the neighbouring sections, and any `transform`/`filter`/
+  `clip-path` on an ancestor cancels it anyway. `background-attachment: fixed`
+  is ignored on iOS.
+  Two cases need stating. Under `prefers-reduced-motion` the animation stays
+  (a picture holding still is the calmer option) but its duration has to be
+  re-asserted as `auto`, because on a progress timeline a duration is a slice
+  of the timeline, not a speed, and the blanket 0.001ms reset would park the
+  picture a window low. Below 520px of height the sections grow past one
+  window, the fixed distance stops matching the section's travel, and the slot
+  goes back to simply covering its section.
 - **Ambient loops only in view.** Every canvas loop and every CSS micro-UI is
   gated on an IntersectionObserver. Twelve sections of animation running at
   once is how a phone loses 60fps.

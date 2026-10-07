@@ -1047,7 +1047,10 @@
 
     <!-- ═══ 05 · LIVE ═══════════════════════════════════════════════ -->
     <section id="live" class="ed ed--a" data-label="LIVE">
-      <div class="layer-back ed__fade" aria-hidden="true">
+      <!-- `layer-back--fixed` names the view timeline the fixed slot animates
+           on. It is on the layer, not the slot, because the slot is the thing
+           being moved. -->
+      <div class="layer-back layer-back--fixed ed__fade" aria-hidden="true">
         <!-- fixed: the picture holds still and the section scrolls over it.
              No `data-depth` — see `.vidslot--fixed` for why the two cannot
              share the slot. -->

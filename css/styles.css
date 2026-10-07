@@ -3780,10 +3780,9 @@ body {
  * "fixed" away again. `background-attachment: fixed` is ignored on iOS and
  * repaints the whole layer on every frame besides.
  *
- * So the slot is exactly one window tall and `initFixedBg()` writes `--fy` as
- * the negated distance from the window's top edge, cancelling the section's
- * own travel. The layer clips it. The result is a window onto a still image,
- * on every engine, composited on the GPU.
+ * So the slot is exactly one window tall and something has to cancel the
+ * section's own travel. The layer clips it. The result is a window onto a
+ * still image, on every engine, composited on the GPU.
  *
  * This replaces the depth-0.3 parallax on the slot rather than joining it:
  * both want the same `transform`, and holding still is the stronger reading.
@@ -3794,6 +3793,51 @@ body {
   height: 100svh;
   transform: translate3d(0, var(--fy, 0px), 0);
   will-change: transform;
+}
+
+/*
+ * How the travel is cancelled — and the whole reason there are two ways.
+ *
+ * A scroll-driven animation is evaluated by the compositor on the same frame
+ * as the scroll that drives it, so the picture is where it should be in every
+ * frame. `initFixedBg()` cannot be: a scroll event tells the script about a
+ * scroll the browser has *already painted*, so its transform always lands a
+ * frame late and the picture visibly shudders against the section sliding
+ * over it. That judder is what this block exists to remove; the script is
+ * kept only as the fallback, and it does not run where this is supported.
+ *
+ * The timeline is named on `.layer-back--fixed` rather than taken from the
+ * slot itself, because the slot is the thing being transformed and a subject
+ * should not be its own frame of reference. The layer is `inset: 0` on the
+ * section and never moves, so it is the section's box exactly.
+ *
+ * The default range runs from the section's top edge at the window's bottom
+ * (so `--fy` must be -100svh) to its bottom edge at the window's top (the
+ * section is one window tall, so +100svh). Scroll distance and section travel
+ * are the same distance, which is why two keyframes and `linear` are the
+ * whole animation.
+ */
+.layer-back--fixed {
+  view-timeline-name: --fixedbg;
+}
+
+@supports (animation-timeline: --x) {
+  .vidslot--fixed {
+    animation-name: hold-still;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --fixedbg;
+  }
+}
+
+@keyframes hold-still {
+  from {
+    transform: translate3d(0, -100svh, 0);
+  }
+  to {
+    transform: translate3d(0, 100svh, 0);
+  }
 }
 
 .vidslot img {
@@ -5715,6 +5759,14 @@ button:disabled,
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+  /*
+   * Capped, and centred in the leftover by the column's own
+   * `justify-content: center`. Grown to the full height of a 900px window the
+   * card was a 774px slab with a chart taller than it was wide — it filled,
+   * but it stopped reading as a panel held in front of the scene. The cap
+   * only bites on tall windows; on a phone the column is already shorter.
+   */
+  max-height: min(70svh, 640px);
   padding: clamp(14px, 2.4svh, 28px);
   gap: clamp(8px, 1.4svh, 18px);
   overflow: hidden;
@@ -6579,6 +6631,24 @@ button:disabled,
     padding-top: calc(var(--header-h) + 20px);
   }
 
+  /*
+   * The fixed back layer is off here, and the slot goes back to covering its
+   * section normally.
+   *
+   * `hold-still` moves the picture a window's height across the section's
+   * pass, which is only the right distance while the section is one window
+   * tall. The rule above is exactly where that stops being true — sections
+   * grow to their content — so the two no longer cancel and the picture
+   * creeps. It is a few pixels on a section that has barely grown and much
+   * more on one that has, which is worse than not fixing it at all.
+   */
+  .vidslot--fixed {
+    bottom: 0;
+    height: auto;
+    transform: none;
+    animation: none;
+  }
+
   .ed__gfx,
   .net,
   .monitor,
@@ -6625,6 +6695,21 @@ button:disabled,
 
   .backvid {
     display: none;
+  }
+
+  /*
+   * The fixed back layer stays. It is the one exception on the page, because
+   * what it does is hold a picture still — switching it off would let that
+   * picture scroll, which is more movement, not less.
+   *
+   * It needs saying here only because the blanket reduced-motion reset above
+   * forces `animation-duration` to 0.001ms. On a scroll-driven timeline a
+   * duration is not a speed, it is the slice of the timeline the animation
+   * maps onto, so 0.001ms would not slow the picture down — it would park it
+   * at the final keyframe, one window below where it belongs.
+   */
+  .vidslot--fixed {
+    animation-duration: auto !important;
   }
 }
 

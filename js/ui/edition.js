@@ -565,20 +565,25 @@ export function initMediaParallax() {
 
 /* ── the fixed back layer ─────────────────────────────────────── */
 /**
- * Holds a `[data-fixedbg]` slot still while its section scrolls over it.
+ * The fallback for the fixed back layer, and only the fallback.
  *
- * The slot is one window tall inside a layer that clips (see
- * `.vidslot--fixed`), so writing `--fy` as the negated distance from the
- * window's top edge cancels the section's own travel and the picture stays
- * put. It is one custom property per frame and the transform is composited,
- * so this costs no layout.
+ * Where the browser has scroll-driven animations the CSS does this on the
+ * compositor and this function returns immediately — see `.vidslot--fixed`.
+ * Doing it from a scroll event cannot be smooth: the event reports a scroll
+ * the browser has already painted, so the transform lands a frame behind the
+ * section moving over it and the picture judders. Everywhere that leaves, a
+ * frame-late picture beats one that does not hold still at all.
  *
- * Unlike every other motion on the page it runs under reduced motion too: a
+ * The value is deliberately not rounded. Snapping to whole pixels trades the
+ * lag for a visible 1px stagger, which reads worse at this size.
+ *
+ * Unlike every other motion on the page this runs under reduced motion too: a
  * background that holds still is the calmer option, not the busier one, and
- * leaving `--fy` unwritten would park the picture at the top of the section
- * and let it scroll — which is more movement, not less.
+ * leaving `--fy` unwritten would let the picture scroll with the section.
  */
 export function initFixedBg() {
+  if (CSS.supports('animation-timeline', '--x')) return
+
   const slots = qq('[data-fixedbg]')
   if (!slots.length) return
 
@@ -586,7 +591,7 @@ export function initFixedBg() {
     slots.forEach((slot) => {
       const host = slot.parentElement
       if (!host) return
-      slot.style.setProperty('--fy', Math.round(-host.getBoundingClientRect().top) + 'px')
+      slot.style.setProperty('--fy', (-host.getBoundingClientRect().top).toFixed(2) + 'px')
     })
   })
 }

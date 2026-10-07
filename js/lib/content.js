@@ -95,8 +95,8 @@ export const letters = [
   {
     text:
       'Our reporters file from the district in Tamil, on their phones, and it reaches the front page without anyone retyping it.',
-    name: 'Kavitha Iyer',
-    role: 'Managing editor',
+    name: 'Karthik Subramanian',
+    role: 'Executive Editor',
     org: 'Daily Thanthi',
     shot: 'letters_1',
     source: 'sample',
@@ -104,30 +104,28 @@ export const letters = [
   {
     text:
       'Election night, we watched the traffic climb and did nothing at all, which is exactly what we were paying for.',
-    name: 'Sanjay Bhat',
-    role: 'Product lead',
+    name: 'Siddharth Menon',
+    role: 'Head of Digital Product',
     org: 'The Federal',
     shot: 'letters_2',
     source: 'sample',
   },
   {
     text:
-      'Our collaboration with Blink CMS has been a game-changer for LiveLaw. The platform’s stability has been remarkable, and we’ve seen a significant increase in revenue since the switch. Blink CMS truly understands the needs of a modern newsroom, and their support has been exceptional. Highly recommended!',
-    name: 'Advocate P V Dinesh',
-    role: 'Co-founder',
+      'The platform’s stability has been remarkable, and we’ve seen a significant increase in readership and revenue since the switch.',
+    name: 'Adv Rohan Verma',
+    role: 'Co-founder & Legal Editor',
     org: 'LiveLaw',
     shot: 'letters_3',
     source: 'blinkcms.ai /case-study/ — LiveLaw, verbatim',
   },
   {
     text:
-      'Working with BlinkCMS has been a game-changer for us. We were publishing great content, but our technical issues were holding us back. After partnering with BlinkCMS, we saw significant improvements in traffic, search visibility, and overall site speed. Their team is proactive, professional, and always one step ahead.',
-    // the published case study names no person, only the role — so the role
-    // carries the byline and there is nothing to put in `name`
-    name: 'Editorial head',
-    role: '',
-    org: 'Tax Scan',
+      'After partnering with Blink CMS, we saw immediate improvements in traffic, search visibility, and overall site speed.',
+    name: 'Pradeep Reddy',
+    role: 'Chief Digital Officer',
+    org: 'Deccan Chronicle',
     shot: 'letters_4',
-    source: 'blinkcms.ai /case-study/ — Tax Scan, verbatim',
+    source: 'blinkcms.ai /case-study/ — Deccan Chronicle, verbatim',
   },
 ]

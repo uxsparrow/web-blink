@@ -1,14 +1,281 @@
 # Handoff — Blink CMS one-page site
 
-Written 26 Sep 2026, updated the same day after section 04 went digital.
-Read this plus `README.md` before changing anything.
+Written 26 Sep 2026. **Rewritten in part on 7 Oct 2026, when the whole page
+below the hero was redesigned — read §0 first, then this line: everything from
+§1 onwards describes the build that the redesign replaced.** It is kept because
+it records why things were done, which is still the fastest way to understand
+what you are looking at in git history, and because §6b (the IA), §6c (where
+the F.A.Q answers came from), §6d (the letters content warning) and §10
+(content rules) all still apply.
+
 `README.md` is the permanent doc (stack, structure, how to run). This file is
 the session context: **what was decided and why**, what's unverified, and what
 is still open.
 
 ---
 
+## 0 · Fix and polish round (7 Oct 2026)
+
+A fix round on top of §0a, not a redesign. The design system, section order
+and everything not listed below are unchanged.
+
+### The global fixes
+
+**The hero title came back cut after scrolling down and up.** It was keyed to
+the section's `.is-in`, which an IntersectionObserver owns — a late callback,
+a resize or a reload at mid-page could catch it mid-transition or leave it at
+its start value, 112% down and behind the header. The intro now runs **once,
+on load**, from `html.is-loaded`, and `initHeroIntro()` adds `.hero-done`
+when it finishes, which takes the transform and the transition off entirely.
+Nothing scroll-linked touches hero text. The `overflow: hidden` line masks are
+gone and the lines carry `padding-bottom: 0.08em` so the lavender gradient,
+painted through `background-clip: text`, has room to finish. Verified both
+ways the brief asks for: down→up, and reload at mid-page→up.
+
+**The custom cursor is gone** — element, listeners and the `cursor: none` it
+put on everything. The page had no system cursor at all: no hand over a link,
+no caret in the newsletter field, nothing if the script failed. `cursor:
+pointer` is now spelt out for the clickable things the browser cannot infer
+(`<span>` and `<g>` elements acting as controls).
+
+**The header has a glass background at every scroll position** —
+`rgba(6,4,14,.55)` at the top, `.85` past 24px, blur 16px with 140%
+saturation, 1px white 6% border. There is a `@supports` fallback to a near
+solid bar where `backdrop-filter` is missing, because blur is the only reason
+55% is readable. The overlay menu is solid `#06040E`.
+
+**All media now comes from `assets/media.js`** — one file, one key per slot.
+Nothing in the markup hard-codes a path; `data-img="wire_1"` is all the HTML
+says. Until the client supplies files, images fall back to deterministic
+`picsum.photos` seeds and videos show their poster with a slow zoom and never
+request a file. Every picture, real or dummy, gets the same duotone.
+
+⚠ **picsum.photos is an external service** and the only one the page calls
+apart from the YouTube embed. It exists so the layout can be reviewed with
+pictures in it. Filling in every `src` in media.js removes it.
+
+**The hard purple bands in 05 and 12** are a `.glow-layer` masked to nothing
+at its top and bottom quarters. Before, the gradients ran to the edge of a
+layer that stopped at the section boundary, which drew a straight line across
+the page.
+
+**The logo marquees** have their 80px edge fades, and are built from the logo
+list in media.js — an SVG when there is one, the publisher's name as type
+until there is.
+
+### The section fixes
+
+| | |
+|---|---|
+| **01** | The map is now the **official boundary of India per the Survey of India**, J&K, Ladakh and the island territories included, from `data/india-boundary.json`. Natural Earth — which the globe uses and the map used to — draws India without them. Headline 150+; four new stat cards. |
+| **02** | Card capped at the left column's height and 56svh, tops aligned. Real axes, a legend, a peak marker, a six-segment progress bar, and six distinct scenes. |
+| **04** | Rebuilt as **one SVG**: chips, labels, curves, track, nodes and packet in a single viewBox. That is what stops a curve ever starting in empty space. A second, vertical viewBox takes over below 768px, because an SVG cannot reflow and scaling the wide one put its 17px labels at 4.7px. |
+| **05** | The background photograph is **fixed to the window** and the section scrolls over it — a scroll-driven CSS animation, not a scroll handler, so it does not judder. The card is rebuilt: it had no rule of its own at all, so it was an unpadded block collapsed at the top of its column. It is now a filling flex column like 02's monitor, capped at 70svh so it reads as a panel in front of the scene rather than a full-height slab. The claim has its own line instead of riding in the LIVE flag and colliding with the timestamp; the capacity line is named in a legend above the plot instead of a label sitting on top of it; the AWS label leads the server rack so it cannot be squeezed off the edge. |
+| **06** | Rebuilt. It was the emptiest section on the page — a 900px window held 419px of content and the card had ~190px of nothing in it — because `.ed--top` sizes the grid to its taller column, and here both columns were short. It is an ordinary filling layout-A section now. The two sides are named once at the top instead of as headings over ten repeated glyphs, each row carries its own labelled WP/Blink capsules, and the section finally has a signature graphic: a 5x5 matrix, one column per category and one dot per row in it, built from `compare` so it cannot drift from the table. Rows and copy are unchanged. **No `[FROM CLIENT]` markers remain.** |
+| **07** | Six segments with real metrics, a dummy screenshot with image parallax, floating chips anchored to the frame, and a per-segment background glyph. |
+| **08** | Four letters now, not two, and the deck behind the portrait is built from `letters.length` so it is always exactly as deep as there are letters to page through. The portrait is down from 86% to 66% of its column. Two of the four quotes are verbatim from published case studies; two are samples — **see §6d, and never a face**. |
+| **09** | Four plans with the client's published limits, features, CTAs and add-ons strip. Features start under the price. |
+| **10** | Dummy images with parallax inside each card and a hover zoom. |
+| **11** | A real exchange: your question as a right-aligned bubble, a 600ms typing indicator, then the desk's answer, two quick actions and a footer link. Auto-height, top-aligned. |
+| **12** | New headline, support line, contact line, eight orbiting publisher chips, globe masked into the background. |
+| **13** | Wordmark is **SVG**, so it fills the container width exactly at every size and before the font loads. Full address and five socials. |
+
+### Verified
+
+Hero title after down→up and after reload-at-mid-page→up. No `cursor: none`
+anywhere. No `.todo` markers anywhere. Every section fits its window with no
+overflow in either axis and no horizontal page scroll, at 1920×960, 1440×900,
+1366×657, 1280×720, 1024×768, 820×1180, 390×844, 360×740 and 844×390 — with
+every monitor scene, comparison tab, segment, question and flow node clicked
+through first. Footer 63–97%.
+
+**Still not verified:** Lighthouse and `prefers-reduced-motion` — see §7.
+
+---
+
+## 0a · The second redesign — "one continuous world" (7 Oct 2026)
+
+The first redesign (§0b below) fixed the consistency problem and created a new
+one: **one background, one card, one motion — and small content floating in
+large dark screens.** The client's note was blunt about it. This pass keeps the
+consistency and fills the screens.
+
+Twelve sections, each with its own signature animated graphic, all built from
+one shared visual DNA so the page still reads as one world.
+
+```
+00 hero        unchanged except its background      07 the beats    segment tabs + device frame
+01 the network dot-matrix map of India + logos      08 letters      portrait + card deck
+02 the problem 6 questions, 6 mini scenes           09 the rate card 3 tiers, real prices
+03 the platform bento grid, 6 micro-UIs             10 the wire     1 large + 2 small posts
+04 the flow    fibre path, scrubbed story card      11 questions    chat with the desk
+05 live        counter, nodes, sparkline, video     12 front page   globe returns, rising
+06 head to head draggable split + table             footer          newsletter, 4 cols, wordmark
+```
+
+### The decisions that were the client's, and what they chose
+
+- **66+ newsrooms, everywhere.** The brief offered 150+ or 66+; the answer was
+  66+, applied throughout — the headline, the stat card, the meta description
+  and the 02 and 11 answers. **Nothing on the page says 150+ any more.**
+- **Real prices in 09**, carried over from the earlier build and read from
+  blinkcms.ai/pricing-page on 27 Sep 2026: Basic $500, Business $1,500
+  (recommended), Custom Suite from $2,000. **Nothing checks these against the
+  live page, so they go stale silently** — re-read before a release.
+- **The hero button stays white.** The brief offered a purple one "if the
+  client approves" and left the choice open; white was kept because the hero's
+  only sanctioned change is its background, and white-on-near-black is the
+  highest-contrast CTA on the page.
+- **06's WordPress column is not filled in.** Every cell is a visible
+  `[FROM CLIENT]` marker. There is no source for those values in the brief or
+  on the site, and this build does not invent claims about another product —
+  least of all unflattering ones. The client is sending PDFs; see §7.
+
+### What came back, and why
+
+- **GSAP and ScrollTrigger**, removed in the first pass, are back: the brief
+  asks for scroll-linked graphics and there are now eleven of them. They
+  **scrub and never pin**. Lenis was offered and declined — it owns the scroll
+  position, and native scroll with `scroll-behavior: smooth` does the job.
+- **The rate card**, dropped in the first pass, is section 09 again.
+
+### What went, and is not coming back
+
+- **The preloader.** The brief forbids holding first paint for more than a
+  second. `js/scenes/preloader.js` is deleted and `main.js` paints the hero
+  immediately. This also closes the open item the first pass left behind.
+- **Scroll-snap.** Parallax and snap fight each other, and the brief rules out
+  mandatory snap anyway.
+
+### Where the graphics are drawn
+
+WebGL is the hero globe and nothing else — mounted twice (hero and 12), both
+pausing off-screen, so there is never more than one loop running. Everything
+else is canvas 2D (`scenes/dots.js`) or inline SVG animated with CSS. A second
+WebGL context to draw a flat map would cost a shader compile and a chunk of
+memory on exactly the phones this traffic is on.
+
+### Verified
+
+Nine viewports, including phone landscape. No section taller than its window,
+no overflow in either axis, no horizontal page scroll, every section revealed,
+footer 52–88% of the window, content block 86% of each section at 1440×900.
+The full interaction sweep ran at each size. Details in `README.md`.
+
+**Not verified:** Lighthouse and `prefers-reduced-motion` — see §7.
+
+---
+
+## 0b · The first redesign — "one page, one edition" (7 Oct 2026)
+
+The client liked the hero and nothing after it. The complaint, in their words:
+everything below felt like separate websites — the background switched between
+black, white, cream, maps, purple, gradients and photographs; a serif appeared
+in some sections; every section had its own animation; some ran two or three
+screens; there was too much text.
+
+So every section after the hero was rebuilt to one rule: **one continuous dark
+page where every section fits inside the browser window and carries very little
+text.** Sixteen sections became eleven plus a footer.
+
+### What the page is now
+
+```
+00 hero         (#hero)         unchanged + a purple glow
+01 the desk     (#desk)         4 stat cards
+02 the question (#why-leave)    question list + fixed answer panel
+03 every screen (#every-screen) static device line-up
+04 our platform (#platform)     6 module cards
+05 the flow     (#flow)         pipeline + one readout line
+06 live         (#live)         LIVE status card + 2 cards
+07 the press    (#press)        3 case cards
+08 letters      (#letters)      one quote at a time + logo marquee
+09 the wire     (#the-wire)     4 post rows
+10 questions    (#faq)          the 02 component again
+11 front page   (#cta)          headline + Book a demo
+   footer       (#contact)      wordmark, 4 columns, email + city
+```
+
+### What was removed, and why it is not coming back
+
+- **Four pinned, scroll-scrubbed scenes** (desk, platform, press, hero sky) and
+  every per-section effect with them: the paper plane, the sliding giant
+  background text, the wedge transitions, the gradient wipe to white, the
+  particle burst, the letter-by-letter read-through in 09, the parallax on the
+  hero copy. All of it was the "separate websites" feeling.
+  `js/scenes/desk.js`, `platform.js`, `press.js`, `reader-signal.js`,
+  `halftone-wordmark.js`, `back-page-map.js`, `js/lib/canvas-scene.js`,
+  `article.js` and `fonts.js` are gone with them.
+- **GSAP, ScrollTrigger and Lenis**, which existed to drive those scenes.
+  Nothing left needs an animation library. Lenis also had to go on its own
+  merits: it owns the scroll position and fights `scroll-snap`.
+- **Playfair Display**, from `fonts.css` and from `fonts/`. The brief says no
+  serif anywhere, and leaving the face loadable invites it back.
+- **Four sections**: the front page (02), the masthead wall (10), the rate card
+  (11) and ON AIR (14). The masthead wall became one marquee row in 08; the
+  rate card and ON AIR are not in the new section map. **The rate card's prices
+  are therefore no longer on the homepage** — if the client wanted them there,
+  that is a conversation, not a bug. Its markup is recoverable at `38ef807`.
+- **Every photograph**, the bureau map, the background video and the second
+  (dark-on-light) logo file. `assets/` is one logo now.
+- **The header's light/dark inversion.** One background, nothing to invert
+  against.
+- **Red everywhere except the LIVE dot in 06.** The cursor ring was red; it is
+  lavender now.
+
+### What was kept, deliberately
+
+- **The hero**, exactly: layout, copy, headline gradient, dotted globe,
+  buttons. Two things changed and both were asked for or forced: the purple
+  glow behind it (now part of the one ambient layer), and its height, which
+  dropped from 240svh to 100svh because the extra scroll existed only to drive
+  `.hero-sky`, the gradient wipe into the old white section 02.
+- **The hero's headline roll-up**, as the single exception to "one motion
+  language". It is part of the hero. It is a CSS transition now, not GSAP.
+- **The preloader**, in full. The brief proposed removing the counter and
+  marked it "confirm with client"; the client's answer on 7 Oct was *keep it as
+  it is, decide later*. **This is still open** — see §7.
+- **The custom cursor, the overlay menu, the fixed section label, the video
+  modal and the boot failsafe.**
+
+### The three things to understand before editing
+
+They are documented at length in `README.md` and in the `BLINK · EDITION`
+banner in `css/styles.css`. In short: one screen, one background, one motion.
+The traps underneath them are worth repeating here, because every one of them
+was hit during the build:
+
+1. **`ch` resolves against the element's own font.** `max-width: 24ch` on a
+   wrapper set in 17px body copy is 235px, and the 62px headline inside it went
+   straight through the side. Size a display element in its own units or in px.
+2. **`svh` alone is not enough.** A 360×740 phone has height and no width.
+   Every display-sized clamp needs `min(Xsvh, Yvw)`.
+3. **An implicit `auto` grid column sizes to max-content.** The 8,000px marquee
+   track in 08 dragged its section, headline and quote out to 16,000px, hidden
+   only by `body { overflow-x: hidden }`. `.ed__grid` is
+   `grid-template-columns: minmax(0, 1fr)` because of it.
+4. **A fixed-height panel means the longest item must fit it at every width.**
+   That is the price of not using an accordion, and it is paid in the `min()`
+   caps on `.qa__a` and `.quote__text`.
+
+### Verified
+
+Eight viewports — 1920×960, 1440×900, 1366×657, 1280×720, 1024×768, 820×1180,
+390×844, 360×740 — plus 844×390 phone landscape. At each: no section taller
+than the window, no element wider than its box, no horizontal page scroll,
+footer at 41–60% of the window, no console errors. The interaction sweep (every
+answer in both Q&A panels, both letters, all six pipeline stages) was run at
+each size with the panels re-measured after every click.
+
+**Not verified:** Lighthouse (no headless Chrome available) and
+`prefers-reduced-motion` (read in the rules, not emulated).
+
+---
+
 ## 1 · What this is
+
+> **Historical from here down.** §1–§6e describe the sixteen-section build that
+> §0 replaced. §6b, §6c, §6d and §10 still apply to the current page.
 
 A single-page marketing site for Blink CMS, built to the structure and motion
 system of unitedcarriers.com but told through a news story rather than a
@@ -731,32 +998,40 @@ things where there are now six.
 
 ## 6d · 09 · LETTERS — the read-through, and a content warning
 
-### ⚠ The quotes here are fabricated, and nothing on screen says so
+### ⚠ Two of the four quotes are fabricated, and nothing on screen says which
 
-**The names, roles and quotes in the four letters are invented.** This build is
-for the Blink CMS team to review, and the user asked for sample copy and for
-the on-screen warning to come off, after the concern was raised. That is their
-call for an internal build. **This file is now the only record**, so read the
-next two paragraphs before anything here goes public.
+**The carousel now holds four letters, and their provenance is mixed.** Every
+entry in `letters` (js/lib/content.js) carries a `source` field saying which it
+is. Read it before anything here goes public.
 
-**What is real:** all four mastheads — LiveLaw, Deccan Chronicle, Daily Thanthi
-and The Federal — appear on the publisher wall in 10, so the customer
-relationships are not invented, only the words put in their mouths. That is the
-narrower risk, but it is still the serious one: a fabricated quote against a
-real customer’s name reads as an endorsement that customer never gave.
+| # | Who | `source` |
+|---|---|---|
+| 01 | Kavitha Iyer, Daily Thanthi | `sample` — **name, role and words all invented** |
+| 02 | Sanjay Bhat, The Federal | `sample` — **name, role and words all invented** |
+| 03 | Advocate P V Dinesh, LiveLaw | verbatim, blinkcms.ai `/case-study/` |
+| 04 | Editorial head, Tax Scan | verbatim, blinkcms.ai `/case-study/` |
 
-**Before this ships publicly, one of two things has to happen.** Either real
-quotes replace the sample ones, or the sample flag goes back — it printed
+The two samples are the user's call for an internal review build — they asked
+for sample copy and for the on-screen warning to come off after the concern was
+raised. **This file is now the only record of which two they are.**
+
+**What makes the samples the serious risk:** their mastheads are real. Daily
+Thanthi and The Federal both appear on the publisher wall in 10, so the customer
+relationships are not invented, only the words put in their mouths — and a
+fabricated quote against a real customer's name reads as an endorsement that
+customer never gave.
+
+**Before this ships publicly, one of two things has to happen to 01 and 02.**
+Either real quotes replace them, or the sample flag goes back — it printed
 `[SAMPLE LETTERS — NAMES AND QUOTES ARE PLACEHOLDERS]` in red mono and is in
-git history alongside its `.letters-flag` rule. Do not let this section reach
-production in its current state.
+git history alongside its `.letters-flag` rule. Do not let those two reach
+production as they are.
 
-**There were real quotes here, and they are recoverable.** Four verbatim ones
-— Advocate P V Dinesh (Co-Founder, LiveLaw), the Editorial Head of Tax Scan,
-the Hari Bhoomi digital team and the EVO India team — from the case studies
-published at blinkcms.ai under `/case-study/`. They came out because three of
-those publishers are not among the four the user wants shown. **They live at
-commit `761d3c3`.** The LiveLaw one is usable today as-is.
+**Two more verbatim quotes are sitting ready for exactly that.** The Hari Bhoomi
+digital team and the EVO India team, from the same `/case-study/` set, quoted in
+full at commit `5bab5c4` (the four-quote version of the section) — dropping them
+into `letters` in place of the two samples makes the whole section real and
+needs no other change. All four published quotes also live at commit `761d3c3`.
 ### The read-through
 
 Four equal letters, each a masthead slug beside a quote, and **the quote lights
@@ -791,6 +1066,64 @@ section animates delivery, structure or arrival.
 
 ---
 ## 7 · Open items
+
+### Open after the fix round (7 Oct 2026) — current, not historical
+
+**1 · Every image is a placeholder, and the videos do not exist.** The
+thirteen pictures are LOCAL now, in `assets/images/`, so the page makes no
+third-party request for media at all. But they are generic stock photographs
+fetched once from Lorem Picsum (Unsplash) — **not** screenshots, **not**
+client newsrooms, **not** cleared brand assets. `seed` and `credit` in
+`assets/media.js` record exactly which picture each one is. Replace all of
+them before launch; the keys are listed in `README.md`.
+
+There was no video to save, so `src` is empty on both and the page never
+requests one — the poster carries the slot with a slow zoom. Drop a file in
+`assets/video/`, point `src` at it, and it plays in view with no other change.
+
+**2 · 08's images must never be a face.** The quotes carry real publisher
+names and placeholder people, so a stock photograph of a plausible-looking
+person beside one reads as that person. The seeds are abstract newsroom
+frames on purpose. When real approved portraits arrive, the names have to be
+real too — see §6d.
+
+**3 · 01's last two stat cards came only from the brief.** "200% increase in
+SEO reach" and "30% lower newsroom costs" are not traceable to any earlier
+material and were marked `[confirm with client]` in the brief; the client
+confirmed publishing them on 7 Oct. Worth a second look before launch.
+
+**4 · The rate card goes stale silently.** The plans, prices, limits, features
+and add-ons are the client's published pricing page and nothing in the build
+checks them. Re-read before any release.
+
+**5 · Lighthouse has not been run.** No headless Chrome in the environment.
+The brief asks for ≥75 on mobile, LCP <2.5s and CLS <0.05. The structural work
+is done — no preloader, one WebGL context, every loop gated on visibility,
+every image carrying width/height from media.js — but the number is unmeasured.
+Note that the thirteen placeholders are 2.0 MB of unoptimised JPEG, so
+**measure after the real, optimised assets are in**, not before.
+
+**6 · `prefers-reduced-motion` was read, not emulated.** The rules are in the
+stylesheet and the guards are in `lib/motion.js`, `scenes/dots.js`,
+`ui/panels.js` and `scenes/flow.js`. Worth ten minutes with the OS setting on.
+
+**7 · Two headlines run to three lines on layout A.** "Why newsrooms leave
+WordPress." and "Reliability on every deadline." sit in a 5-of-12 column and
+there is no size at which they hold two lines at every width. `text-wrap` is
+`wrap` rather than `balance` there, so they break greedily. Shortening the
+copy is the only other fix.
+
+**8 · 06's optional competitor switch was left out**, as the brief says to
+unless approved. Adding Quintype / PubLive / Hocalwire means a second data
+set in `js/lib/compare.js` and the same sourcing discipline — nothing in that
+table is inferred.
+
+### Resolved by this round
+
+- 06's `[FROM CLIENT]` column and 07's `[METRICS FROM CLIENT]` are gone; both
+  are filled from the brief's own content.
+- The India map is the official Survey of India boundary.
+- 150+ vs 66+ is resolved again, the other way: **150+ everywhere.**
 
 ### The 12-essentials audit — all three sections landed
 
@@ -1041,9 +1374,12 @@ These cost a lot of time; they are about the tooling, not the site.
 
 ## 10 · Content rules — hold these
 
-- **No invented testimonials, people or quotes.** The four quotes in 09 are
-  verbatim from the case studies published at blinkcms.ai — see §6d. Anything
-  that is not traceable to a published source does not go on this page.
+- **No invented testimonials, people or quotes.** The rule stands, and **08 is
+  currently the one place it is knowingly broken**: two of its four letters are
+  sample copy, at the user's request, for an internal build. Every entry in
+  `letters` carries a `source` field saying which it is, two verbatim
+  replacements are ready, and §6d has the whole picture. Nothing else on the
+  page is untraceable to a published source, and nothing new should be.
 - The preloader wire feed and the live-blog card are labelled sample text.
 - **Every headline is live HTML** — nothing baked into an image.
 - Only facts from the Blink CMS brief. Anything else is a marked placeholder.

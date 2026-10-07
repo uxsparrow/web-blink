@@ -134,40 +134,82 @@ export function initMonitor() {
   select(0, true)
 }
 
-/* ── 06 · the comparison table ────────────────────────────────── */
+/* ── 06 · the comparison ──────────────────────────────────────── */
+/**
+ * The card is built from `compare` and nothing else — the rows, the category
+ * name and the matrix all come out of the same object, so a row that is not in
+ * the client's comparison document cannot appear on the page.
+ *
+ * The matrix is the section's signature graphic: one column per category, one
+ * dot per row inside it, and the open category lit. It is the shape of the
+ * comparison rather than a decoration, and it is what the section had instead
+ * of a graphic of its own — which is why it read as a plain table on a page
+ * where everything else has one.
+ */
 export function initCompare() {
   const tabs = document.querySelector('[data-vs-tabs]')
   const rows = document.querySelector('[data-vs-rows]')
   if (!tabs || !rows) return
 
   const buttons = qq('[data-vs-tab]', tabs)
+  const catName = document.querySelector('[data-vs-cat]')
+  const matrix = document.querySelector('[data-vs-matrix]')
+
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag)
+    if (cls) n.className = cls
+    if (text != null) n.textContent = text
+    return n
+  }
+
+  // the matrix is built once; only which column is lit ever changes
+  const columns = buttons.map((b) => {
+    const set = compare[b.dataset.vsTab]
+    const col = el('span', 'vs2__mcol')
+    if (set) {
+      set.rows.forEach((_, r) => {
+        const dot = el('i', 'vs2__dot')
+        // counted from the bottom, so a column lights upward
+        dot.style.setProperty('--d', String(set.rows.length - 1 - r))
+        col.append(dot)
+      })
+      col.append(el('span', 'meta vs2__mcap', set.label))
+    }
+    return col
+  })
+  if (matrix) matrix.replaceChildren(...columns)
 
   const select = (i) => {
-    const key = buttons[i].dataset.vsTab
-    const set = compare[key]
+    const set = compare[buttons[i].dataset.vsTab]
     if (!set) return
+
     buttons.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)))
+    columns.forEach((c, k) => c.classList.toggle('is-on', k === i))
+    if (catName) catName.textContent = set.label
 
     swap(rows, () => {
       rows.replaceChildren(
-        ...set.rows.map((label) => {
-          const row = document.createElement('div')
-          row.className = 'vs2__row'
+        ...set.rows.map((label, r) => {
+          const row = el('div', 'vs2__row')
+          row.style.setProperty('--r', String(r))
 
-          const name = document.createElement('span')
-          name.textContent = label
+          const cells = el('span', 'vs2__cells')
+          const wp = el('span', 'vs2__cell vs2__cell--no')
+          wp.append(el('i', 'vs2__mark', '✘'), el('span', 'vs2__cellname', 'WP'))
+          const bl = el('span', 'vs2__cell vs2__cell--yes')
+          bl.append(el('i', 'vs2__mark', '✔'), el('span', 'vs2__cellname', 'Blink'))
+          wp.setAttribute('aria-hidden', 'true')
+          bl.setAttribute('aria-hidden', 'true')
+          cells.append(wp, bl)
 
-          const wp = document.createElement('span')
-          wp.className = 'vs2__no'
-          wp.textContent = '✘'
-          wp.setAttribute('aria-label', 'Not in WordPress out of the box')
+          // the marks are decoration; this is what a screen reader reads
+          const said = el(
+            'span',
+            'visually-hidden',
+            'Not in WordPress out of the box. Included in Blink CMS.'
+          )
 
-          const bl = document.createElement('span')
-          bl.className = 'vs2__yes'
-          bl.textContent = '✔'
-          bl.setAttribute('aria-label', 'Included in Blink CMS')
-
-          row.append(name, wp, bl)
+          row.append(el('span', 'vs2__name', label), cells, said)
           return row
         })
       )

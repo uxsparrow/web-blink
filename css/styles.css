@@ -5921,6 +5921,21 @@ button:disabled,
 }
 
 /* ── 06 · the comparison, rebuilt ─────────────────────────────── */
+/*
+ * This section was the emptiest on the page: a 900px window held 419px of
+ * content, vertically centred, with ~190px of nothing inside a card stretched
+ * to a column it had no content for. Two causes, both removed.
+ *
+ * It was `.ed--top`, whose grid is only as tall as its taller column — here a
+ * headline and five small tabs — so the whole section sat at 54% full. That
+ * treatment earns its keep in 02 and 11, where a panel really can be shorter
+ * than the list beside it. Here both columns were short and the section just
+ * starved. 06 is an ordinary filling layout-A section now.
+ *
+ * And the card's content did not grow into whatever height it was given. Now
+ * the rows take what the fixed furniture leaves, exactly as every other card
+ * on the page does.
+ */
 .vtabs {
   display: flex;
   flex-direction: column;
@@ -5956,49 +5971,68 @@ button:disabled,
 .vs2 {
   display: flex;
   flex-direction: column;
-  padding: clamp(12px, 2.2svh, 24px);
+  flex: 1 1 auto;
   min-height: 0;
+  /* capped and centred, like 05's card: filling a 900px window outright gave
+     a one-line capability 99px of row to sit in */
+  max-height: min(70svh, 640px);
+  padding: clamp(14px, 2.4svh, 28px);
+  gap: clamp(8px, 1.4svh, 18px);
+  overflow: hidden;
 }
 
-.vs2__head,
-.vs2__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(6px, 1.4vw, 20px);
-  align-items: center;
-}
-
-.vs2__head {
-  padding-bottom: clamp(6px, 1.2svh, 12px);
-  border-bottom: 1px solid var(--glass-line);
+/*
+ * The two sides, named once. They used to be column headings over ten
+ * repeated glyphs — three columns of which two were a single character wide,
+ * which is what left the middle of the card empty.
+ */
+.vs2__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px clamp(12px, 2.4vw, 28px);
   flex: none;
 }
 
-.vs2__head span:nth-child(2),
-.vs2__head span:nth-child(3),
-.vs2__row span:nth-child(2),
-.vs2__row span:nth-child(3) {
-  text-align: center;
+.vs2__cat {
+  font-size: clamp(17px, min(2.8svh, 3vw), 30px);
+  color: var(--txt);
 }
 
-.vs2__sub {
-  display: block;
-  opacity: 0.6;
-  letter-spacing: 0.08em;
+.vs2__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 2vw, 22px);
+}
+
+.vs2__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.vs2__key--lit {
+  color: var(--txt);
+}
+
+.vs2__key .vs2__mark {
+  font-style: normal;
+}
+
+.vs2__key--lit .vs2__mark {
+  color: var(--blink-light);
 }
 
 .vs2__abbr {
   display: none;
 }
 
-/* the Blink column is lit; the WordPress one is simply not */
-.vs2__lit {
-  color: var(--txt);
-}
-
+/* the rows take the height the furniture above and below leaves */
 .vs2__rows {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-height: 0;
   transition: opacity 0.3s;
 }
@@ -6007,41 +6041,149 @@ button:disabled,
   opacity: 0;
 }
 
+/*
+ * One row, one line of meaning: the capability, then what each product does
+ * with it. The cells are labelled, so a row still says WP and Blink on its
+ * own even though the headings are gone.
+ */
 .vs2__row {
-  padding-block: clamp(5px, 1.1svh, 11px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(8px, 1.8vw, 24px);
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-block: clamp(4px, 0.8svh, 10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: clamp(12px, 1.7svh, 15px);
-  line-height: 1.25;
 }
 
 .vs2__row:last-child {
   border-bottom: 0;
 }
 
-.vs2__row > span:first-child {
-  color: var(--txt-2);
+.vs2__name {
+  min-width: 0;
+  color: var(--txt);
+  font-size: clamp(13px, min(1.9svh, 1.6vw), 17px);
+  line-height: 1.25;
+}
+
+.vs2__cells {
+  display: flex;
+  gap: clamp(6px, 1vw, 12px);
+  flex: none;
 }
 
 /*
- * The Blink cell carries the glow. The WordPress cross is muted grey, never
- * red — red on this page means a live or alert state, and "this product does
- * not ship that feature" is neither.
+ * A capsule each. The Blink one carries the light; the WordPress one is an
+ * empty outline, because "not in the box" is an absence and should look like
+ * one. The cross is muted grey and never red — red on this page means a live
+ * or alert state, and "this product does not ship that feature" is neither.
  */
-.vs2__yes {
-  color: var(--blink-light);
-  font-size: 1.1em;
-  background: radial-gradient(ellipse 70% 120% at 50% 50%, rgba(97, 24, 234, 0.3), transparent 72%);
-  border-radius: 8px;
+.vs2__cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 0.75em;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  font-family: var(--font-spacemono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.vs2__no {
+.vs2__cell .vs2__mark {
+  font-style: normal;
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+.vs2__cell--no {
   color: rgba(245, 243, 255, 0.3);
+}
+
+.vs2__cell--yes {
+  color: var(--txt);
+  border-color: rgba(154, 108, 241, 0.45);
+  background: radial-gradient(ellipse 90% 180% at 50% 50%, rgba(97, 24, 234, 0.42), rgba(97, 24, 234, 0.14));
+}
+
+.vs2__cell--yes .vs2__mark {
+  color: var(--blink-light);
+}
+
+/*
+ * The signature graphic. One column per category, one dot per row inside it,
+ * built from `compare` so it cannot drift from the table above it. The open
+ * category is lit and the others are the dot grid at rest, which makes the
+ * five tabs legible as a shape rather than only as a list.
+ */
+.vs2__matrix {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(6px, 1.2vw, 16px);
+  padding-top: clamp(8px, 1.6svh, 16px);
+  border-top: 1px solid var(--glass-line);
+  flex: none;
+}
+
+.vs2__mcol {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: clamp(3px, 0.6svh, 6px);
+}
+
+/* round, and sized in its own right rather than stretched to the column —
+   at `width: 100%` each dot was a 126px bar and a lit column read as one
+   solid block instead of five things */
+.vs2__dot {
+  width: clamp(6px, min(1.1svh, 1vw), 11px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  transition: background 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--d, 0) * 60ms);
+}
+
+.vs2__mcol.is-on .vs2__dot {
+  background: var(--blink-light);
+  box-shadow: 0 0 10px rgba(154, 108, 241, 0.6);
+}
+
+/*
+ * The caption sits under the column — `column-reverse` puts it first.
+ *
+ * It is held to the column's width and truncated. A caption is sized by its
+ * own text, not by the grid cell it sits in, so at phone width "DISTRIBUTION"
+ * is 85px of label in a 55px column and it simply printed over "REVENUE"
+ * next to it. Truncating is width-independent: wherever there is room the
+ * label reads in full, and where there is not it gets shorter instead of
+ * landing on its neighbour.
+ */
+.vs2__mcap {
+  order: -1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--txt-3);
+  transition: color 0.3s;
+}
+
+.vs2__mcol.is-on .vs2__mcap {
+  color: var(--txt);
 }
 
 .vs2__note {
   flex: none;
-  margin-top: clamp(8px, 1.6svh, 16px);
-  padding-top: clamp(8px, 1.6svh, 16px);
+  margin: 0;
+  padding-top: clamp(6px, 1.2svh, 14px);
   border-top: 1px solid var(--glass-line);
   color: var(--txt-3);
   font-size: clamp(12px, 1.6svh, 14px);
@@ -6050,7 +6192,7 @@ button:disabled,
 
 .vs2__src {
   flex: none;
-  margin-top: 6px;
+  margin: 0;
   opacity: 0.7;
 }
 
@@ -6542,29 +6684,15 @@ button:disabled,
   }
 
   /*
-   * The comparison table at phone width. The feature column takes what is
-   * left and the two marks get 34px each — at `1.6fr / 1fr / 1fr` the ticks
-   * were as wide as the text and every row wrapped to three lines, which put
-   * 170px of rows outside the panel. The note underneath stays: it is what
-   * stops the table reading as the whole story.
+   * The comparison at phone width. The capsules lose their words and keep
+   * their marks: "WordPress, out of the box" is 160px of label and the names
+   * are already in the key at the top of the card, so repeating them ten
+   * times down a 360px screen costs the capability names their room. The note
+   * underneath stays at every width — it is what stops the comparison reading
+   * as the whole story.
    */
   .vs2 {
     padding: clamp(10px, 1.8svh, 20px);
-  }
-
-  .vs2__head,
-  .vs2__row {
-    grid-template-columns: minmax(0, 1fr) 34px 34px;
-    gap: 6px;
-  }
-
-  /* the column headings have to live in those 34px too — at the full label
-     size "WORDPRESS out of the box" wrapped to 95px of header */
-  .vs2__head span:nth-child(2),
-  .vs2__head span:nth-child(3) {
-    font-size: 10px;
-    letter-spacing: 0.02em;
-    line-height: 1.15;
   }
 
   .vs2__full {
@@ -6575,13 +6703,16 @@ button:disabled,
     display: inline;
   }
 
-  .vs2__sub {
+  .vs2__cellname {
     display: none;
   }
 
-  .vs2__row {
-    padding-block: 4px;
-    font-size: 12px;
+  .vs2__cell {
+    padding: 0.3em 0.55em;
+  }
+
+  .vs2__name {
+    font-size: 13px;
   }
 
   .vs2__note {

@@ -1152,17 +1152,22 @@
       under the table says plainly what WordPress does offer, so the
       comparison cannot be read as the whole story.
     -->
-    <section id="versus" class="ed ed--a ed--top" data-label="HEAD TO HEAD">
+    <section id="versus" class="ed ed--a" data-label="HEAD TO HEAD">
+      <div class="layer-back ed__fade" aria-hidden="true">
+        <span class="glow-layer"></span>
+      </div>
+
       <div class="ed__shell">
         <div class="ed__grid">
-          <div class="ed__col ed__col--top">
+          <div class="ed__col">
             <div class="ed__head">
               <span class="mono ed__label" data-in style="--i:0">06 — HEAD TO HEAD</span>
               <h2 class="display ed__h2" data-in style="--i:1">Blink CMS <span class="head-lilac">vs
                   WordPress.</span></h2>
+              <p class="ed__sup" data-in style="--i:2">Five categories, and the same answer in every row.</p>
             </div>
 
-            <div class="vtabs" role="tablist" aria-label="Comparison categories" data-vs-tabs data-in style="--i:2">
+            <div class="vtabs" role="tablist" aria-label="Comparison categories" data-vs-tabs data-in style="--i:3">
               <button type="button" role="tab" aria-selected="true" aria-controls="vs-table"
                 data-vs-tab="newsroom">Newsroom</button>
               <button type="button" role="tab" aria-selected="false" aria-controls="vs-table"
@@ -1176,18 +1181,31 @@
             </div>
           </div>
 
-          <div class="ed__gfx ed__gfx--top">
+          <!--
+            The two sides are named once, at the top, instead of as column
+            headings over ten repeated glyphs. Each row then carries its own
+            pair of labelled cells, so a row says what it means on its own
+            line and the card can be read from any point in it.
+          -->
+          <div class="ed__gfx">
             <div class="glass vs2" id="vs-table" role="tabpanel" data-in style="--i:1">
-              <!-- the short forms are for phone width, where each mark column
-                   is 34px and "WordPress" alone needs 57 -->
-              <div class="vs2__head">
-                <span class="meta">Feature</span>
-                <span class="meta"><span class="vs2__full">WordPress</span><span
-                    class="vs2__abbr">WP</span> <span class="vs2__sub">out of the box</span></span>
-                <span class="meta vs2__lit"><span class="vs2__full">Blink CMS</span><span
-                    class="vs2__abbr">Blink</span></span>
+              <div class="vs2__top">
+                <span class="display vs2__cat" data-vs-cat>Newsroom</span>
+                <span class="vs2__keys">
+                  <span class="meta vs2__key"><i class="vs2__mark" aria-hidden="true">✘</i><span
+                      class="vs2__full">WordPress, out of the box</span><span class="vs2__abbr">WP</span></span>
+                  <span class="meta vs2__key vs2__key--lit"><i class="vs2__mark" aria-hidden="true">✔</i><span
+                      class="vs2__full">Blink CMS</span><span class="vs2__abbr">Blink</span></span>
+                </span>
               </div>
+
               <div class="vs2__rows" data-vs-rows></div>
+
+              <!-- the signature graphic: one column per category, one dot per
+                   row inside it, the open category lit. It is the shape of the
+                   whole comparison, and it is built from `compare` itself. -->
+              <div class="vs2__matrix" data-vs-matrix aria-hidden="true"></div>
+
               <p class="vs2__note">Both offer SEO tools, AMP, PWA, API integrations and analytics. WordPress is
                 open-source with a free plan.</p>
               <p class="meta vs2__src">SOURCE: BLINK CMS FEATURE COMPARISON</p>

@@ -319,14 +319,14 @@ serves a directory works:
 
 ```bash
 npx serve .                      # or: python3 -m http.server 8080
-node .claude/preview.js          # the zero-dependency one, kept for tooling
+node tools/preview.js            # the zero-dependency one, kept for tooling
 ```
 
 ### Git
 
 All committed on `master`, working tree clean. The digital Desk, the header
 logo and this file landed as three commits; section 04's rail was built on
-`claude/section-04-conveyor-digital-291321` and merged in. Nothing is pushed —
+`feature/section-04-conveyor-digital-291321` and merged in. Nothing is pushed —
 there is no remote configured.
 
 The only merge conflict was in `README.md`, where both sides had edited
@@ -1315,7 +1315,7 @@ These cost a lot of time; they are about the tooling, not the site.
 
 - **The preview pane does not composite canvas/WebGL into screenshots.** DOM
   renders fine, canvases come out blank or black. To actually see a canvas
-  scene, temporarily add a POST endpoint to `.claude/preview.js` that writes a PNG to
+  scene, temporarily add a POST endpoint to `tools/preview.js` that writes a PNG to
   disk, capture frames into an offscreen grid canvas in the page, POST it, and
   read the file. Remove the endpoint afterwards.
 - **`requestAnimationFrame` throttles when the pane isn't painting.** In-pane

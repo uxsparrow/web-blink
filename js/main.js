@@ -21,6 +21,7 @@
 
 import { onInView, hasGsap, ScrollTrigger } from './lib/motion.js'
 import { letters } from './lib/content.js'
+import { mountGlobe } from './scenes/globe.js'
 
 import { initHeader, initSectionLabel } from './ui/chrome.js'
 import {
@@ -61,17 +62,7 @@ const isMobile = () => window.matchMedia('(max-width: 899px)').matches
 
 /* ── the globe, twice ─────────────────────────────────────────── */
 
-/**
- * Three.js is ~700 kB, so it stays off the critical path — but the fetch
- * starts here, at boot, rather than when something scrolls into view, so it is
- * usually resolved before the hero has finished fading in.
- */
-const globeModule = q('[data-scene="globe"]') ? import('./scenes/globe.js') : null
-
-async function mountGlobes() {
-  if (!globeModule) return
-  const { mountGlobe } = await globeModule
-
+function mountGlobes() {
   const hero = q('[data-scene="globe"]')
   if (hero) {
     const globe = mountGlobe(hero, { tagEls: qq('[data-ping-tag]'), dense: !isMobile() })
@@ -83,8 +74,7 @@ async function mountGlobes() {
   /*
    * The same scene again at the closing CTA, rising from the bottom edge so
    * the page ends on what it opened with. Both pause when they scroll away,
-   * so there is never more than one WebGL loop actually running — which is
-   * what the brief's "ONE shared renderer" is really asking for.
+   * so there is never more than one WebGL loop actually running.
    */
   const cta = q('[data-scene="globe-cta"]')
   if (cta && !isMobile()) {

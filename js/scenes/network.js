@@ -13,6 +13,7 @@
 
 import { onScrub, easeOut, clamp } from '../lib/motion.js'
 import { fitCanvas, loop, token } from './dots.js'
+import indiaData from '../../data/india-boundary.json'
 
 /* The cities the brief names, plus the Noida desk every arc runs back to. */
 const CITIES = [
@@ -101,9 +102,7 @@ export function mountNetwork(root) {
    * to it — and its own bbox drives the projection, so the whole country
    * fits the frame and nothing is cropped.
    */
-  fetch('data/india-boundary.json')
-    .then((r) => r.json())
-    .then((world) => {
+    const world = indiaData
     const polys = world.polygons
     const b = world.bbox
     // a little air so the coast is never flush against the edge
@@ -138,7 +137,6 @@ export function mountNetwork(root) {
         })
       }
     }
-  })
 
   /** Rasterises polygons into India's own box rather than the whole world. */
   function rasterizeBox(polys, w, h) {

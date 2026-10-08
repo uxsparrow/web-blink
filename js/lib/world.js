@@ -9,6 +9,8 @@
  * `topojson` is a global, loaded by vendor/topojson-client.min.js.
  */
 
+import topoWorld from '../../data/countries-110m.json'
+
 let worldCache = null
 let worldPromise = null
 
@@ -29,17 +31,16 @@ function collectPolys(gj) {
 export function loadWorld() {
   if (worldCache) return Promise.resolve(worldCache)
   if (worldPromise) return worldPromise
-  worldPromise = fetch('data/countries-110m.json')
-    .then((r) => r.json())
-    .then((topo) => {
-      const land = collectPolys(window.topojson.feature(topo, topo.objects.land))
-      const countries = window.topojson.feature(topo, topo.objects.countries)
-      const ind = countries.features.find(
-        (f) => String(f.id) === '356' || f.properties?.name === 'India'
-      )
-      worldCache = { land, india: ind ? collectPolys(ind) : [] }
-      return worldCache
-    })
+  const processTopo = (topo) => {
+    const land = collectPolys(window.topojson.feature(topo, topo.objects.land))
+    const countries = window.topojson.feature(topo, topo.objects.countries)
+    const ind = countries.features.find(
+      (f) => String(f.id) === '356' || f.properties?.name === 'India'
+    )
+    worldCache = { land, india: ind ? collectPolys(ind) : [] }
+    return worldCache
+  }
+  worldPromise = Promise.resolve(processTopo(topoWorld))
   return worldPromise
 }
 

@@ -12,7 +12,7 @@
  * empty space. Coordinates below are viewBox units and match the markup.
  */
 
-import { onInView, reducedMotion, clamp } from '../lib/motion.js'
+import { onInView, reducedMotion, clamp, onScrub } from '../lib/motion.js'
 
 /* the three stages. The copy is shared; the coordinates are read off
    whichever diagram is in the DOM. */
@@ -191,12 +191,10 @@ export function mountRatesBg(svg) {
     flat.style.strokeDashoffset = String(lf * (1 - clamp(p * 1.3)))
   }
 
-  import('../lib/motion.js').then(({ onScrub }) => {
-    onScrub(svg.closest('.ed') || svg, draw, {
-      start: 'top bottom',
-      end: 'center center',
-      scrub: 0.6,
-    })
+  onScrub(svg.closest('.ed') || svg, draw, {
+    start: 'top bottom',
+    end: 'center center',
+    scrub: 0.6,
   })
   return { draw }
 }

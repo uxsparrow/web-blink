@@ -1,0 +1,9 @@
+{
+  "name": "blink-cms",
+  "version": "1.0.0",
+  "description": "Blink CMS",
+  "scripts": {
+    "build": "npx --yes esbuild js/main.js --bundle --outfile=js/bundle.js --format=iife --minify",
+    "serve": "node tools/preview.js"
+  }
+}

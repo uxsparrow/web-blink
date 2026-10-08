@@ -4686,8 +4686,8 @@ body {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: clamp(8px, 1.6vw, 20px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1.6vw, 24px);
   transition: opacity 0.4s;
 }
 
@@ -4696,9 +4696,8 @@ body {
 }
 
 /*
- * Each metric in its own cell with a 120px floor and a figure that cannot
- * wrap — the previous build let three numbers share a flex row and they
- * collided at exactly the sizes a case-study card is read at.
+ * Each metric in its own cell with proportional font scaling so numbers and
+ * multi-word labels never overflow or collide across languages.
  */
 .metric {
   min-width: 0;
@@ -4708,9 +4707,9 @@ body {
   display: block;
   font-family: var(--font-tomorrow), "Arial Narrow", sans-serif;
   font-weight: 700;
-  font-size: clamp(26px, min(5.4svh, 5.4vw), 64px);
+  font-size: clamp(20px, min(4.2svh, 3.2vw), 44px);
   line-height: 0.88;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -4719,6 +4718,9 @@ body {
   display: block;
   margin-top: clamp(4px, 0.9svh, 10px);
   color: var(--txt-3);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
 }
 
 /* the device frame + its floating chips */
@@ -6068,6 +6070,31 @@ button:disabled,
   overflow: visible;
 }
 
+@media (min-width: 768px) {
+  #flow .ed__shell {
+    gap: clamp(12px, 2.2svh, 36px);
+  }
+
+  .flow {
+    flex: 0 1 auto;
+    gap: clamp(8px, 1.5svh, 18px);
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  .flow__stage {
+    flex: 0 1 auto;
+    width: 100%;
+    aspect-ratio: 1200 / 336;
+    max-height: min(420px, 50svh);
+  }
+
+  .flow__read {
+    min-height: auto;
+  }
+}
+
 /* one diagram or the other, never both — an SVG cannot reflow, so the
    vertical version is a second viewBox rather than a CSS rearrangement */
 .flow__svg--v {
@@ -7133,7 +7160,16 @@ button:disabled,
 
   .metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .metric b {
+    font-size: clamp(20px, 5.8vw, 32px);
+  }
+
+  .metric span {
+    font-size: 10px;
+    letter-spacing: 0.05em;
   }
 
   /* the footer has a 100svh budget and four columns, a newsletter, socials,

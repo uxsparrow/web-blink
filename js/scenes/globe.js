@@ -152,9 +152,9 @@ function buildPings(tagEls, labelHost) {
     const line =
       span > 0.08
         ? new THREE.Line(
-            new THREE.BufferGeometry().setFromPoints(curve.getPoints(ARC_SEGMENTS)),
-            new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: 0 })
-          )
+          new THREE.BufferGeometry().setFromPoints(curve.getPoints(ARC_SEGMENTS)),
+          new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: 0 })
+        )
         : null
     if (line) group.add(line)
 
@@ -240,7 +240,7 @@ export function mountGlobe(canvas, { tagEls = [], dense = true } = {}) {
   camera.position.set(0, 0, 4.55)
 
   const rig = new THREE.Group()
-  // open on the Indian subcontinent, where the bureaus are
+  // open on the Indian subcontinent from the left, rotating across
   rig.rotation.set(0.28, yawFor(START_LON), 0.12)
   scene.add(rig)
 
@@ -281,7 +281,7 @@ export function mountGlobe(canvas, { tagEls = [], dense = true } = {}) {
   const frame = () => {
     const dt = clock.getDelta()
     const t = clock.elapsedTime
-    rig.rotation.y += dt * 0.055
+    rig.rotation.y += dt * 0.035
 
     const size = renderer.getSize(viewport)
 

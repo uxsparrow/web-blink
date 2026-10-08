@@ -59,8 +59,8 @@ export const pings = [
   { city: 'SAO PAULO', lat: -23.5505, lon: -46.6333 },
 ]
 
-/** Longitude parked in front of the camera when the globe first appears. */
-export const START_LON = 78
+/** Longitude parked in front of the camera when the globe first appears (120 places India ~78°E on the left). */
+export const START_LON = 120
 
 
 /**

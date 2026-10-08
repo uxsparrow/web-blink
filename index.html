@@ -39,6 +39,11 @@
     `.boot-failed` is set by the classic script at the end of <body>.
   -->
   <style>
+    .js [data-in],
+    .js [data-hero-in] {
+      opacity: 0;
+    }
+
     .boot-failed [data-in],
     .boot-failed [data-hero-in],
     .boot-failed .line-inner {
@@ -383,34 +388,36 @@
 
         <div class="shell position-relative z-3 d-flex h-100 flex-column justify-content-center" data-hero-copy>
           <div class="hero-copy">
-            <div class="mb-5 d-flex align-items-center gap-4" data-hero-in style="--i:0">
+            <div class="mb-5 d-flex align-items-center gap-4" data-in style="--i:0">
               <span class="colour-bar" style="width:44px;height:4px"><i></i><i></i><i></i><i></i></span>
               <span class="mono" style="color:rgba(255,255,255,.62)">ONE PLATFORM</span>
             </div>
 
-            <h1 class="display hero-head head-lilac">
-              <span class="line-mask"><span class="line-inner">THE ENGINE BEHIND</span></span>
-              <span class="line-mask"><span class="line-inner">MODERN NEWSROOMS</span></span>
+            <h1 class="display hero-head head-lilac" data-in style="--i:1">
+              <span class="d-block">THE ENGINE BEHIND</span>
+              <span class="d-block">MODERN NEWSROOMS</span>
             </h1>
 
-            <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66); --i:2" data-hero-in>
+            <p class="body-copy hero-sub mt-7" style="color:rgba(255,255,255,.66); --i:2" data-in>
               Monitor, gather, create, publish, monetize and analyze, all in one newsroom platform.
             </p>
 
-            <div class="mt-9 d-flex flex-wrap align-items-center gap-3" data-hero-in style="--i:3">
+            <div class="mt-9 d-flex flex-wrap align-items-center gap-3" data-in style="--i:3">
               <a href="#cta" class="pill pill-white">Book a demo</a>
               <button class="pill pill-outline-inv" data-open-video><span class="play-tri"></span>Watch video</button>
             </div>
 
-            <div class="mono-xs mt-10" style="color:rgba(255,255,255,.3); --i:4" data-hero-in>NOIDA, 26 SEP 2026 —
+            <div class="mono-xs mt-10" style="color:rgba(255,255,255,.3); --i:4" data-in>NOIDA, 26 SEP 2026 —
               14:32 IST</div>
           </div>
         </div>
 
         <div class="mono-xs scroll-cue position-absolute bottom-6 start-50 z-3 translate-middle-x text-center"
           style="color:rgba(255,255,255,.35)">
-          <div class="scroll-cue__word">SCROLL</div>
-          <div class="scroll-cue__line"></div>
+          <div data-in style="--i:5">
+            <div class="scroll-cue__word">SCROLL</div>
+            <div class="scroll-cue__line"></div>
+          </div>
         </div>
 
       </div>
@@ -478,7 +485,7 @@
           </div>
 
           <div class="ed__gfx ed__gfx--bleed ed__fade">
-            <div class="net" data-net data-in style="--i:1">
+            <div class="net" data-net data-in style="--i:2">
               <canvas data-net-canvas></canvas>
               <div class="net__tags" data-net-tags aria-hidden="true"></div>
             </div>
@@ -534,7 +541,7 @@
           </div>
 
           <div class="ed__gfx ed__gfx--top">
-            <div class="glass monitor" id="monitor" role="tabpanel" data-monitor data-in style="--i:1">
+            <div class="glass monitor" id="monitor" role="tabpanel" data-monitor data-in style="--i:2">
               <div class="monitor__bar">
                 <span class="meta" style="color:var(--txt)"><span class="sig" style="margin-right:.6em"></span>RESULTS
                   NIGHT · LIVE</span>
@@ -1083,7 +1090,7 @@
               label floating on top of it, where it sat across the trace and
               against the card's edge.
             -->
-            <div class="glass live" data-live data-in style="--i:1">
+            <div class="glass live" data-live data-in style="--i:2">
               <div class="live__top">
                 <span class="meta live__flag"><span class="sig"></span>LIVE</span>
                 <span class="meta">NOIDA · 14:32 IST</span>
@@ -1181,7 +1188,7 @@
             line and the card can be read from any point in it.
           -->
           <div class="ed__gfx">
-            <div class="glass vs2" id="vs-table" role="tabpanel" data-in style="--i:1">
+            <div class="glass vs2" id="vs-table" role="tabpanel" data-in style="--i:2">
               <div class="vs2__top">
                 <span class="display vs2__cat" data-vs-cat>Newsroom</span>
                 <span class="vs2__keys">
@@ -1256,7 +1263,7 @@
           </div>
 
           <div class="ed__gfx">
-            <div class="shot" data-shot data-in style="--i:1">
+            <div class="shot" data-shot data-in style="--i:2">
               <div class="shot__frame duo">
                 <span class="pxm" data-pxm>
                   <img data-beat-shot data-img="beats_thanthi" alt="" loading="lazy">
@@ -1329,7 +1336,7 @@
             `initMediaParallax()` runs.
           -->
           <div class="ed__gfx">
-            <div class="deck" data-deck data-in style="--i:1">
+            <div class="deck" data-deck data-in style="--i:2">
               <div class="deck__card deck__card--front duo" style="--k:0;--t:0">
                 <span class="pxm deck__media" data-pxm>
                   <img data-quote-shot data-img="letters_1" alt="" loading="lazy">
@@ -1547,7 +1554,7 @@
           </div>
 
           <div class="ed__gfx ed__gfx--top">
-            <div class="glass chat" id="chat" role="tabpanel" aria-live="polite" data-chat data-in style="--i:1">
+            <div class="glass chat" id="chat" role="tabpanel" aria-live="polite" data-chat data-in style="--i:2">
               <div class="chat__head">
                 <span class="chat__avatar">BD</span>
                 <span class="meta">THE BLINK DESK · USUALLY REPLIES IN MINUTES</span>

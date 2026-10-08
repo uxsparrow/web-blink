@@ -13,6 +13,7 @@
 import { gsap, hasGsap, onInView, onScroll, reducedMotion, clamp } from '../lib/motion.js'
 import { imageSrc, imageSize, logos, posterSrc, videoSrc } from '../../assets/media.js'
 
+const q = (sel, root = document) => root.querySelector(sel)
 const qq = (sel, root = document) => [...root.querySelectorAll(sel)]
 
 /* ── the one entry reveal ─────────────────────────────────────── */
@@ -73,66 +74,66 @@ function expandStagger() {
 export function initReveals() {
   expandStagger()
 
-  const blocks = qq('#hero, .ed, .ed-footer')
-  if (!blocks.length) return
+  const hero = q('#hero')
+  const sections = qq('.ed, .ed-footer')
+  const allBlocks = hero ? [hero, ...sections] : sections
+  if (!allBlocks.length) return
 
   if (typeof IntersectionObserver === 'undefined') {
-    blocks.forEach((b) => b.classList.add('is-in'))
+    allBlocks.forEach((b) => b.classList.add('is-in'))
     return
   }
 
-  /*
-   * THE SAFETY NET, and it is not optional.
-   *
-   * Every revealed element on this page starts at `opacity: 0` and waits for
-   * `.is-in`. If the observer never runs, the page is blank — not degraded,
-   * blank. And there is a real case where it never runs: a document that
-   * loads HIDDEN. A background tab, a minimised window, a preview pane that
-   * is not on screen — Chrome does not deliver IntersectionObserver callbacks
-   * for a hidden document at all. (This was found exactly that way: the whole
-   * page measured as unrevealed, and a plain observer on a full-viewport
-   * element reported nothing, because `document.visibilityState` was
-   * `hidden`.)
-   *
-   * So: reveal anything already in the viewport whenever the page becomes
-   * visible, and once more on a timer regardless. The observer still does the
-   * normal work; this only catches the case where it cannot.
-   */
-  const reveal = (el) => {
-    el.classList.add('is-in')
-    io.unobserve(el)
-  }
+  const io = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in')
+        } else {
+          // When section scrolls fully out of view, reset so re-entering replays the entrance animation
+          e.target.classList.remove('is-in')
+        }
+      }),
+    { threshold: 0, rootMargin: '0px 0px -12% 0px' }
+  )
+  allBlocks.forEach((b) => io.observe(b))
 
+  /* Safety sweep: ensure any section currently in the viewport has .is-in */
   const sweep = () => {
-    blocks.forEach((b) => {
-      if (b.classList.contains('is-in')) return
+    const vh = window.innerHeight
+    allBlocks.forEach((b) => {
       const r = b.getBoundingClientRect()
-      if (r.top < window.innerHeight * 0.92 && r.bottom > 0) reveal(b)
+      if (r.top < vh * 0.88 && r.bottom > 0) {
+        b.classList.add('is-in')
+      } else if (r.bottom <= 0 || r.top >= vh) {
+        b.classList.remove('is-in')
+      }
     })
   }
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') sweep()
   })
-  setTimeout(sweep, 2500)
 
-  const io = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return
-        reveal(e.target)
-      }),
-    /*
-     * threshold 0 with a negative bottom margin, not a percentage of the
-     * section. A section is a whole window tall, so a percentage threshold
-     * can be jumped clean over by a fast scroll or an in-page link — and a
-     * section that never gets `.is-in` stays at opacity 0 forever. This fires
-     * the moment any part of it crosses 92% of the viewport, which nothing
-     * short of a page reload can skip.
-     */
-    { threshold: 0, rootMargin: '0px 0px -8% 0px' }
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (window.scrollY === 0 && hero) {
+        hero.classList.add('is-in')
+      }
+    },
+    { passive: true }
   )
-  blocks.forEach((b) => io.observe(b))
+
+  // Hero load reveal:
+  if (hero) {
+    requestAnimationFrame(() => {
+      const r = hero.getBoundingClientRect()
+      if (r.top < window.innerHeight * 0.90 && r.bottom > 0) {
+        hero.classList.add('is-in')
+      }
+    })
+  }
 }
 
 /* ── the ambient glow ─────────────────────────────────────────── */
@@ -385,27 +386,7 @@ export function initBackVideos() {
  * anything to put back.
  */
 export function initHeroIntro() {
-  const root = document.documentElement
-  const head = document.querySelector('.hero-head')
-  if (!head) return
-
-  const settle = () => root.classList.add('hero-done')
-
-  // two frames, so the start value is painted before the end value is set
-  requestAnimationFrame(() =>
-    requestAnimationFrame(() => {
-      root.classList.add('is-loaded')
-      const lines = qq('.line-inner', head)
-      if (!lines.length || reducedMotion()) {
-        settle()
-        return
-      }
-      // whichever comes first: the transition ending, or a timeout well past
-      // its 1.05s + 0.085s stagger, so a dropped event cannot strand it
-      lines[lines.length - 1].addEventListener('transitionend', settle, { once: true })
-      setTimeout(settle, 1800)
-    })
-  )
+  document.documentElement.classList.add('is-loaded')
 }
 
 /* ── media ────────────────────────────────────────────────────── */

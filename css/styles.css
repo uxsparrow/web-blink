@@ -5122,15 +5122,35 @@ body {
 .ticker-back {
   position: absolute;
   left: 0;
-  right: 0;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(calc(-50% + var(--py, 0px)));
+  display: flex;
+  width: max-content;
+  user-select: none;
+  pointer-events: none;
   opacity: 0.05;
   font-size: min(14svh, 11vw);
   line-height: 1;
   white-space: nowrap;
   font-family: var(--font-tomorrow), sans-serif;
   text-transform: uppercase;
+  will-change: transform;
+}
+
+.ticker-back__item {
+  display: inline-block;
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: ticker-loop 80s linear infinite;
+}
+
+@keyframes ticker-loop {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
 }
 
 /* ══ 11 · QUESTIONS ═══════════════════════════════════════════ */
@@ -7330,7 +7350,8 @@ button:disabled,
   .deck__media,
   .wordmark,
   .rate--best,
-  .chat__dots i {
+  .chat__dots i,
+  .ticker-back__item {
     animation: none !important;
   }
 

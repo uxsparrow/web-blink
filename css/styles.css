@@ -4901,7 +4901,64 @@ body {
   z-index: calc(10 - var(--k));
   transform: translateX(calc(var(--t) * 24%)) scale(calc(1 - var(--t) * 0.18)) rotate(calc(var(--t) * 10deg));
   opacity: calc(1 - var(--k) * 0.28);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.deck__card.is-animating-next {
+  animation: deck-card-exit-next 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  pointer-events: none;
+}
+
+.deck__card.is-animating-prev {
+  animation: deck-card-enter-prev 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes deck-card-exit-next {
+  0% {
+    transform: translateX(0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 25;
+  }
+  35% {
+    transform: translateX(-68%) translateY(-2%) scale(0.96) rotate(-8deg);
+    opacity: 0.85;
+    z-index: 25;
+  }
+  40% {
+    transform: translateX(-72%) translateY(-2%) scale(0.92) rotate(-9deg);
+    opacity: 0.65;
+    z-index: 4;
+  }
+  100% {
+    transform: translateX(calc(var(--t) * 24%)) scale(calc(1 - var(--t) * 0.18)) rotate(calc(var(--t) * 10deg));
+    opacity: calc(1 - var(--k) * 0.28);
+    z-index: calc(10 - var(--k));
+  }
+}
+
+@keyframes deck-card-enter-prev {
+  0% {
+    transform: translateX(calc(var(--t-prev, 1) * 24%)) scale(calc(1 - var(--t-prev, 1) * 0.18)) rotate(calc(var(--t-prev, 1) * 10deg));
+    opacity: calc(1 - var(--k-prev, 3) * 0.28);
+    z-index: 4;
+  }
+  35% {
+    transform: translateX(-72%) translateY(-2%) scale(0.92) rotate(-9deg);
+    opacity: 0.7;
+    z-index: 4;
+  }
+  40% {
+    transform: translateX(-68%) translateY(-2%) scale(0.96) rotate(-8deg);
+    opacity: 0.85;
+    z-index: 25;
+  }
+  100% {
+    transform: translateX(0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 10;
+  }
 }
 
 .deck__card img {
@@ -7119,8 +7176,13 @@ button:disabled,
 
   /* only the front card below lg — the deck behind it is a desktop device,
      and at this width it just pushes the portrait off-centre */
-  .deck__card:not(.deck__card--front) {
+  .deck__card:not(.deck__card--front):not(.is-animating-next):not(.is-animating-prev) {
     display: none;
+  }
+
+  .deck__card.is-animating-next,
+  .deck__card.is-animating-prev {
+    position: absolute;
   }
 
   /*
@@ -7351,7 +7413,9 @@ button:disabled,
   .wordmark,
   .rate--best,
   .chat__dots i,
-  .ticker-back__item {
+  .ticker-back__item,
+  .deck__card.is-animating-next,
+  .deck__card.is-animating-prev {
     animation: none !important;
   }
 

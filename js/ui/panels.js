@@ -304,65 +304,119 @@ export function initQuotes(letters) {
   const count = root.querySelector('[data-quote-count]')
   const prev = root.querySelector('[data-quote-prev]')
   const next = root.querySelector('[data-quote-next]')
-  const shot = document.querySelector('[data-quote-shot]')
   const deck = document.querySelector('[data-deck]')
   const front = deck?.querySelector('.deck__card')
-  if (!panel) return
+  if (!panel || !deck || !front) return
 
   const total = String(letters.length).padStart(2, '0')
   let i = 0
+  const span = Math.max(1, letters.length - 1)
+  const cards = [front]
 
   /*
-   * One card behind the front one per remaining letter, so a deck of three
-   * letters is three cards deep and a deck of four is four. `--k` is the
-   * card's depth and the stylesheet derives the offset, scale, tilt and
-   * opacity from it, which is why adding a fifth letter needs no CSS.
+   * One card in the deck per letter, built once and held in place.
+   * On prev/next, cards shuffle depth and animate according to action
+   * direction rather than having their images rewritten in place.
    */
-  const backs = []
-  // `--t` is the depth normalised across however many cards there are, so the
-  // deck leans the same distance whether it is two deep or five
-  const span = Math.max(1, letters.length - 1)
-  if (deck && front) {
-    for (let k = letters.length - 1; k >= 1; k--) {
-      const card = document.createElement('div')
-      card.className = 'deck__card duo'
-      card.style.setProperty('--k', String(k))
-      card.style.setProperty('--t', (k / span).toFixed(4))
-      const img = document.createElement('img')
-      img.alt = ''
-      img.loading = 'lazy'
-      card.append(img)
-      deck.insertBefore(card, front)
-      backs[k - 1] = img
-    }
+  for (let idx = 1; idx < letters.length; idx++) {
+    const card = document.createElement('div')
+    card.className = 'deck__card duo'
+    const spanMedia = document.createElement('span')
+    spanMedia.className = 'pxm deck__media'
+    spanMedia.setAttribute('data-pxm', '')
+    const img = document.createElement('img')
+    img.alt = ''
+    img.loading = 'lazy'
+    const L = letters[idx]
+    if (L?.shot) setImage(img, mediaSrc(L.shot))
+    spanMedia.append(img)
+    card.append(spanMedia)
+    deck.append(card)
+    cards.push(card)
   }
 
-  /** The cards behind show whichever letters come next, in order. */
-  const paintDeck = () => {
-    backs.forEach((img, k) => {
-      const L = letters[(i + k + 1) % letters.length]
-      if (L?.shot) setImage(img, mediaSrc(L.shot))
+  // Apply stack depths (--k, --t, z-index, and front card class)
+  const applyStackPositions = (activeIdx) => {
+    cards.forEach((card, idx) => {
+      const k = (idx - activeIdx + letters.length) % letters.length
+      const t = (k / span).toFixed(4)
+      card.style.setProperty('--k', String(k))
+      card.style.setProperty('--t', t)
+      card.style.zIndex = String(10 - k)
+      card.classList.toggle('deck__card--front', k === 0)
     })
   }
 
-  // an empty field is hidden rather than left as a gap in the byline — not
-  // every published case study names a person
+  let animTimer = 0
+  const animateStack = (prevIdx, nextIdx, step) => {
+    clearTimeout(animTimer)
+    cards.forEach((card) => {
+      card.classList.remove('is-animating-next', 'is-animating-prev')
+    })
+
+    if (reducedMotion()) {
+      applyStackPositions(nextIdx)
+      return
+    }
+
+    const outgoing = cards[prevIdx]
+    const incoming = cards[nextIdx]
+
+    if (step > 0) {
+      // NEXT: outgoing card peels out to left, dips behind deck to the deepest slot
+      outgoing.style.setProperty('--k', String(span))
+      outgoing.style.setProperty('--t', '1.0000')
+      outgoing.classList.remove('deck__card--front')
+      outgoing.classList.add('is-animating-next')
+
+      // Other cards smoothly advance forward in the stack
+      cards.forEach((card, idx) => {
+        if (idx === prevIdx) return
+        const k = (idx - nextIdx + letters.length) % letters.length
+        const t = (k / span).toFixed(4)
+        card.style.setProperty('--k', String(k))
+        card.style.setProperty('--t', t)
+        card.style.zIndex = String(10 - k)
+        card.classList.toggle('deck__card--front', k === 0)
+      })
+    } else {
+      // PREV: incoming card sweeps out from the back, rises to top, and snaps onto front
+      incoming.style.setProperty('--k-prev', String(span))
+      incoming.style.setProperty('--t-prev', '1.0000')
+      incoming.style.setProperty('--k', '0')
+      incoming.style.setProperty('--t', '0.0000')
+      incoming.classList.add('deck__card--front')
+      incoming.classList.add('is-animating-prev')
+
+      // Other cards smoothly retreat backward in the stack
+      cards.forEach((card, idx) => {
+        if (idx === nextIdx) return
+        const k = (idx - nextIdx + letters.length) % letters.length
+        const t = (k / span).toFixed(4)
+        card.style.setProperty('--k', String(k))
+        card.style.setProperty('--t', t)
+        card.style.zIndex = String(10 - k)
+        card.classList.remove('deck__card--front')
+      })
+    }
+
+    animTimer = setTimeout(() => {
+      outgoing.classList.remove('is-animating-next')
+      incoming.classList.remove('is-animating-prev')
+      applyStackPositions(nextIdx)
+    }, 550)
+  }
+
+  // an empty field is hidden rather than left as a gap in the byline
   const put = (el, value) => {
     if (!el) return
     el.textContent = value || ''
     el.hidden = !value
   }
 
-  /*
-   * A published quote runs two and a half times longer than a one-line one,
-   * and at the same type size that is the difference between a four-line
-   * panel and a twelve-line one — the column lurched every time an arrow was
-   * pressed. Past 180 characters the quote steps down a size, which is what a
-   * letters page does with a long letter anyway.
-   */
   const LONG = 180
 
-  const render = () => {
+  const renderText = () => {
     const L = letters[i]
     panel.classList.toggle('quote--long', (L.text || '').length > LONG)
     if (text) text.textContent = L.text
@@ -370,25 +424,21 @@ export function initQuotes(letters) {
     put(role, L.role)
     put(org, L.org)
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`
-    if (shot && L.shot) setImage(shot, mediaSrc(L.shot))
-    paintDeck()
   }
 
   const go = (step) => {
+    const prevIdx = i
     i = (i + step + letters.length) % letters.length
-    swap(panel, render)
+    const nextIdx = i
+    swap(panel, renderText)
+    animateStack(prevIdx, nextIdx, step)
   }
 
   prev?.addEventListener('click', () => go(-1))
   next?.addEventListener('click', () => go(1))
 
-  /*
-   * Rendered once on load rather than left to the markup. The first letter is
-   * written into index.html so the section reads with no scripts, but the
-   * total beside it cannot be — it said `01 / 02` while there were four
-   * letters to page through, because only an arrow press ever rewrote it.
-   */
-  render()
+  applyStackPositions(0)
+  renderText()
 }
 
 /* ── 11 · the chat ────────────────────────────────────────────── */

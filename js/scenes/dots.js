@@ -57,7 +57,7 @@ export function fitCanvas(canvas, onResize) {
 export function loop(el, draw) {
   if (reducedMotion()) {
     requestAnimationFrame(() => draw(0))
-    return { stop() {} }
+    return { stop() { } }
   }
 
   let live = false
@@ -125,7 +125,7 @@ export function mountIsoGrid(canvas) {
  */
 export function mountWave(canvas) {
   const c = fitCanvas(canvas)
-  const colour = token('--dot', 'rgba(185,166,255,.45)')
+  const colour = token('--lilac', 'rgba(185,166,255,0.25)')
 
   return loop(canvas, (t) => {
     const { ctx, w, h } = c
@@ -133,14 +133,16 @@ export function mountWave(canvas) {
     ctx.clearRect(0, 0, w, h)
     ctx.fillStyle = colour
 
-    const gap = 26
+    const gap = 24
     for (let x = gap / 2; x < w; x += gap) {
       for (let y = gap / 2; y < h; y += gap) {
-        const d = Math.sin(x / 150 + t * 0.6) * Math.cos(y / 190 - t * 0.35)
-        const a = 0.06 + 0.16 * (d * 0.5 + 0.5)
+        const d = Math.sin(x / 140 + t * 0.7) * Math.cos(y / 170 - t * 0.4)
+        const norm = d * 0.5 + 0.5
+        const a = 0.10 + 0.45 * Math.pow(norm, 1.3)
+        const r = 1.3 + 1.2 * norm
         ctx.globalAlpha = a
         ctx.beginPath()
-        ctx.arc(x, y + d * 6, 1.6, 0, Math.PI * 2)
+        ctx.arc(x, y + d * 18, r, 0, Math.PI * 2)
         ctx.fill()
       }
     }
